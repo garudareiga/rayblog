@@ -10,15 +10,20 @@ import sys
 sys.path.append(os.curdir)
 from pelicanconf import *
 
-SITEURL = 'http://www.raydevblog.us'
-RELATIVE_URLS = False
+#SITEURL = '.'
+SITEURL = 'http://garudareiga.github.io/rayblog'
+#SITEURL = 'http://www.raydevblog.us'
+#RELATIVE_URLS = False
+RELATIVE_URLS = True 
 
 FEED_ALL_ATOM = 'feeds/all.atom.xml'
 CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
 
 DELETE_OUTPUT_DIRECTORY = True
 
+FILES_TO_COPY = (('extra/CNAME', 'CNAME'),)
+
 # Following items are often useful when publishing
 
-#DISQUS_SITENAME = ""
+DISQUS_SITENAME = "garudareiga"
 #GOOGLE_ANALYTICS = ""

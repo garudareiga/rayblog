@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
+
 AUTHOR = u'Ray Chen'
 SITENAME = u"Ray's Blog"
 SITEURL = ''
 
-TIMEZONE = 'Europe/Paris'
+TIMEZONE = 'US/Pacific'
 
 DEFAULT_LANG = u'en'
 
@@ -22,10 +23,27 @@ LINKS =  (('Pelican', 'http://getpelican.com/'),
           ('You can modify those links in your config file', '#'),)
 
 # Social widget
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
+SOCIAL = (('twitter', 'https://twitter.com/garudareiga'),
+          ('github', 'https://github.com/garudareiga'),)
 
 DEFAULT_PAGINATION = 5
 
+#ARTICLE_SAVE_AS='posts/{date:%Y}/{slug}.html'
+#ARTICLE_URL='posts/{date:%Y}/{slug}.html'
+#YEAR_ARCHIVE_SAVE_AS='posts/{date:%Y}/index.html'
+
 # Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+RELATIVE_URLS = True
+#THEME = 'theme/bootlex'
+#THEME='../pelican-themes/pelican-bootstrap3'
+THEME='theme/pelican-bootstrap3'
+PLUGIN_PATH='../pelican-plugins'
+#PLUGINS=['sitemap']
+#PLUGINS=['sitemap', 'latex']
+
+#SITEMAP = {
+#    'format': 'xml',
+#    'changefreqs': {
+#            'pages': 'weekly',
+#    }
+#}
