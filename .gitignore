@@ -3,4 +3,5 @@
 *.swp
 
 output/
-theme/
+pelican-themes/
+pelican-plugins/

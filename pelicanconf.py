@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Ray Chen'
 SITENAME = u"Ray's Blog"
-SITEURL = ''
+SITEURL = 'http://www.raydevblog.us'
 
 TIMEZONE = 'US/Pacific'
 
@@ -33,11 +33,11 @@ DEFAULT_PAGINATION = 5
 #YEAR_ARCHIVE_SAVE_AS='posts/{date:%Y}/index.html'
 
 # Uncomment following line if you want document-relative URLs when developing
-RELATIVE_URLS = True
+#RELATIVE_URLS = True
 #THEME = 'theme/bootlex'
 #THEME='../pelican-themes/pelican-bootstrap3'
-THEME='theme/pelican-bootstrap3'
-PLUGIN_PATH='../pelican-plugins'
+THEME='pelican-themes/pelican-bootstrap3'
+PLUGIN_PATH='pelican-plugins'
 #PLUGINS=['sitemap']
 #PLUGINS=['sitemap', 'latex']
 

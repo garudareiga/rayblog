@@ -11,10 +11,9 @@ sys.path.append(os.curdir)
 from pelicanconf import *
 
 #SITEURL = '.'
-SITEURL = 'http://garudareiga.github.io/rayblog'
-#SITEURL = 'http://www.raydevblog.us'
+SITEURL = 'http://www.raydevblog.us'
 #RELATIVE_URLS = False
-RELATIVE_URLS = True 
+#RELATIVE_URLS = True 
 
 FEED_ALL_ATOM = 'feeds/all.atom.xml'
 CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
