@@ -26,31 +26,9 @@
     <script src="http://code.jquery.com/jquery.js"></script>
 
         <link href="http://www.raydevblog.us/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
-              title="Ray's Thoughts and Writings ATOM Feed"/>
+              title="Ray's Blog ATOM Feed"/>
 
     <!-- Latex -->
-        
-    <script type= "text/javascript">
-        var s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.src = 'https:' == document.location.protocol ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js' : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'; 
-        s[(window.opera ? "innerHTML" : "text")] =
-            "MathJax.Hub.Config({" + 
-            "    config: ['MMLorHTML.js']," + 
-            "    jax: ['input/TeX','input/MathML','output/HTML-CSS','output/NativeMML']," +
-            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," + 
-            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-            "    tex2jax: { " +
-            "        inlineMath: [ ['$','$'] ], " +
-            "        displayMath: [ ['$$','$$'] ]," +
-            "        processEscapes: true }, " +
-            "    'HTML-CSS': { " +
-            "        styles: { '.MathJax .mo, .MathJax .mi': {color: 'black ! important'}} " +
-            "    } " +
-            "}); ";
-        (document.body || document.getElementsByTagName('head')[0]).appendChild(s);
-    </script>
-
   
 
 </head>
@@ -64,13 +42,10 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href="http://www.raydevblog.us" class="navbar-brand">Ray's Thoughts and Writings</a>
+            <a href="http://www.raydevblog.us" class="navbar-brand">Ray's Blog</a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                        <li >
-                            <a href="http://www.raydevblog.us/category/data-science.html">Data Science</a>
-                        </li>
                         <li class="active">
                             <a href="http://www.raydevblog.us/category/python.html">Python</a>
                         </li>
@@ -118,11 +93,10 @@
 only provide one such variable after the ordinary positional parameters in
 the function definition. For example, <em>printall</em> takes any number of arguments
 and print them:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">print_all</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">print</span> <span class="n">args</span>
-        <span class="n">print_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span>
-
-<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">def</span> <span class="n">print_all</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">print</span> <span class="n">args</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">print_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="err">&#39;</span><span class="n">foo</span><span class="err">&#39;</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="err">&#39;</span><span class="n">foo</span><span class="err">&#39;</span><span class="p">)</span>
 </pre></div>
 
 
@@ -137,28 +111,28 @@ For example, <em>divmond</em> takes exactly two argument:</p>
 
 <p>The <em>chain</em> function from the <em>itertools</em> module provides an example for gather
 and scatter:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">itertools</span>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">import</span> <span class="n">itertools</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">myList</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">myList</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">list</span><span class="p">(</span><span class="n">iterools</span><span class="p">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">myList</span><span class="p">))</span>
 <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
 </pre></div>
 
 
 <h2>Using ** operator for keyword arguments</h2>
 <p>A parameter name that begins with ** gathers arguments into a dictionary: </p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">print_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">print</span> <span class="n">kwargs</span>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">def</span> <span class="n">print_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">print</span> <span class="n">kwargs</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">print_kwargs</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+<span class="p">{</span><span class="sc">&#39;a&#39;</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="sc">&#39;c&#39;</span><span class="o">:</span> <span class="mi">3</span><span class="p">,</span> <span class="sc">&#39;b&#39;</span><span class="o">:</span> <span class="mi">2</span><span class="p">}</span>
 </pre></div>
 
 
 <p>You can also use ** operator as a scatter when calling a function:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">print_args</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
-        <span class="k">print</span> <span class="s">&quot;arg1:&quot;</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="s">&quot;arg2:&quot;</span><span class="p">,</span> <span class="n">arg2</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;arg1&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;arg2&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">def</span> <span class="n">print_args</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
+        <span class="n">print</span> <span class="s">&quot;arg1:&quot;</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="s">&quot;arg2:&quot;</span><span class="p">,</span> <span class="n">arg2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="err">&#39;</span><span class="n">arg1</span><span class="err">&#39;</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span> <span class="err">&#39;</span><span class="n">arg2</span><span class="err">&#39;</span><span class="o">:</span> <span class="mi">1</span><span class="p">}</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">print_args</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="n">arg1</span><span class="p">:</span> <span class="mi">2</span> <span class="n">arg2</span><span class="p">:</span> <span class="mi">1</span>
+<span class="nl">arg1:</span> <span class="mi">2</span> <span class="n">arg2</span><span class="o">:</span> <span class="mi">1</span>
 </pre></div>
             </div>
             <!-- /.entry-content -->
@@ -206,18 +180,8 @@ and scatter:</p>
 
             <li class="list-group-item"><a href="http://www.raydevblog.us/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                        machine learning
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/python.html">
                         python
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/data-mining.html">
-                        data mining
                     </a>
                 </li>
         </ul>
