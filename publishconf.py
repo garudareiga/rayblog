@@ -20,7 +20,9 @@ CATEGORY_FEED_ATOM = 'feeds/%s.atom.xml'
 
 DELETE_OUTPUT_DIRECTORY = True
 
-FILES_TO_COPY = (('extra/CNAME', 'CNAME'),)
+#FILES_TO_COPY = (('extra/CNAME', 'CNAME'),)
+STATIC_PATHS = ['images', 'extra/CNAME']
+EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'}, }
 
 # Following items are often useful when publishing
 

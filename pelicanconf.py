@@ -38,9 +38,9 @@ THEME='pelican-themes/pelican-bootstrap3'
 PLUGIN_PATH='pelican-plugins'
 PLUGINS=['sitemap', 'latex']
 
-#SITEMAP = {
-#    'format': 'xml',
+SITEMAP = {
+    'format': 'xml',
 #    'changefreqs': {
 #            'pages': 'weekly',
 #    }
-#}
+}
