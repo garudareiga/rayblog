@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 AUTHOR = u'Ray Chen'
 SITENAME = u"Ray's Thoughts and Writings"
-SITEURL = 'http://www.raydevblog.us'
+#SITEURL = 'http://www.raydevblog.us'
 
 TIMEZONE = 'US/Pacific'
 
@@ -23,14 +23,12 @@ LINKS =  (('Pelican', 'http://getpelican.com/'),
           ('You can modify those links in your config file', '#'),)
 
 # Social widget
-SOCIAL = (('twitter', 'https://twitter.com/garudareiga'),
+SOCIAL = (('linkedin', 'http://www.linkedin.com/in/leichen1983'),
+          ('twitter', 'https://twitter.com/garudareiga'),
           ('github', 'https://github.com/garudareiga'),)
 
 DEFAULT_PAGINATION = 5
 
-#ARTICLE_SAVE_AS='posts/{date:%Y}/{slug}.html'
-#ARTICLE_URL='posts/{date:%Y}/{slug}.html'
-#YEAR_ARCHIVE_SAVE_AS='posts/{date:%Y}/index.html'
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
