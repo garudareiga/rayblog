@@ -23,9 +23,13 @@ SOCIAL = SOCIAL + (('rss', SITEURL + '/' + FEED_ALL_ATOM),)
 DELETE_OUTPUT_DIRECTORY = True
 
 #FILES_TO_COPY = (('extra/CNAME', 'CNAME'),)
-STATIC_PATHS = ['images', 'extra/CNAME', 'extra/favicon.ico']
+STATIC_PATHS = ['images', 
+                'extra/CNAME', 
+                'extra/favicon.ico',
+                'extra/robots.txt',]
 EXTRA_PATH_METADATA = {'extra/CNAME': {'path': 'CNAME'}, 
                        'extra/favicon.ico': {'path': 'favicon.ico'},
+                       'extra/robots.txt': {'path': 'robots.txt'},
                        }
 
 ARTICLE_SAVE_AS='posts/{date:%Y}/{slug}.html'
