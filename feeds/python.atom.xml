@@ -1,5 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/python.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2013-09-08T13:00:00-07:00</updated><entry><title>Python Function Parameter Using * and ** Operators</title><link href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html" rel="alternate"></link><updated>2013-09-08T13:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</id><summary type="html">&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/python.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-01-14T22:38:00-08:00</updated><entry><title>Python Logging Tutorial</title><link href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html" rel="alternate"></link><updated>2014-01-14T22:38:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-01-14:posts/2014/python-logging-tutorial.html</id><summary type="html">&lt;p&gt;The Python &lt;a href="http://docs.python.org/2/library/logging.html"&gt;logging documentation&lt;/a&gt; is initially confusing to me, therefore I decide to write this tutorial as a quick reference.&lt;/p&gt;
+&lt;h2&gt;Root Logger&lt;/h2&gt;
+&lt;p&gt;We can use the default (&lt;em&gt;root&lt;/em&gt;) logger directly on module level. You can view and download the file 
+&lt;a href="https://gist.github.com/garudareiga/8451107"&gt;logger0.py&lt;/a&gt; from my Gist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logger0&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger0&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As we can see the message emitted by the root logger, the &lt;em&gt;debug&lt;/em&gt; and &lt;em&gt;info&lt;/em&gt; messages are ignored. 
+Besides, it prefixes all outputs by something like WARNING:root. It is because the root logger's
+severity level is set to &lt;em&gt;WARN&lt;/em&gt; by default, and it has its own formatter. Let's quickly confirm
+that and then change the level from &lt;em&gt;WARN&lt;/em&gt; to &lt;em&gt;DEBUG&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;level&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;WARN&lt;/span&gt;
+&lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;handlers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;formatter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_fmt&lt;/span&gt;
+&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(name)s&lt;/span&gt;&lt;span class="s"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger0&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Customized Logger&lt;/h2&gt;
+&lt;p&gt;Let me introduce four main objects in the Python standard logging module - &lt;strong&gt;Logger&lt;/strong&gt;, &lt;strong&gt;Handler&lt;/strong&gt;,
+&lt;strong&gt;Formatter&lt;/strong&gt; and &lt;strong&gt;LogRecord&lt;/strong&gt;, to understand how the logging process works.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Logger, Handler and LogRecord have a &lt;em&gt;severity&lt;/em&gt; level.&lt;/li&gt;
+&lt;li&gt;We can messages to a Logger using the Logger's log method. The log method needs two parameters -
+  a msg (message) and a severity level. Logger also has a few methods defined - &lt;em&gt;debug&lt;/em&gt;, &lt;em&gt;info&lt;/em&gt;, 
+  &lt;em&gt;warn&lt;/em&gt;, &lt;em&gt;error&lt;/em&gt;, and 'critical'. Each of them has a pre-defined severity level.&lt;/li&gt;
+&lt;li&gt;Logger looks at the message and ignores it if the message level is less severe than its own level.
+  If not, it creates a LogRecord object from the message string and pass to its Handlers. A Logger 
+  can have multiple custom Handlers such as StreamHandler, FileHandler, HTTPHandler etc.&lt;/li&gt;
+&lt;li&gt;Handler is responsible for emitting messages to a stream, file, socket etc. THe Handerl also has
+  its own level. After receiving the LogRecord, Handler ignores any LogRecord that has a less severe 
+  level, otherwise it passes the LogRecord to its Formatter.&lt;/li&gt;
+&lt;li&gt;Formatter formats the LogRecord message and then sends back to its Handler. A Handler is associated 
+  with exactly one Formatter.&lt;/li&gt;
+&lt;li&gt;Finally the Handler emits the formatted LogRecord message to our destination.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now, let's use our own logger instead of root. You can view and download the file 
+&lt;a href="https://gist.github.com/garudareiga/8446080"&gt;logger1.py&lt;/a&gt; from my Gist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logger1&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;logger1.log&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We ask logging for a reference using the &lt;strong&gt;getLogger&lt;/strong&gt; function. If the logger with that 
+name does not exist it is created, else a reference is returned.
+We add two handlers to the logger, one is a StreamHandler which by default prints to stderr,
+while the other is a FileHandler which writes to a file &lt;strong&gt;logger1.log&lt;/strong&gt;, and both of them 
+use a custom formatter. In the example above, we log all messages to a file and log messages
+with a severity level of INFO or higher to stderr.&lt;/p&gt;
+&lt;h3&gt;Log Hierarchy&lt;/h3&gt;
+&lt;p&gt;Loggers are arranged in a hierarchy based on their names as python module names. So we choose 
+to use the module name as the logger name, with '.' dots separating hierarchy levels. 
+The root logger is at the top of this hierarchy. The name of the root logger is an empty string.
+The hierarchy is created and managed automatically by the logging system. All message send to a
+logger is automatically sent to its parent. We can turn off this upward propagation by setting the
+attribute &lt;strong&gt;propagate&lt;/strong&gt; to false. Configuring the parent logger will cascade down to the other loggers.  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;appLogger&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;myapp&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;appLogger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All myapp.* loggers will have the level INFO as their default.&lt;/p&gt;
+&lt;h3&gt;Exception with Traceback&lt;/h3&gt;
+&lt;p&gt;In reality, it is helpful to record whith traceback when something goes wrong.
+By calling logger methods with &lt;em&gt;exc_info=True&lt;/em&gt; parameter, traceback is dumped
+to the logger.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;database&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;process&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;changed&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;execpt&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ne"&gt;KeyboardInterrupt&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ne"&gt;SystemExit&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;raise&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Failed to process record&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;exc_info&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Use RotatingFileHandler&lt;/h3&gt;
+&lt;p&gt;When we use FileHandler for writing the log, the size of log file grows quickly
+with time. We'd better use RotatingFileHandler instead of FileHandler in production 
+environment.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;handler_rotate_file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RoFileHandler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;.log&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;maxBytes&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;10485760&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;backupCount&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Use JSON Logging Configuration&lt;/h2&gt;
+&lt;p&gt;It is not flexible to configure out logging system in Python code. Instead, we can load the logging configuration from a JSON file. You can download the following three files &lt;a href="https://gist.github.com/garudareiga/8445508"&gt;logging.json&lt;/a&gt;, &lt;a href="https://gist.github.com/garudareiga/8445881"&gt;logger2.py&lt;/a&gt;, &lt;a href="https://gist.github.com/garudareiga/8445890"&gt;logger3.py&lt;/a&gt; from my Gist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging.config&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;json&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;logger2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;logger3&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;logging.son&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;r&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;config&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loads&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dictConfig&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;WARNING&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;ERROR&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;CRITICAL&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;logger3&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;WARNING&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Pay attention to the argument name "disable_existing_loggers". When we create the logger at module level, and them import the module before we load the logging configuration, the &lt;strong&gt;logging.dictConfig&lt;/strong&gt; disable existing loggers by default, unless we set "disable_existing_loggers" to false. For example, if we set "disable_existing_loggers" to true, logger3.foo() will not print out anything.&lt;/p&gt;
+&lt;p&gt;I hope this blog can help clear up Python's logging module for you.&lt;/p&gt;
+&lt;h2&gt;Extra Links&lt;/h2&gt;
+&lt;p&gt;Some credits go to the following links which help me understand the Python logging module.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://victorlin.me/posts/2012/08/26/good-logging-practice-in-python"&gt;Good logging practice in Python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.shutupandship.com/2012/02/how-python-logging-module-works.html"&gt;How Python logging module works&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://eric.themoritzfamily.com/learning-python-logging.html"&gt;Learning Python logging&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.red-dove.com/python_logging.html"&gt;A Logging System for Python&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="python"></category><category term="logging"></category></entry><entry><title>Python Function Parameter Using * and ** Operators</title><link href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html" rel="alternate"></link><updated>2013-09-08T13:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</id><summary type="html">&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
 &lt;h2&gt;Using * operator for positional arguments&lt;/h2&gt;
 &lt;p&gt;A parameter name that begins with * &lt;em&gt;gathers&lt;/em&gt; arguments into a tuple. You can
 only provide one such variable after the ordinary positional parameters in

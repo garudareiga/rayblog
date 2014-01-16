@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:og="http://ogp.me/ns#"
+      xmlns:fb="https://www.facebook.com/2008/fbml">
+<head>
+    <title>Python Logging Tutorial</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Open Graph tags -->
+
+            <meta property="og:type" content="article"/>
+            <meta property="og:title" content="Python Logging Tutorial"/>
+            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html"/>
+            <meta property="og:description" content="The Python logging documentation is initially confusing to me, therefore I decide to write this tutorial as a quick reference. Root Logger We can use the default (root) logger directly on module level. You can view and download the file logger0.py from my Gist. >>> import logger0 >>> logger0.foo() WARNING ..."/>
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="http://www.raydevblog.us/theme/css/bootstrap.min.css" type="text/css"/>
+    <link href="http://www.raydevblog.us/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://www.raydevblog.us/theme/css/bootstrap-glyphicons.css" rel="stylesheet">
+    <link href="http://www.raydevblog.us/theme/css/pygments.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://www.raydevblog.us/theme/css/style.css" type="text/css"/>
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+
+        <link href="http://www.raydevblog.us/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Ray's Thoughts and Writings ATOM Feed"/>
+
+    <!-- Latex -->
+        
+    <script type= "text/javascript">
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.src = 'https:' == document.location.protocol ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js' : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'; 
+        s[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" + 
+            "    config: ['MMLorHTML.js']," + 
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS','output/NativeMML']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," + 
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax .mo, .MathJax .mi': {color: 'black ! important'}} " +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(s);
+    </script>
+
+  
+
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="http://www.raydevblog.us" class="navbar-brand">Ray's Thoughts and Writings</a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                        <li >
+                            <a href="http://www.raydevblog.us/category/data-science.html">Data Science</a>
+                        </li>
+                        <li class="active">
+                            <a href="http://www.raydevblog.us/category/python.html">Python</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://www.raydevblog.us/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</nav>
+<!-- /.navbar -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html"
+                       rel="bookmark"
+                       title="Permalink to Python Logging Tutorial">
+                        Python Logging Tutorial
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="icon-calendar"></i>Tue 14 January 2014
+    </span>
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="http://www.raydevblog.us/tag/python.html">python</a>
+        /
+	<a href="http://www.raydevblog.us/tag/logging.html">logging</a>
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>The Python <a href="http://docs.python.org/2/library/logging.html">logging documentation</a> is initially confusing to me, therefore I decide to write this tutorial as a quick reference.</p>
+<h2>Root Logger</h2>
+<p>We can use the default (<em>root</em>) logger directly on module level. You can view and download the file 
+<a href="https://gist.github.com/garudareiga/8451107">logger0.py</a> from my Gist.</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logger0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logger0</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
+<span class="n">WARNING</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+<span class="n">ERROR</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+<span class="n">CRITICAL</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+</pre></div>
+
+
+<p>As we can see the message emitted by the root logger, the <em>debug</em> and <em>info</em> messages are ignored. 
+Besides, it prefixes all outputs by something like WARNING:root. It is because the root logger's
+severity level is set to <em>WARN</em> by default, and it has its own formatter. Let's quickly confirm
+that and then change the level from <em>WARN</em> to <em>DEBUG</em>.</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logging</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARN</span>
+<span class="bp">True</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">handlers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">_fmt</span>
+<span class="s">&#39;</span><span class="si">%(levelname)s</span><span class="s">:</span><span class="si">%(name)s</span><span class="s">:</span><span class="si">%(message)s</span><span class="s">&#39;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logger0</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
+<span class="n">DEBUG</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">debug</span> <span class="n">message</span>
+<span class="n">INFO</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">info</span> <span class="n">message</span>
+<span class="n">WARNING</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+<span class="n">ERROR</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">error</span> <span class="n">message</span>
+<span class="n">CRITICAL</span><span class="p">:</span><span class="n">root</span><span class="p">:</span><span class="n">Dump</span> <span class="n">critical</span> <span class="n">message</span>
+</pre></div>
+
+
+<h2>Customized Logger</h2>
+<p>Let me introduce four main objects in the Python standard logging module - <strong>Logger</strong>, <strong>Handler</strong>,
+<strong>Formatter</strong> and <strong>LogRecord</strong>, to understand how the logging process works.</p>
+<ul>
+<li>Logger, Handler and LogRecord have a <em>severity</em> level.</li>
+<li>We can messages to a Logger using the Logger's log method. The log method needs two parameters -
+  a msg (message) and a severity level. Logger also has a few methods defined - <em>debug</em>, <em>info</em>, 
+  <em>warn</em>, <em>error</em>, and 'critical'. Each of them has a pre-defined severity level.</li>
+<li>Logger looks at the message and ignores it if the message level is less severe than its own level.
+  If not, it creates a LogRecord object from the message string and pass to its Handlers. A Logger 
+  can have multiple custom Handlers such as StreamHandler, FileHandler, HTTPHandler etc.</li>
+<li>Handler is responsible for emitting messages to a stream, file, socket etc. THe Handerl also has
+  its own level. After receiving the LogRecord, Handler ignores any LogRecord that has a less severe 
+  level, otherwise it passes the LogRecord to its Formatter.</li>
+<li>Formatter formats the LogRecord message and then sends back to its Handler. A Handler is associated 
+  with exactly one Formatter.</li>
+<li>Finally the Handler emits the formatted LogRecord message to our destination.</li>
+</ul>
+<p>Now, let's use our own logger instead of root. You can view and download the file 
+<a href="https://gist.github.com/garudareiga/8446080">logger1.py</a> from my Gist.</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logger1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logger1</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
+<span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">info</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">ERROR</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">error</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">CRITICAL</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">critical</span> <span class="n">message</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;logger1.log&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="p">[</span><span class="n">DEBUG</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">debug</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">INFO</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">info</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">WARNING</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">ERROR</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">error</span> <span class="n">message</span>
+<span class="p">[</span><span class="n">CRITICAL</span><span class="p">]</span> <span class="n">Dump</span> <span class="n">critical</span> <span class="n">message</span>
+</pre></div>
+
+
+<p>We ask logging for a reference using the <strong>getLogger</strong> function. If the logger with that 
+name does not exist it is created, else a reference is returned.
+We add two handlers to the logger, one is a StreamHandler which by default prints to stderr,
+while the other is a FileHandler which writes to a file <strong>logger1.log</strong>, and both of them 
+use a custom formatter. In the example above, we log all messages to a file and log messages
+with a severity level of INFO or higher to stderr.</p>
+<h3>Log Hierarchy</h3>
+<p>Loggers are arranged in a hierarchy based on their names as python module names. So we choose 
+to use the module name as the logger name, with '.' dots separating hierarchy levels. 
+The root logger is at the top of this hierarchy. The name of the root logger is an empty string.
+The hierarchy is created and managed automatically by the logging system. All message send to a
+logger is automatically sent to its parent. We can turn off this upward propagation by setting the
+attribute <strong>propagate</strong> to false. Configuring the parent logger will cascade down to the other loggers.  </p>
+<div class="highlight"><pre><span class="n">appLogger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;myapp&quot;</span><span class="p">)</span>
+<span class="n">appLogger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</pre></div>
+
+
+<p>All myapp.* loggers will have the level INFO as their default.</p>
+<h3>Exception with Traceback</h3>
+<p>In reality, it is helpful to record whith traceback when something goes wrong.
+By calling logger methods with <em>exc_info=True</em> parameter, traceback is dumped
+to the logger.</p>
+<div class="highlight"><pre><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">database</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">process</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="n">update</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    <span class="n">execpt</span> <span class="p">(</span><span class="ne">KeyboardInterrupt</span><span class="p">,</span> <span class="ne">SystemExit</span><span class="p">):</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Failed to process record&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+
+<h3>Use RotatingFileHandler</h3>
+<p>When we use FileHandler for writing the log, the size of log file grows quickly
+with time. We'd better use RotatingFileHandler instead of FileHandler in production 
+environment.</p>
+<div class="highlight"><pre><span class="n">handler_rotate_file</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">RoFileHandler</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&#39;.log&#39;</span><span class="p">,</span> <span class="n">maxBytes</span><span class="o">=</span><span class="mi">10485760</span><span class="p">,</span> <span class="n">backupCount</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Use JSON Logging Configuration</h2>
+<p>It is not flexible to configure out logging system in Python code. Instead, we can load the logging configuration from a JSON file. You can download the following three files <a href="https://gist.github.com/garudareiga/8445508">logging.json</a>, <a href="https://gist.github.com/garudareiga/8445881">logger2.py</a>, <a href="https://gist.github.com/garudareiga/8445890">logger3.py</a> from my Gist.</p>
+<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logging.config</span><span class="o">,</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">logger2</span><span class="o">,</span> <span class="nn">logger3</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;logging.son&#39;</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logger2</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
+<span class="n">logger2</span> <span class="o">-</span> <span class="n">DEBUG</span> <span class="o">-</span> <span class="n">Dump</span> <span class="n">debug</span> <span class="n">message</span>
+<span class="n">logger2</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Dump</span> <span class="n">info</span> <span class="n">message</span>
+<span class="n">logger2</span> <span class="o">-</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+<span class="n">logger2</span> <span class="o">-</span> <span class="n">ERROR</span> <span class="o">-</span> <span class="n">Dump</span> <span class="n">error</span> <span class="n">message</span>
+<span class="n">logger2</span> <span class="o">-</span> <span class="n">CRITICAL</span> <span class="o">-</span> <span class="n">Dump</span> <span class="n">critical</span> <span class="n">message</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">logger3</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
+<span class="n">logger3</span> <span class="o">-</span> <span class="n">WARNING</span> <span class="o">-</span> <span class="n">Dump</span> <span class="n">warn</span> <span class="n">message</span>
+</pre></div>
+
+
+<p>Pay attention to the argument name "disable_existing_loggers". When we create the logger at module level, and them import the module before we load the logging configuration, the <strong>logging.dictConfig</strong> disable existing loggers by default, unless we set "disable_existing_loggers" to false. For example, if we set "disable_existing_loggers" to true, logger3.foo() will not print out anything.</p>
+<p>I hope this blog can help clear up Python's logging module for you.</p>
+<h2>Extra Links</h2>
+<p>Some credits go to the following links which help me understand the Python logging module.</p>
+<ul>
+<li><a href="http://victorlin.me/posts/2012/08/26/good-logging-practice-in-python">Good logging practice in Python</a></li>
+<li><a href="http://www.shutupandship.com/2012/02/how-python-logging-module-works.html">How Python logging module works</a></li>
+<li><a href="http://eric.themoritzfamily.com/learning-python-logging.html">Learning Python logging</a></li>
+<li><a href="http://www.red-dove.com/python_logging.html">A Logging System for Python</a></li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr />
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
+            var disqus_identifier = 'python-logging-tutorial';
+            var disqus_url = 'http://www.raydevblog.us/posts/2014/python-logging-tutorial.html';
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+        <div class="col-lg-3 well well-sm" id="sidebar">
+<aside>
+    <section>
+        <ul class="list-group list-group-flush">
+                <li class="list-group-item"><h4><i class="icon-home icon-large"></i>Social</h4></li>
+                    <li class="list-group-item"><a href="http://www.linkedin.com/in/leichen1983"><i
+                            class="icon-linkedin-sign icon-large"></i>linkedin
+                    </a></li>
+                    <li class="list-group-item"><a href="https://twitter.com/garudareiga"><i
+                            class="icon-twitter-sign icon-large"></i>twitter
+                    </a></li>
+                    <li class="list-group-item"><a href="https://github.com/garudareiga"><i
+                            class="icon-github-sign icon-large"></i>github
+                    </a></li>
+                    <li class="list-group-item"><a href="http://www.raydevblog.us/feeds/all.atom.xml"><i
+                            class="icon-rss-sign icon-large"></i>rss
+                    </a></li>
+
+
+
+            <li class="list-group-item"><a href="http://www.raydevblog.us/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
+                <li class="list-group-item tag-1">
+                    <a href="http://www.raydevblog.us/tag/python.html">
+                        python
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/json.html">
+                        json
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/logging.html">
+                        logging
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                        machine learning
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/data-mining.html">
+                        data mining
+                    </a>
+                </li>
+        </ul>
+    </section>
+</aside>        </div>
+    </div>
+</div>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="http://www.raydevblog.us/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="http://www.raydevblog.us/theme/js/respond.min.js"></script>
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+</body>
+</html>

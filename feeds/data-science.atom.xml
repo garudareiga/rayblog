@@ -87,4 +87,4 @@ leads to the performance problem. &lt;/p&gt;
 compute item similarity. For each item, I retain 100 most similar items and provide an option to store their similarity
 values in a local JSON disk file, or in a MongoDB collection (One document correspond to one item with its 100 most
 similar items and their similarity scores). At the start of recommendation, I simply load the precomputed similarity
-information from the local JSON disk file or the MongoDB collection.&lt;/p&gt;</summary><category term="data mining"></category><category term="machine learning"></category></entry></feed>
+information from the local JSON disk file or the MongoDB collection.&lt;/p&gt;</summary><category term="data mining"></category><category term="machine learning"></category><category term="json"></category><category term="mongodb"></category></entry></feed>
