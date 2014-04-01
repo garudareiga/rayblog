@@ -13,7 +13,7 @@ formatted messages through sockets. The sever uses a thread pool to support conc
 accross multiple sets and a set-associative cache, which is backed by a disk storage.
 
 The figure below shows a single-node key-value server with three clients making simultaneous requests:
-![Alt text](images/kvstore.jpg "")
+![Alt text](http://www.raydevblog.us/images/kvstore.jpg)
 
 ## Requirements
 
