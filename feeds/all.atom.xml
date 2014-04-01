@@ -5,7 +5,7 @@
 formatted messages through sockets. The sever uses a thread pool to support concurrent operations
 accross multiple sets and a set-associative cache, which is backed by a disk storage.&lt;/p&gt;
 &lt;p&gt;The figure below shows a single-node key-value server with three clients making simultaneous requests:
-&lt;img alt="Alt text" src="images/kvstore.jpg" title="" /&gt;&lt;/p&gt;
+&lt;img alt="Alt text" src="../../images/kvstore.jpg" /&gt;&lt;/p&gt;
 &lt;h2&gt;Requirements&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;
