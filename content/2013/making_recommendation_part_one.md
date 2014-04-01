@@ -1,7 +1,7 @@
 Title: Making Recommendations Part I - Item-based Collaborative Filtering
 Date: 2013-12-08 10:00
 Author: Ray Chen
-Category: Data Science 
+Category: Machine Learning 
 Tags: data mining, machine learning, json, mongodb 
 
 Recommender systems are popular on e-commerce web sites, to make personalized
