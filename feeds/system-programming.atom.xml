@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system-programming.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-03-31T22:11:00-07:00</updated><entry><title>A Single Server Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html" rel="alternate"></link><updated>2014-03-31T22:11:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-03-31:posts/2014/a-single-server-key-value-store.html</id><summary type="html">&lt;p&gt;On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Multiple clients will be communicating with a single-node key-value server by sending and receiving
+formatted messages through sockets. The sever uses a thread pool to support concurrent operations
+accross multiple sets and a set-associative cache, which is backed by a disk storage.&lt;/p&gt;
+&lt;p&gt;The figure below shows a single-node key-value server with three clients making simultaneous requests:
+&lt;img alt="Alt text" src="images/kvstore.jpg" title="" /&gt;&lt;/p&gt;
+&lt;h2&gt;Requirements&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The key-value server will support 3 interfaces:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Value GET (Key k)&lt;/em&gt;: Retrieves the key-value pair corresponding to the provided key.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;PUT (Key k, Value v)&lt;/em&gt;: Inserts the key-value pair into the store.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;DEL (Key k)&lt;/em&gt;: Removes the key-value pair corresponding to the provided key from the store.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The key-value server has a set-associative cache with the second-change eviction policy within each set.
+  Each set in the cache will have a fixed number of entries, and evict entries using the second-chance algorithm.
+  The cache follows a write-through caching policy. If a key exists in the cache for a &lt;em&gt;GET&lt;/em&gt; request, do not access
+  the store.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;All requests (get/put/del) are atomic in that they must modify the state of both the cache and the store together.&lt;br /&gt;
+  Requests must be parallel across different sets and serial with the same set. The threadpool in the server shall
+  maintain a queue of tasks, assign free threads to tasks and execute them asynchronously.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The server will create a serversocket that listens on a port for connections, and service requests from the client.
+  A socket shall be passed to the client handler for each request that comes in.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Source Code&lt;/h2&gt;
+&lt;p&gt;The latest source code of my implementation is available in my &lt;a href="https://github.com/garudareiga/computer_system_design/tree/master/kvstore/src/edu/berkeley/cs162"&gt;github repository&lt;/a&gt;&lt;/p&gt;</summary><category term="java"></category><category term="key-value store"></category><category term="socket"></category><category term="concurrency"></category></entry></feed>
