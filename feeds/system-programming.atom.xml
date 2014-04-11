@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system-programming.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-03-31T22:11:00-07:00</updated><entry><title>A Single Server Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html" rel="alternate"></link><updated>2014-03-31T22:11:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-03-31:posts/2014/a-single-server-key-value-store.html</id><summary type="html">&lt;p&gt;On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system-programming.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-04-10T22:07:00-07:00</updated><entry><title>Distributed Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/distributed-key-value-store.html" rel="alternate"></link><updated>2014-04-10T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-10:posts/2014/distributed-key-value-store.html</id><summary type="html">&lt;p&gt;Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
+a distributed key-value store system design.&lt;/p&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This distributed key-value storage system has multiple clients communicating 
+with a single master server in a given messaging format. The master server contains a set-associative 
+cache, and it uses the cache to serve GET requests without going to the key-value slave servers it
+coordinates. The slave servers are contacted for a GET request only upon a cache miss on the master. 
+The master will forward PUT and DEL client requests to multiple slave servers and follow the two-phase 
+commit protocol for atomic PUT and DEL operations across multiple slave servers.&lt;/p&gt;
+&lt;p&gt;The figure below shows an example distributed key-value storage system.
+Three clients send a master server simultaneous requests, and the master server coordinates with three
+slave servers.
+&lt;img alt="Alt text" src="http://www.raydevblog.us/images/distributed_kvstore_master.jpg" /&gt;&lt;/p&gt;
+&lt;h2&gt;Registration&lt;/h2&gt;
+&lt;h2&gt;Consistent Hashing&lt;/h2&gt;
+&lt;h2&gt;Two-phase Commit&lt;/h2&gt;
+&lt;h2&gt;Failures, Timeouts, and Recovery&lt;/h2&gt;
+&lt;h2&gt;Source Code&lt;/h2&gt;
+&lt;p&gt;The latest source code of my implementation is available in my &lt;a href="https://github.com/garudareiga/computer_system_design/tree/master/distributed_kvstore/src/edu/berkeley/cs162"&gt;github repository&lt;/a&gt;&lt;/p&gt;</summary><category term="distributed"></category><category term="two-phase commit"></category><category term="logging and recovery"></category><category term="consistent hashing"></category></entry><entry><title>A Single Server Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html" rel="alternate"></link><updated>2014-03-31T22:11:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-03-31:posts/2014/a-single-server-key-value-store.html</id><summary type="html">&lt;p&gt;On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.&lt;/p&gt;
 &lt;h2&gt;Summary&lt;/h2&gt;
 &lt;p&gt;Multiple clients will be communicating with a single-node key-value server by sending and receiving
 formatted messages through sockets. The sever uses a thread pool to support concurrent operations
 accross multiple sets and a set-associative cache, which is backed by a disk storage.&lt;/p&gt;
 &lt;p&gt;The figure below shows a single-node key-value server with three clients making simultaneous requests:
-&lt;img alt="Alt text" src="../../images/kvstore.jpg" /&gt;&lt;/p&gt;
+&lt;img alt="Alt text" src="http://www.raydevblog.us/images/kvstore.jpg" /&gt;&lt;/p&gt;
 &lt;h2&gt;Requirements&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;
