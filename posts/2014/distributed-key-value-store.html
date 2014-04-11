@@ -132,17 +132,59 @@ with a single master server in a given messaging format. The master server conta
 cache, and it uses the cache to serve GET requests without going to the key-value slave servers it
 coordinates. The slave servers are contacted for a GET request only upon a cache miss on the master. 
 The master will forward PUT and DEL client requests to multiple slave servers and follow the two-phase 
-commit protocol for atomic PUT and DEL operations across multiple slave servers.</p>
+commit protocol (2PC) for atomic PUT and DEL operations across multiple slave servers.</p>
 <p>The figure below shows an example distributed key-value storage system.
 Three clients send a master server simultaneous requests, and the master server coordinates with three
 slave servers.
-<img alt="Alt text" src="http://www.raydevblog.us/images/distributed_kvstore_master.jpg" /></p>
+<img alt="Alt text" src="http://www.raydevblog.us/images/distributed_kvstore_master.jpeg" /></p>
 <h2>Registration</h2>
+<p>Slave servers will send to the master a registration message with a 64-bit globally unique ID 
+when they start.</p>
+<ul>
+<li>The master listens for registration requests from slaves on port 9090.</li>
+<li>When a slave starts it should listen in a random free port for 2PC requests, and register that port
+number with the master so that the master can send requests to it.</li>
+<li>Assuming no errors regarding registration, the master sends a response and the slave accepts the response.</li>
+</ul>
 <h2>Consistent Hashing</h2>
+<ul>
+<li>Each key will be stored using 2PC in <strong>two</strong> slave servers; the first of them will be selected using
+consistent hashing, while the second will be placed in the successor of the first one.</li>
+<li>The master will hash the key to 64-bit address space, because each slave server has a unique 64-bit ID.</li>
+<li>Each slave will store the first copies of key with hash values greater than the ID of its immediate
+predecessor up to its own ID, and also the keys whose first copies are stored in its predecessor. </li>
+</ul>
 <h2>Two-phase Commit</h2>
+<ul>
+<li>The master will select replica locations using consistent hashing.</li>
+<li>A slave will send vote-abort to the master if the key does not exist for DEL, or invalid key/value;</li>
+<li>When sending phase-1 requests, the master must contact slaves, even if the first slave sends an abort. The master
+does this by sequentially making the requests or concurrently by forking off threads.</li>
+<li>Only a single 2PC operation can be executed at a time. The master does not support concurrent update
+operations across different keys, but GET operations of different keys must be concurrent unless restricted
+by an ongoing update operation on the same set.</li>
+</ul>
 <h2>Failures, Timeouts, and Recovery</h2>
-<h2>Source Code</h2>
-<p>The latest source code of my implementation is available in my <a href="https://github.com/garudareiga/computer_system_design/tree/master/distributed_kvstore/src/edu/berkeley/cs162">github repository</a></p>
+<p>For this particular design, assume that the master will never go down. However, slave servers must log
+necessary information to survive from failures.</p>
+<ul>
+<li>When the slave comes back with the same ID, it will be rebuilt using the log, and know if the last 
+request it received was a phase-1 or phase-2 request.</li>
+<li>If a slave crashes during phase-1, if master does not get a vote within a single timeout period, it should
+assume the slave voted abort.</li>
+<li>If a slave crashes during phase-2, the master must retry until it receives a response to its decision. 
+Note that when the slave restarts, it may bind to a new port and re-register. The master must retry with
+the latest port the slave has registered with. </li>
+</ul>
+<h2>Components</h2>
+<p>Master Server = TPCMaster + SocketServer attached (port 8080) with KVClientHandler
+TPCMaster = Master Cache + SocketServer attached (port 9090) with TPCRegistrationHandler
+Slave Server = TPCLog + KVServer + SocketServer (free port) attached with TPCMasterHandler</p>
+<h2>Java Source Code Breakdown</h2>
+<ul>
+<li>TPCMasterHandler.java: a network handler to handler 2PC operation requests from the master server.</li>
+</ul>
+<p>The latest Java source code of my implementation is available in my <a href="https://github.com/garudareiga/computer_system_design/tree/master/distributed_kvstore/src/edu/berkeley/cs162">github repository</a></p>
             </div>
             <!-- /.entry-content -->
     <hr />
@@ -195,43 +237,13 @@ slave servers.
 
             <li class="list-group-item"><a href="http://www.raydevblog.us/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item tag-1">
-                    <a href="http://www.raydevblog.us/tag/java.html">
-                        java
-                    </a>
-                </li>
-                <li class="list-group-item tag-1">
                     <a href="http://www.raydevblog.us/tag/python.html">
                         python
                     </a>
                 </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                        machine learning
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/concurrency.html">
-                        concurrency
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/distributed.html">
-                        distributed
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                        two-phase commit
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/data-mining.html">
-                        data mining
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/socket.html">
-                        socket
+                <li class="list-group-item tag-1">
+                    <a href="http://www.raydevblog.us/tag/java.html">
+                        java
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -240,23 +252,23 @@ slave servers.
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/logging-and-recovery.html">
-                        logging and recovery
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/thread.html">
-                        thread
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mongodb.html">
-                        mongodb
+                    <a href="http://www.raydevblog.us/tag/distributed.html">
+                        distributed
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/json.html">
                         json
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/data-mining.html">
+                        data mining
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                        two-phase commit
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -267,6 +279,36 @@ slave servers.
                 <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
                         consistent hashing
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/socket.html">
+                        socket
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/logging-and-recovery.html">
+                        logging and recovery
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                        machine learning
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/concurrency.html">
+                        concurrency
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/thread.html">
+                        thread
                     </a>
                 </li>
         </ul>
