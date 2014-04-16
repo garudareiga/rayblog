@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/index.html</loc>
-<lastmod>2014-04-11T00:18:33-00:00</lastmod>
+<lastmod>2014-04-15T21:26:01-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/archives.html</loc>
-<lastmod>2014-04-11T00:18:33-00:00</lastmod>
+<lastmod>2014-04-15T21:26:01-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/tags.html</loc>
-<lastmod>2014-04-11T00:18:33-00:00</lastmod>
+<lastmod>2014-04-15T21:26:01-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/categories.html</loc>
-<lastmod>2014-04-11T00:18:33-00:00</lastmod>
+<lastmod>2014-04-15T21:26:01-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html</loc>
+<lastmod>2014-04-15T15:06:00-00:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -83,6 +90,13 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>http://www.raydevblog.us/category/machine-learning.html</loc>
 <lastmod>2013-12-08T10:00:00-00:00</lastmod>
+<changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://www.raydevblog.us/category/miscellaneous.html</loc>
+<lastmod>2014-04-15T15:06:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -208,7 +222,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/author/ray-chen.html</loc>
-<lastmod>2014-04-10T22:07:00-00:00</lastmod>
+<lastmod>2014-04-15T15:06:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
