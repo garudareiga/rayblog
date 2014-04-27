@@ -3,7 +3,7 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
-    <title>Distributed Key-Value Store</title>
+    <title>Hadoop MapReduce - Running WordCount</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -12,9 +12,9 @@
     <!-- Open Graph tags -->
 
             <meta property="og:type" content="article"/>
-            <meta property="og:title" content="Distributed Key-Value Store"/>
-            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/distributed-key-value-store.html"/>
-            <meta property="og:description" content="Special thanks go to Berkeley CS162 course providing a nice document and starter code for a distributed key-value store system design. Overview This distributed key-value storage system has multiple clients communicating with a single master server in a given messaging format. The master server contains a set-associative cache, and it ..."/>
+            <meta property="og:title" content="Hadoop MapReduce - Running WordCount"/>
+            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html"/>
+            <meta property="og:description" content="WordCount Example WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model. Generally Hadoop can be run in three modes: Standalone (or local) mode: There are no daemons running ..."/>
 
     <!-- Bootstrap -->
         <link rel="stylesheet" href="http://www.raydevblog.us/theme/css/bootstrap.min.css" type="text/css"/>
@@ -68,7 +68,7 @@
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                        <li >
+                        <li class="active">
                             <a href="http://www.raydevblog.us/category/hadoop.html">Hadoop</a>
                         </li>
                         <li >
@@ -83,7 +83,7 @@
                         <li >
                             <a href="http://www.raydevblog.us/category/python.html">Python</a>
                         </li>
-                        <li class="active">
+                        <li >
                             <a href="http://www.raydevblog.us/category/system-programming.html">System Programming</a>
                         </li>
             </ul>
@@ -102,10 +102,10 @@
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/distributed-key-value-store.html"
+                    <a href="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html"
                        rel="bookmark"
-                       title="Permalink to Distributed Key-Value Store">
-                        Distributed Key-Value Store
+                       title="Permalink to Hadoop MapReduce - Running WordCount">
+                        Hadoop MapReduce - Running WordCount
                     </a>
                 </h1>
             </header>
@@ -115,82 +115,131 @@
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="icon-calendar"></i>Thu 10 April 2014
+        <i class="icon-calendar"></i>Fri 25 April 2014
     </span>
 
 
 
 <span class="label label-default">Tags</span>
-	<a href="http://www.raydevblog.us/tag/distributed.html">distributed</a>
+	<a href="http://www.raydevblog.us/tag/hadoop.html">hadoop</a>
         /
-	<a href="http://www.raydevblog.us/tag/two-phase-commit.html">two-phase commit</a>
-        /
-	<a href="http://www.raydevblog.us/tag/logging-and-recovery.html">logging and recovery</a>
-        /
-	<a href="http://www.raydevblog.us/tag/consistent-hashing.html">consistent hashing</a>
+	<a href="http://www.raydevblog.us/tag/mapreduce.html">mapreduce</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
-a distributed key-value store system design.</p>
-<h2>Overview</h2>
-<p>This distributed key-value storage system has multiple clients communicating 
-with a single master server in a given messaging format. The master server contains a set-associative 
-cache, and it uses the cache to serve GET requests without going to the key-value slave servers it
-coordinates. The slave servers are contacted for a GET request only upon a cache miss on the master. 
-The master will forward PUT and DEL client requests to multiple slave servers and follow the two-phase 
-commit protocol (2PC) for atomic PUT and DEL operations across multiple slave servers.</p>
-<p>The figure below shows an example distributed key-value storage system.
-Three clients send a master server simultaneous requests, and the master server coordinates with three
-slave servers.
-<img alt="Alt text" src="http://www.raydevblog.us/images/distributed_kvstore_master.jpeg" /></p>
-<h2>Registration</h2>
-<p>Slave servers will send to the master a registration message with a 64-bit globally unique ID 
-when they start.</p>
+                <h4>WordCount Example</h4>
+<p>WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model.</p>
+<p>Generally Hadoop can be run in three modes:</p>
 <ul>
-<li>The master listens for registration requests from slaves on port 9090.</li>
-<li>When a slave starts it should listen in a random free port for 2PC requests, and register that port
-number with the master so that the master can send requests to it.</li>
-<li>Assuming no errors regarding registration, the master sends a response and the slave accepts the response.</li>
+<li><strong>Standalone (or local) mode</strong>: There are no daemons running in this mode. Hadoop uses the local file system instead of HDFS.</li>
+<li><strong>Pseudo-distributed mode</strong>: All the daemons run on a single machine locally using the HDFS protocol and this setting mimics the behavior of a cluster.</li>
+<li><strong>Fully-distributed mode</strong>: This is how Hadoop runs on a real cluster.</li>
 </ul>
-<h2>Consistent Hashing</h2>
+<p>I run WordCount application in pesudo-distributed mode here.</p>
+<h4>Hadoop Installation</h4>
+<p>You can install Hadoop on your local machine following the <a href="http://www.bigdataplanet.info/2013/10/Hadoop-Installation-on-Local-Machine-Single-node-Cluster.html">instruction</a>, or you can download and use Cloudera Quickstart VM. I already have Hadoop version 1.2.1 installed on my Ubuntu 12.04 LTS.</p>
+<h4>Plain Java Version</h4>
+<p>You can download the WordCount Java source code from this <a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/HadoopTutorial/CDH4/Hadoop-Tutorial/ht_wordcount1_source.html">link</a>. Then I will show you how to prepare the data set in HDFS and submit Hadoop MapReduce job step by step:</p>
 <ul>
-<li>Each key will be stored using 2PC in <strong>two</strong> slave servers; the first of them will be selected using
-consistent hashing, while the second will be placed in the successor of the first one.</li>
-<li>The master will hash the key to 64-bit address space, because each slave server has a unique 64-bit ID.</li>
-<li>Each slave will store the first copies of key with hash values greater than the ID of its immediate
-predecessor up to its own ID, and also the keys whose first copies are stored in its predecessor. </li>
+<li>Create the input directory wordcount/input in HDFS:</li>
 </ul>
-<h2>Two-phase Commit</h2>
+<div class="highlight"><pre><span class="nv">$ </span>hadoop fs -mkdir wordcount/input
+</pre></div>
+
+
 <ul>
-<li>The master will select replica locations using consistent hashing.</li>
-<li>A slave will send vote-abort to the master if the key does not exist for DEL, or invalid key/value;</li>
-<li>When sending phase-1 requests, the master must contact slaves, even if the first slave sends an abort. The master
-does this by sequentially making the requests or concurrently by forking off threads.</li>
-<li>Only a single 2PC operation can be executed at a time. The master does not support concurrent update
-operations across different keys, but GET operations of different keys must be concurrent unless restricted
-by an ongoing update operation on the same set.</li>
+<li>Create sample text files as input and move to the input directory:</li>
 </ul>
-<h2>Failures, Timeouts, and Recovery</h2>
-<p>For this particular design, assume that the master will never go down. However, slave servers must log
-necessary information to survive from failures.</p>
+<div class="highlight"><pre><span class="nv">$ </span><span class="nb">echo</span> <span class="s2">&quot;Hello Bye&quot;</span> &gt; file0 <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;Hello Goodbye&quot;</span> &gt; file1
+<span class="nv">$ </span>hadoop fs -copyFromLocal file* wordcount/input
+</pre></div>
+
+
 <ul>
-<li>When the slave comes back with the same ID, it will be rebuilt using the log, and know if the last 
-request it received was a phase-1 or phase-2 request.</li>
-<li>If a slave crashes during phase-1, if master does not get a vote within a single timeout period, it should
-assume the slave voted abort.</li>
-<li>If a slave crashes during phase-2, the master must retry until it receives a response to its decision. 
-Note that when the slave restarts, it may bind to a new port and re-register. The master must retry with
-the latest port the slave has registered with. </li>
+<li>Compile WordCount.java and create a JAR</li>
 </ul>
-<h2>Components</h2>
-<p>Master Server = TPCMaster + SocketServer attached (port 8080) with KVClientHandler
-TPCMaster = Master Cache + SocketServer attached (port 9090) with TPCRegistrationHandler
-Slave Server = TPCLog + KVServer + SocketServer (free port) attached with TPCMasterHandler</p>
-<h2>Java Source Code Breakdown</h2>
+<div class="highlight"><pre><span class="nv">$ </span>mkdir wordcount <span class="o">&amp;&amp;</span> javac -cp /usr/local/hadoop/hadoop-core-1.2.1.jar -d classes WordCount.java <span class="o">&amp;&amp;</span> jar -cvf wordcount.jar -C classes/ .
+</pre></div>
+
+
 <ul>
-<li>TPCMasterHandler.java: a network handler to handler 2PC operation requests from the master server.</li>
+<li>Run the application</li>
 </ul>
-<p>The latest Java source code of my implementation is available in my <a href="https://github.com/garudareiga/computer_system_design/tree/master/distributed_kvstore/src/edu/berkeley/cs162">github repository</a></p>
+<div class="highlight"><pre><span class="nv">$ </span>hadoop jar wordcount.jar us.raydevblog.hadoop.WordCount wordcount/input wordcount/output1
+</pre></div>
+
+
+<ul>
+<li>Examine the output:</li>
+</ul>
+<div class="highlight"><pre><span class="nv">$ </span>hadoop fs -cat wordcount/part-00000
+Bye 1
+Goodbye 1
+Hello   2
+</pre></div>
+
+
+<h4>Using Maven Project</h4>
+<p>If you are not familiar with Maven, You can find an excellent, short
+post on the Maven website called <a href="http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">"Maven in 5 minutes"</a>. I use the following commands to create a Maven project and adjust the POM:</p>
+<ul>
+<li>First thing is to create a project structure using Maven:</li>
+</ul>
+<div class="highlight"><pre><span class="nv">$ </span>mvn archetype:generate -DgroupId<span class="o">=</span>us.raydevblog.hadoop -DartifactId<span class="o">=</span>WordCountV2 -DarchetypeArtifactId<span class="o">=</span>maven-archetype-quickstart -DinteractiveMode<span class="o">=</span><span class="nb">false</span>
+</pre></div>
+
+
+<ul>
+<li>Reference the Hadoop libraries in the pom.xml:</li>
+</ul>
+<div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.apache.hadoop<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>hadoop-core<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.2.1<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+</pre></div>
+
+
+<ul>
+<li>Inorder to make us an executable JAR, we need tell Maven what class is holding our "main" function. I create a <strong>build</strong> node and within that node create a <strong>plugins</strong> node and then add the following:</li>
+</ul>
+<div class="highlight"><pre><span class="nt">&lt;plugin&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>maven-jar-plugin<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;configuration&gt;</span>
+    <span class="nt">&lt;archive&gt;</span>
+      <span class="nt">&lt;manifest&gt;</span>
+        <span class="nt">&lt;addClasspath&gt;</span>true<span class="nt">&lt;/addClasspath&gt;</span>
+        <span class="nt">&lt;mainClass&gt;</span>us.raydevblog.hadoop.WordCount<span class="nt">&lt;/mainClass&gt;</span>
+      <span class="nt">&lt;/manifest&gt;</span>
+    <span class="nt">&lt;/archive&gt;</span>
+  <span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</pre></div>
+
+
+<ul>
+<li>Also need add this plugin to use Java 1.7 for compilation. Otherwise, we will have the error "generics are not supported in -source 1.3":</li>
+</ul>
+<div class="highlight"><pre><span class="nt">&lt;plugin&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;configuration&gt;</span>
+    <span class="nt">&lt;source&gt;</span>1.7<span class="nt">&lt;/source&gt;</span>
+    <span class="nt">&lt;target&gt;</span>1.7<span class="nt">&lt;/target&gt;</span>
+  <span class="nt">&lt;/configuration&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span>
+</pre></div>
+
+
+<ul>
+<li>I copy WordCount.java into src/main/java/us/raydevblog/hadoop/ and remove the template provided "App.java" in this folder. Now it is time to compile our project and run the application:</li>
+</ul>
+<div class="highlight"><pre><span class="nv">$ </span>mvn clean install
+<span class="nv">$ </span>hadoop jar target/WordCountV2-1.0-SNAPSHOT.jar wordcount/input wordcount/output2
+</pre></div>
+
+
+<p>We now have a WordCount Map-Reduce example running successfully on the Hadoop. You can download my WordCount maven project from my <a href="https://github.com/garudareiga/hadoopstudy/tree/master/wordcount">github reposity</a></p>
             </div>
             <!-- /.entry-content -->
     <hr />
@@ -200,8 +249,8 @@ Slave Server = TPCLog + KVServer + SocketServer (free port) attached with TPCMas
         <script type="text/javascript">
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
-            var disqus_identifier = 'distributed-key-value-store';
-            var disqus_url = 'http://www.raydevblog.us/posts/2014/distributed-key-value-store.html';
+            var disqus_identifier = 'hadoop-mapreduce-running-wordcount';
+            var disqus_url = 'http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html';
 
             /* * * DON'T EDIT BELOW THIS LINE * * */
             (function () {

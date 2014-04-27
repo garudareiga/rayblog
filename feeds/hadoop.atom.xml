@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/hadoop.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-04-25T22:07:00-07:00</updated><entry><title>Hadoop MapReduce - Running WordCount</title><link href="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html" rel="alternate"></link><updated>2014-04-25T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-25:posts/2014/hadoop-mapreduce-running-wordcount.html</id><summary type="html">&lt;h4&gt;WordCount Example&lt;/h4&gt;
+&lt;p&gt;WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model.&lt;/p&gt;
+&lt;p&gt;Generally Hadoop can be run in three modes:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Standalone (or local) mode&lt;/strong&gt;: There are no daemons running in this mode. Hadoop uses the local file system instead of HDFS.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pseudo-distributed mode&lt;/strong&gt;: All the daemons run on a single machine locally using the HDFS protocol and this setting mimics the behavior of a cluster.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fully-distributed mode&lt;/strong&gt;: This is how Hadoop runs on a real cluster.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I run WordCount application in pesudo-distributed mode here.&lt;/p&gt;
+&lt;h4&gt;Hadoop Installation&lt;/h4&gt;
+&lt;p&gt;You can install Hadoop on your local machine following the &lt;a href="http://www.bigdataplanet.info/2013/10/Hadoop-Installation-on-Local-Machine-Single-node-Cluster.html"&gt;instruction&lt;/a&gt;, or you can download and use Cloudera Quickstart VM. I already have Hadoop version 1.2.1 installed on my Ubuntu 12.04 LTS.&lt;/p&gt;
+&lt;h4&gt;Plain Java Version&lt;/h4&gt;
+&lt;p&gt;You can download the WordCount Java source code from this &lt;a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/HadoopTutorial/CDH4/Hadoop-Tutorial/ht_wordcount1_source.html"&gt;link&lt;/a&gt;. Then I will show you how to prepare the data set in HDFS and submit Hadoop MapReduce job step by step:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Create the input directory wordcount/input in HDFS:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop fs -mkdir wordcount/input
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Create sample text files as input and move to the input directory:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Hello Bye&amp;quot;&lt;/span&gt; &amp;gt; file0 &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Hello Goodbye&amp;quot;&lt;/span&gt; &amp;gt; file1
+&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop fs -copyFromLocal file* wordcount/input
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Compile WordCount.java and create a JAR&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir wordcount &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; javac -cp /usr/local/hadoop/hadoop-core-1.2.1.jar -d classes WordCount.java &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; jar -cvf wordcount.jar -C classes/ .
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Run the application&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop jar wordcount.jar us.raydevblog.hadoop.WordCount wordcount/input wordcount/output1
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Examine the output:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop fs -cat wordcount/part-00000
+Bye 1
+Goodbye 1
+Hello   2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Using Maven Project&lt;/h4&gt;
+&lt;p&gt;If you are not familiar with Maven, You can find an excellent, short
+post on the Maven website called &lt;a href="http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html"&gt;"Maven in 5 minutes"&lt;/a&gt;. I use the following commands to create a Maven project and adjust the POM:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;First thing is to create a project structure using Maven:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mvn archetype:generate -DgroupId&lt;span class="o"&gt;=&lt;/span&gt;us.raydevblog.hadoop -DartifactId&lt;span class="o"&gt;=&lt;/span&gt;WordCountV2 -DarchetypeArtifactId&lt;span class="o"&gt;=&lt;/span&gt;maven-archetype-quickstart -DinteractiveMode&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;false&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Reference the Hadoop libraries in the pom.xml:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.hadoop&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;hadoop-core&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2.1&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Inorder to make us an executable JAR, we need tell Maven what class is holding our "main" function. I create a &lt;strong&gt;build&lt;/strong&gt; node and within that node create a &lt;strong&gt;plugins&lt;/strong&gt; node and then add the following:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-jar-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;archive&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;manifest&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;addClasspath&amp;gt;&lt;/span&gt;true&lt;span class="nt"&gt;&amp;lt;/addClasspath&amp;gt;&lt;/span&gt;
+        &lt;span class="nt"&gt;&amp;lt;mainClass&amp;gt;&lt;/span&gt;us.raydevblog.hadoop.WordCount&lt;span class="nt"&gt;&amp;lt;/mainClass&amp;gt;&lt;/span&gt;
+      &lt;span class="nt"&gt;&amp;lt;/manifest&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/archive&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;Also need add this plugin to use Java 1.7 for compilation. Otherwise, we will have the error "generics are not supported in -source 1.3":&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;source&amp;gt;&lt;/span&gt;1.7&lt;span class="nt"&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;target&amp;gt;&lt;/span&gt;1.7&lt;span class="nt"&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
+  &lt;span class="nt"&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;I copy WordCount.java into src/main/java/us/raydevblog/hadoop/ and remove the template provided "App.java" in this folder. Now it is time to compile our project and run the application:&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mvn clean install
+&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop jar target/WordCountV2-1.0-SNAPSHOT.jar wordcount/input wordcount/output2
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We now have a WordCount Map-Reduce example running successfully on the Hadoop. You can download my WordCount maven project from my &lt;a href="https://github.com/garudareiga/hadoopstudy/tree/master/wordcount"&gt;github reposity&lt;/a&gt;&lt;/p&gt;</summary><category term="hadoop"></category><category term="mapreduce"></category></entry></feed>
