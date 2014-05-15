@@ -3,7 +3,7 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
-    <title>Ray's Thoughts and Writings - python</title>
+    <title>Ray's Thoughts and Writings - algorithm</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -80,26 +80,15 @@
     <div class="row">
         <div class="col-lg-9">
             <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html">Python Logging Tutorial</a></h2>
-                <div class="summary"><p>The Python <a href="http://docs.python.org/2/library/logging.html">logging documentation</a> is initially confusing to me, therefore I decide to write this tutorial as a quick reference.</p>
-<h2>Root Logger</h2>
-<p>We can use the default (<em>root</em>) logger directly on module level. You can view and download the file 
-<a href="https://gist.github.com/garudareiga/8451107">logger0.py</a> from my Gist.</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logger0</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">logger0</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
-<span class="n">WARNING ...</span></pre></div>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html">Python Function Parameter Using * and ** Operators</a></h2>
-                <div class="summary"><p>Python lets us define a function that can take a variable number of arguments. </p>
-<h2>Using * operator for positional arguments</h2>
-<p>A parameter name that begins with * <em>gathers</em> arguments into a tuple. You can
-only provide one such variable after the ordinary positional parameters in
-the function definition. For example, <em>printall</em> takes ...</p>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html">more ...</a>
+                <h2><a href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">Fibonacci Sequence</a></h2>
+                <div class="summary"><p>Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. </p>
+<p>Fibonacci sequence is defined as:
+$f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.</p>
+<h3>Naive Recursive Solution</h3>
+<div class="highlight"><pre><span class="kt">int</span> <span class="nf">fib</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">n ...</span></pre></div>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">more ...</a>
                 </div>
             </article>
             <hr/>
