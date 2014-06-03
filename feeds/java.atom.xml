@@ -1,5 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/java.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-03-20T22:06:00-07:00</updated><entry><title>Java Thread Pool Example</title><link href="http://www.raydevblog.us/posts/2014/java-thread-pool-example.html" rel="alternate"></link><updated>2014-03-20T22:06:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-03-20:posts/2014/java-thread-pool-example.html</id><summary type="html">&lt;p&gt;A thread pool from the executor implementation in &lt;em&gt;java.util.concurrent&lt;/em&gt; manages the pool 
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/java.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-06-02T20:10:00-07:00</updated><entry><title>Java Reentrant Lock</title><link href="http://www.raydevblog.us/posts/2014/java-reentrant-lock.html" rel="alternate"></link><updated>2014-06-02T20:10:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-06-02:posts/2014/java-reentrant-lock.html</id><summary type="html">&lt;h3&gt;Intrinsic Lock&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Synchronized&lt;/strong&gt; uses intrinsic locks. Every object in Java has an associated intrinsic lock. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock on that object.&lt;/p&gt;
+&lt;p&gt;The intrinsic locking mechanism have some limitations as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It is not possible to attempt to acquire a lock without being willing to wait for it forever. &lt;/li&gt;
+&lt;li&gt;It is not possible to interrupt a thread waiting to acquire a lock.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As an alternative, ReentrantLock provides more control on lock acquisition. ReentrantLock allows threads to re-request locks they already own. It provides timed or polled lock acquisition. It also has support for configurable fairness policy, allowing more flexible thread scheduling.&lt;/p&gt;
+&lt;h3&gt;Polled and Timed Lock Acquisition&lt;/h3&gt;
+&lt;p&gt;Let's see some example code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;float&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;synchronized&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;synchronized&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;debit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+            &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;credit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;em&gt;transferMoney()&lt;/em&gt; method above, there is a possibility of &lt;strong&gt;deadlock&lt;/strong&gt; when two threads A and B are trying to transfer money at the same time. For example, when thread A has acquired a lock on &lt;em&gt;account_1&lt;/em&gt; object and is waiting to acquire a lock on the &lt;em&gt;account_2&lt;/em&gt; object, thread B has acquired a lock on the &lt;em&gt;account_2&lt;/em&gt; object and is waiting for a lock on &lt;em&gt;account_1&lt;/em&gt;. This will lead to deadlock.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;account_1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;account_2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;account_2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;account_1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Using &lt;em&gt;tryLock&lt;/em&gt;, a &lt;strong&gt;timed and polled lock acquisition&lt;/strong&gt; mechanism lets you regain control if you can not acquire all the required locks, release the ones you have acquired and retry. If we can not acquire both, we will release if one of these has been acquired, then retry. If the locks can not be acquired within the specified time, the transferMoney method will return a failure.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="nf"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;float&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;startTime&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;nanoTime&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;tryLock&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;tryLock&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                    &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                        &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;debit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+                        &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;credit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+                    &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;finally&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                        &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;unlock&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+                    &lt;span class="o"&gt;}&lt;/span&gt;
+                &lt;span class="o"&gt;}&lt;/span&gt;
+            &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;finally&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;unlock&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+            &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;nanoTime&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;startTime&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;5000&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+        &lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="java"></category><category term="concurrency"></category></entry><entry><title>Java Thread Pool Example</title><link href="http://www.raydevblog.us/posts/2014/java-thread-pool-example.html" rel="alternate"></link><updated>2014-03-20T22:06:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-03-20:posts/2014/java-thread-pool-example.html</id><summary type="html">&lt;p&gt;A thread pool from the executor implementation in &lt;em&gt;java.util.concurrent&lt;/em&gt; manages the pool 
 of &lt;em&gt;worker threads&lt;/em&gt;. Using worker threads minimizes the overhead due to thread creation.&lt;/p&gt;
 &lt;p&gt;The &lt;em&gt;java.util.concurrent.Executor&lt;/em&gt; interface accepts the collection of &lt;em&gt;Runnable&lt;/em&gt; objects and 
 running worker threads execute &lt;em&gt;Runnable&lt;/em&gt; objects from the task queue. The queue holds extra
@@ -127,4 +178,4 @@ Here is the implementation of &lt;em&gt;ThreadFactory&lt;/em&gt; and we use &lt;
 &lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
 &lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
 &lt;span class="n"&gt;Threads&lt;/span&gt; &lt;span class="n"&gt;all&lt;/span&gt; &lt;span class="n"&gt;done&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="java"></category><category term="thread"></category></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;</summary><category term="java"></category><category term="concurrency"></category></entry></feed>

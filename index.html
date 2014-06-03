@@ -65,7 +65,7 @@
                             <a href="http://www.raydevblog.us/category/python.html">Python</a>
                         </li>
                         <li >
-                            <a href="http://www.raydevblog.us/category/system-programming.html">System Programming</a>
+                            <a href="http://www.raydevblog.us/category/system-design.html">System Design</a>
                         </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -79,6 +79,17 @@
 <div class="container">
     <div class="row">
         <div class="col-lg-9">
+            <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/java-reentrant-lock.html">Java Reentrant Lock</a></h2>
+                <div class="summary"><h3>Intrinsic Lock</h3>
+<p><strong>Synchronized</strong> uses intrinsic locks. Every object in Java has an associated intrinsic lock. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock on that object.</p>
+<p>The intrinsic locking mechanism have some limitations as follows:</p>
+<ul>
+<li>It is not possible to attempt to ...</li></ul>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/java-reentrant-lock.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
             <article>
                 <h2><a href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">Fibonacci Sequence</a></h2>
                 <div class="summary"><p>Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. </p>
@@ -131,17 +142,6 @@ cache, and it ...</p>
                 </div>
             </article>
             <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html">A Single Server Key-Value Store</a></h2>
-                <div class="summary"><p>On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.</p>
-<h2>Summary</h2>
-<p>Multiple clients will be communicating with a single-node key-value server by sending and receiving
-formatted messages through sockets. The sever uses a thread pool to support concurrent operations
-accross multiple sets ...</p>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
 
         <ul class="pagination">
                 <li class="prev disabled"><a href="#">&laquo;</a></li>
@@ -175,23 +175,23 @@ accross multiple sets ...</p>
 
             <li class="list-group-item"><a href="http://www.raydevblog.us/tags.html"><h4><i class="icon-tags icon-large"></i>Tags</h4></a></li>
                 <li class="list-group-item tag-1">
-                    <a href="http://www.raydevblog.us/tag/python.html">
-                        python
+                    <a href="http://www.raydevblog.us/tag/concurrency.html">
+                        concurrency
                     </a>
                 </li>
-                <li class="list-group-item tag-1">
+                <li class="list-group-item tag-2">
                     <a href="http://www.raydevblog.us/tag/java.html">
                         java
                     </a>
                 </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/hadoop.html">
-                        hadoop
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
+                <li class="list-group-item tag-2">
                     <a href="http://www.raydevblog.us/tag/key-value-store.html">
                         key-value store
+                    </a>
+                </li>
+                <li class="list-group-item tag-2">
+                    <a href="http://www.raydevblog.us/tag/python.html">
+                        python
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -200,13 +200,8 @@ accross multiple sets ...</p>
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                        machine learning
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/distributed.html">
-                        distributed
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -215,8 +210,8 @@ accross multiple sets ...</p>
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/algorithm.html">
-                        algorithm
+                    <a href="http://www.raydevblog.us/tag/distributed.html">
+                        distributed
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -225,28 +220,8 @@ accross multiple sets ...</p>
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/logging-and-recovery.html">
-                        logging and recovery
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mongodb.html">
-                        mongodb
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/data-mining.html">
-                        data mining
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/thread.html">
-                        thread
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/concurrency.html">
-                        concurrency
+                    <a href="http://www.raydevblog.us/tag/json.html">
+                        json
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -255,13 +230,23 @@ accross multiple sets ...</p>
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/socket.html">
-                        socket
+                    <a href="http://www.raydevblog.us/tag/hadoop.html">
+                        hadoop
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/json.html">
-                        json
+                    <a href="http://www.raydevblog.us/tag/algorithm.html">
+                        algorithm
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                        machine learning
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/data-mining.html">
+                        data mining
                     </a>
                 </li>
         </ul>

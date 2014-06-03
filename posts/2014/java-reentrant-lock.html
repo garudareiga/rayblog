@@ -3,7 +3,7 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
-    <title>Python Function Parameter Using * and ** Operators</title>
+    <title>Java Reentrant Lock</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -12,9 +12,9 @@
     <!-- Open Graph tags -->
 
             <meta property="og:type" content="article"/>
-            <meta property="og:title" content="Python Function Parameter Using * and ** Operators"/>
-            <meta property="og:url" content="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html"/>
-            <meta property="og:description" content="Python lets us define a function that can take a variable number of arguments. Using * operator for positional arguments A parameter name that begins with * gathers arguments into a tuple. You can only provide one such variable after the ordinary positional parameters in the function definition. For example, printall takes ..."/>
+            <meta property="og:title" content="Java Reentrant Lock"/>
+            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/java-reentrant-lock.html"/>
+            <meta property="og:description" content="Intrinsic Lock Synchronized uses intrinsic locks. Every object in Java has an associated intrinsic lock. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock on that object. The intrinsic locking mechanism have some limitations as follows: It is not possible to attempt to ..."/>
 
     <!-- Bootstrap -->
         <link rel="stylesheet" href="http://www.raydevblog.us/theme/css/bootstrap.min.css" type="text/css"/>
@@ -74,7 +74,7 @@
                         <li >
                             <a href="http://www.raydevblog.us/category/hadoop.html">Hadoop</a>
                         </li>
-                        <li >
+                        <li class="active">
                             <a href="http://www.raydevblog.us/category/java.html">Java</a>
                         </li>
                         <li >
@@ -83,7 +83,7 @@
                         <li >
                             <a href="http://www.raydevblog.us/category/miscellaneous.html">Miscellaneous</a>
                         </li>
-                        <li class="active">
+                        <li >
                             <a href="http://www.raydevblog.us/category/python.html">Python</a>
                         </li>
                         <li >
@@ -105,10 +105,10 @@
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html"
+                    <a href="http://www.raydevblog.us/posts/2014/java-reentrant-lock.html"
                        rel="bookmark"
-                       title="Permalink to Python Function Parameter Using * and ** Operators">
-                        Python Function Parameter Using * and ** Operators
+                       title="Permalink to Java Reentrant Lock">
+                        Java Reentrant Lock
                     </a>
                 </h1>
             </header>
@@ -118,62 +118,68 @@
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="icon-calendar"></i>Sun 08 September 2013
+        <i class="icon-calendar"></i>Mon 02 June 2014
     </span>
 
 
 
 <span class="label label-default">Tags</span>
-	<a href="http://www.raydevblog.us/tag/python.html">python</a>
+	<a href="http://www.raydevblog.us/tag/java.html">java</a>
+        /
+	<a href="http://www.raydevblog.us/tag/concurrency.html">concurrency</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>Python lets us define a function that can take a variable number of arguments. </p>
-<h2>Using * operator for positional arguments</h2>
-<p>A parameter name that begins with * <em>gathers</em> arguments into a tuple. You can
-only provide one such variable after the ordinary positional parameters in
-the function definition. For example, <em>printall</em> takes any number of arguments
-and print them:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">print_all</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-        <span class="k">print</span> <span class="n">args</span>
-        <span class="n">print_all</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span>
-
-<span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="s">&#39;foo&#39;</span><span class="p">)</span>
+                <h3>Intrinsic Lock</h3>
+<p><strong>Synchronized</strong> uses intrinsic locks. Every object in Java has an associated intrinsic lock. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock on that object.</p>
+<p>The intrinsic locking mechanism have some limitations as follows:</p>
+<ul>
+<li>It is not possible to attempt to acquire a lock without being willing to wait for it forever. </li>
+<li>It is not possible to interrupt a thread waiting to acquire a lock.</li>
+</ul>
+<p>As an alternative, ReentrantLock provides more control on lock acquisition. ReentrantLock allows threads to re-request locks they already own. It provides timed or polled lock acquisition. It also has support for configurable fairness policy, allowing more flexible thread scheduling.</p>
+<h3>Polled and Timed Lock Acquisition</h3>
+<p>Let's see some example code:</p>
+<div class="highlight"><pre><span class="kd">public</span> <span class="kt">void</span> <span class="nf">transferMoney</span><span class="o">(</span><span class="n">Account</span> <span class="n">from</span><span class="o">,</span> <span class="n">Account</span> <span class="n">to</span><span class="o">,</span> <span class="kt">float</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">synchronized</span><span class="o">(</span><span class="n">from</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">synchronized</span><span class="o">(</span><span class="n">to</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">from</span><span class="o">.</span><span class="na">debit</span><span class="o">(</span><span class="n">amount</span><span class="o">);</span>
+            <span class="n">to</span><span class="o">.</span><span class="na">credit</span><span class="o">(</span><span class="n">amount</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
 
 
-<p>The complement of gather is <em>scatter</em>. If you have a sequence of values and you 
-want to pass it to a function as multiple arguments, you can use the * operator.
-For example, <em>divmond</em> takes exactly two argument:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="n">t</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">divmond</span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="p">)</span>
-<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<p>In <em>transferMoney()</em> method above, there is a possibility of <strong>deadlock</strong> when two threads A and B are trying to transfer money at the same time. For example, when thread A has acquired a lock on <em>account_1</em> object and is waiting to acquire a lock on the <em>account_2</em> object, thread B has acquired a lock on the <em>account_2</em> object and is waiting for a lock on <em>account_1</em>. This will lead to deadlock.</p>
+<div class="highlight"><pre><span class="n">transferMoney</span><span class="o">(</span><span class="n">account_1</span><span class="o">,</span> <span class="n">account_2</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+<span class="n">transferMoney</span><span class="o">(</span><span class="n">account_2</span><span class="o">,</span> <span class="n">account_1</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
 </pre></div>
 
 
-<p>The <em>chain</em> function from the <em>itertools</em> module provides an example for gather
-and scatter:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">myList</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterools</span><span class="o">.</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">myList</span><span class="p">))</span>
-<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
-</pre></div>
+<p>Using <em>tryLock</em>, a <strong>timed and polled lock acquisition</strong> mechanism lets you regain control if you can not acquire all the required locks, release the ones you have acquired and retry. If we can not acquire both, we will release if one of these has been acquired, then retry. If the locks can not be acquired within the specified time, the transferMoney method will return a failure.</p>
+<div class="highlight"><pre><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">transferMoney</span><span class="o">(</span><span class="n">Account</span> <span class="n">from</span><span class="o">,</span> <span class="n">Account</span> <span class="n">to</span><span class="o">,</span> <span class="kt">float</span> <span class="n">amount</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">long</span> <span class="n">startTime</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">();</span>
+    <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">from</span><span class="o">.</span><span class="na">getReentrantLock</span><span class="o">().</span><span class="na">tryLock</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="k">if</span> <span class="o">(</span><span class="n">to</span><span class="o">.</span><span class="na">getReentrantLock</span><span class="o">().</span><span class="na">tryLock</span><span class="o">())</span> <span class="o">{</span>
+                    <span class="k">try</span> <span class="o">{</span>
+                        <span class="n">from</span><span class="o">.</span><span class="na">debit</span><span class="o">(</span><span class="n">amount</span><span class="o">);</span>
+                        <span class="n">to</span><span class="o">.</span><span class="na">credit</span><span class="o">(</span><span class="n">amount</span><span class="o">);</span>
+                    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                        <span class="n">to</span><span class="o">.</span><span class="na">getReentrantLock</span><span class="o">().</span><span class="na">unlock</span><span class="o">();</span>
+                    <span class="o">}</span>
+                <span class="o">}</span>
+            <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+                <span class="n">from</span><span class="o">.</span><span class="na">getReentrantLock</span><span class="o">().</span><span class="na">unlock</span><span class="o">();</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">nanoTime</span><span class="o">()</span> <span class="o">-</span> <span class="n">startTime</span> <span class="o">&gt;</span> <span class="mi">5000</span><span class="o">)</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
 
-
-<h2>Using ** operator for keyword arguments</h2>
-<p>A parameter name that begins with ** gathers arguments into a dictionary: </p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">print_kwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">print</span> <span class="n">kwargs</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">print_kwargs</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="p">{</span><span class="s">&#39;a&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&#39;c&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
-</pre></div>
-
-
-<p>You can also use ** operator as a scatter when calling a function:</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="k">def</span> <span class="nf">print_args</span><span class="p">(</span><span class="n">arg1</span><span class="p">,</span> <span class="n">arg2</span><span class="p">)</span>
-        <span class="k">print</span> <span class="s">&quot;arg1:&quot;</span><span class="p">,</span> <span class="n">arg1</span><span class="p">,</span> <span class="s">&quot;arg2:&quot;</span><span class="p">,</span> <span class="n">arg2</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;arg1&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&#39;arg2&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">print_args</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="n">arg1</span><span class="p">:</span> <span class="mi">2</span> <span class="n">arg2</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">100</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
 </pre></div>
             </div>
             <!-- /.entry-content -->
@@ -184,8 +190,8 @@ and scatter:</p>
         <script type="text/javascript">
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
-            var disqus_identifier = 'python-function-parameter-using-and-operators';
-            var disqus_url = 'http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html';
+            var disqus_identifier = 'java-reentrant-lock';
+            var disqus_url = 'http://www.raydevblog.us/posts/2014/java-reentrant-lock.html';
 
             /* * * DON'T EDIT BELOW THIS LINE * * */
             (function () {
