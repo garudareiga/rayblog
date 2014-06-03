@@ -2,7 +2,7 @@ Title: Java Thread Pool Example
 Date: 2014-03-20 22:06
 Author: Ray Chen
 Category: Java 
-Tags: java, thread 
+Tags: java, concurrency 
 
 A thread pool from the executor implementation in _java.util.concurrent_ manages the pool 
 of _worker threads_. Using worker threads minimizes the overhead due to thread creation.
