@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/index.html</loc>
-<lastmod>2014-06-02T22:19:28-00:00</lastmod>
+<lastmod>2014-07-24T21:28:02-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/archives.html</loc>
-<lastmod>2014-06-02T22:19:28-00:00</lastmod>
+<lastmod>2014-07-24T21:28:02-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/tags.html</loc>
-<lastmod>2014-06-02T22:19:28-00:00</lastmod>
+<lastmod>2014-07-24T21:28:02-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/categories.html</loc>
-<lastmod>2014-06-02T22:19:28-00:00</lastmod>
+<lastmod>2014-07-24T21:28:02-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html</loc>
+<lastmod>2014-07-20T22:07:00-00:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -145,7 +152,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/category/system-design.html</loc>
-<lastmod>2014-04-10T22:07:00-00:00</lastmod>
+<lastmod>2014-07-20T22:07:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -250,14 +257,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/tag/key-value-store.html</loc>
-<lastmod>2014-04-10T22:07:00-00:00</lastmod>
+<lastmod>2014-07-20T22:07:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/author/ray-chen.html</loc>
-<lastmod>2014-06-02T20:10:00-00:00</lastmod>
+<lastmod>2014-07-20T22:07:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>

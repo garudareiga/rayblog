@@ -3,7 +3,7 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
-    <title>A Single Server Key-Value Store</title>
+    <title>Dynamo: Amazon's Highly Available Key-Value Store</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -12,9 +12,9 @@
     <!-- Open Graph tags -->
 
             <meta property="og:type" content="article"/>
-            <meta property="og:title" content="A Single Server Key-Value Store"/>
-            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html"/>
-            <meta property="og:description" content="On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java. Summary Multiple clients will be communicating with a single-node key-value server by sending and receiving formatted messages through sockets. The sever uses a thread pool to support concurrent operations accross multiple sets ..."/>
+            <meta property="og:title" content="Dynamo: Amazon's Highly Available Key-Value Store"/>
+            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html"/>
+            <meta property="og:description" content="This paper was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper ..."/>
 
     <!-- Bootstrap -->
         <link rel="stylesheet" href="http://www.raydevblog.us/theme/css/bootstrap.min.css" type="text/css"/>
@@ -105,10 +105,10 @@
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html"
+                    <a href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html"
                        rel="bookmark"
-                       title="Permalink to A Single Server Key-Value Store">
-                        A Single Server Key-Value Store
+                       title="Permalink to Dynamo: Amazon's Highly Available Key-Value Store">
+                        Dynamo: Amazon's Highly Available Key-Value Store
                     </a>
                 </h1>
             </header>
@@ -118,52 +118,56 @@
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="icon-calendar"></i>Mon 31 March 2014
+        <i class="icon-calendar"></i>Sun 20 July 2014
     </span>
 
 
 
 <span class="label label-default">Tags</span>
 	<a href="http://www.raydevblog.us/tag/key-value-store.html">key-value store</a>
-        /
-	<a href="http://www.raydevblog.us/tag/concurrency.html">concurrency</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.</p>
-<h2>Summary</h2>
-<p>Multiple clients will be communicating with a single-node key-value server by sending and receiving
-formatted messages through sockets. The sever uses a thread pool to support concurrent operations
-accross multiple sets and a set-associative cache, which is backed by a disk storage.</p>
-<p>The figure below shows a single-node key-value server with three clients making simultaneous requests:
-<img alt="Alt text" src="http://www.raydevblog.us/images/kvstore.jpg" /></p>
-<h2>Requirements</h2>
+                <p>This <a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html">paper</a> was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.</p>
+<h3>Introduction</h3>
+<p>Dynamo is a completely decentralized system targeting applications that operate with weaker consistency and high availability. It is built to be an <strong>"always writeable"</strong> data store. Hence, Dynamos allows conflicting updates in the system. </p>
+<p>Dynamo achieves scalability and availability by the following technologies:</p>
 <ul>
-<li>
-<p>The key-value server will support 3 interfaces:</p>
+<li>Data is partitioned and replicated using consistent hashing.</li>
+<li>Consistency is facilitated by object versioning. </li>
+<li>The consistency among replicas during updates is maintained by a quorum-like technique and a decentralized replica synchronization protocol. </li>
+<li>A gossip based distributed failure detection and membership protocol. </li>
+</ul>
+<h3>System Architecture</h3>
+<p>Table 1 presents a summary of the list of techniques Dynamo uses and their respective advantages.
+<img alt="Alt text" src="http://www.raydevblog.us/images/dynamo.jpeg" /></p>
+<p>The paper gives details on the partitioning, replication, versioning, membership, and failure handling components of Dynamo.</p>
+<h3>Partitioning</h3>
+<h4>Consistent Hashing</h4>
+<p>Dynamo's partitioning scheme relies on a variant of consistent hashing for load balancing. It applies a MD5 hash on the key to generate a 128-bit identifier, which is used to determine the storage nodes. The hash output range forms a ring, and each node in the system is assigned a position on the ring. Thus, each node is responsible for the region in the ring between it and its predecessor node. To know the detail about consistent hashing, please refer to this blog <a href="http://www.tomkleinpeter.com/2008/03/17/programmers-toolbox-part-3-consistent-hashing">post</a>.</p>
+<h4>Virtual Node</h4>
+<p>Dynamo uses the concept of "virtual nodes", and each physical node can be responsible for more than one virtual node on the ring. Using virtual nodes makes the key distribution load balancing more fine-grained and more uniform:</p>
 <ul>
-<li><em>Value GET (Key k)</em>: Retrieves the key-value pair corresponding to the provided key.</li>
-<li><em>PUT (Key k, Value v)</em>: Inserts the key-value pair into the store.</li>
-<li><em>DEL (Key k)</em>: Removes the key-value pair corresponding to the provided key from the store.</li>
+<li>The load handled by an unavailable node is evenly dispersed across the remaining available nodes.</li>
+<li>A new node accepts a roughly equivalent of load from each of the other available nodes.</li>
+<li>The number of virtual nodes that a physical node is responsible can be decided by its capacity.</li>
 </ul>
-</li>
-<li>
-<p>The key-value server has a set-associative cache with the second-change eviction policy within each set.
-  Each set in the cache will have a fixed number of entries, and evict entries using the second-chance algorithm.
-  The cache follows a write-through caching policy. If a key exists in the cache for a <em>GET</em> request, do not access
-  the store.</p>
-</li>
-<li>
-<p>All requests (get/put/del) are atomic in that they must modify the state of both the cache and the store together.<br />
-  Requests must be parallel across different sets and serial with the same set. The threadpool in the server shall
-  maintain a queue of tasks, assign free threads to tasks and execute them asynchronously.</p>
-</li>
-<li>
-<p>The server will create a serversocket that listens on a port for connections, and service requests from the client.
-  A socket shall be passed to the client handler for each request that comes in.</p>
-</li>
+<h4>Replication</h4>
+<p>To achieve high availability, each data is replicated at N storage hosts. Each key is assigned to a coordinator node. The coordinator stores each key locally and replicates at the N-1 clockwise successor nodes in the ring. The list of nodes responsible for storing a particular key is called the <strong>preference list</strong>.</p>
+<h3>Object Versioning</h3>
+<p>Dynamo provides <a href="http://en.wikipedia.org/wiki/Eventual_consistency">eventual consistency</a>, which allows for updates on replicas <strong>asynchronously</strong>. Dynamo treats the result of every modification as a new and immutable version of data. It uses <strong>vector clocks</strong> to capture causality between different versions of the same object. One verctor clock is associated with every version of every object. Upon processing a read request, Dynamo detects conflicts and employs application-assisted conflict resolution if necessary. </p>
+<h3>Sloppy Quorum</h3>
+<p>Dynamo uses a "sloppy quoram" instead of strict quorum. All read and write operations are performed on the first N healthy nodes in the preference list, skipping those that are down or inaccessible. To maintain consistency among its replicas, Dynamo uses a consistency protocol similar to quorum-based voting. This protocol has two key configurable values: R and W. R is the minimum number of nodes that must participate in a successful read operation. W is the minimum number of nodes that must participate in a successful write operation. Setting R and W such that R + W &gt; N yields a quorum-like system. </p>
+<h3>Merkle Tree</h3>
+<p>A <a href="http://en.wikipedia.org/wiki/Merkle_tree">Merke tree</a> is a hash tree where leaves are hashes of the values of individual keys. Parent nodes higher in the tree are hashes of their respective children. If the hash values of the root of two trees are equal, then the values of the leaf nodes in the tree are equal and the nodes require no synchronization. If not, it implies that the values of some replicas are different. </p>
+<p>Dynamo uses Merkle Trees for anti-entropy to keey the replicas synchronized. Each virtual node maintains a seperate Merkle tree for each key range it hosts. This allows nodes to compare whether the keys within a key range are up-to-date.</p>
+<h3>Gossip-based Membership and Failure Detection</h3>
+<p>Decentralized failure detection protocols use a simple gossip-style protocol that enable each node in the system to learn about the arrival or departure of other nodes.</p>
+<h3>Reference</h3>
+<ul>
+<li><a href="http://muratbuffalo.blogspot.com/2010/11/dynamo-amazons-highly-available-key.html">Dynamo: Amazon's highly available key-value store</a></li>
+<li><a href="http://jsensarma.com/blog/?p=55">Dynamo: A flawed architecture</a></li>
+<li><a href="http://docs.basho.com/riak/1.3.2/references/dynamo/">Riak docs</a></li>
 </ul>
-<h2>Source Code</h2>
-<p>The latest source code of my implementation is available in my <a href="https://github.com/garudareiga/computer_system_design/tree/master/kvstore/src/edu/berkeley/cs162">github repository</a></p>
             </div>
             <!-- /.entry-content -->
     <hr />
@@ -173,8 +177,8 @@ accross multiple sets and a set-associative cache, which is backed by a disk sto
         <script type="text/javascript">
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
-            var disqus_identifier = 'a-single-server-key-value-store';
-            var disqus_url = 'http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html';
+            var disqus_identifier = 'dynamo-amazons-highly-available-key-value-store';
+            var disqus_url = 'http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html';
 
             /* * * DON'T EDIT BELOW THIS LINE * * */
             (function () {

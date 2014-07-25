@@ -1,5 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system-design.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-04-10T22:07:00-07:00</updated><entry><title>Distributed Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/distributed-key-value-store.html" rel="alternate"></link><updated>2014-04-10T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-10:posts/2014/distributed-key-value-store.html</id><summary type="html">&lt;p&gt;Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system-design.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-07-20T22:07:00-07:00</updated><entry><title>Dynamo: Amazon's Highly Available Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html" rel="alternate"></link><updated>2014-07-20T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-20:posts/2014/dynamo-amazons-highly-available-key-value-store.html</id><summary type="html">&lt;p&gt;This &lt;a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"&gt;paper&lt;/a&gt; was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Dynamo is a completely decentralized system targeting applications that operate with weaker consistency and high availability. It is built to be an &lt;strong&gt;"always writeable"&lt;/strong&gt; data store. Hence, Dynamos allows conflicting updates in the system. &lt;/p&gt;
+&lt;p&gt;Dynamo achieves scalability and availability by the following technologies:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Data is partitioned and replicated using consistent hashing.&lt;/li&gt;
+&lt;li&gt;Consistency is facilitated by object versioning. &lt;/li&gt;
+&lt;li&gt;The consistency among replicas during updates is maintained by a quorum-like technique and a decentralized replica synchronization protocol. &lt;/li&gt;
+&lt;li&gt;A gossip based distributed failure detection and membership protocol. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;System Architecture&lt;/h3&gt;
+&lt;p&gt;Table 1 presents a summary of the list of techniques Dynamo uses and their respective advantages.
+&lt;img alt="Alt text" src="http://www.raydevblog.us/images/dynamo.jpeg" /&gt;&lt;/p&gt;
+&lt;p&gt;The paper gives details on the partitioning, replication, versioning, membership, and failure handling components of Dynamo.&lt;/p&gt;
+&lt;h3&gt;Partitioning&lt;/h3&gt;
+&lt;h4&gt;Consistent Hashing&lt;/h4&gt;
+&lt;p&gt;Dynamo's partitioning scheme relies on a variant of consistent hashing for load balancing. It applies a MD5 hash on the key to generate a 128-bit identifier, which is used to determine the storage nodes. The hash output range forms a ring, and each node in the system is assigned a position on the ring. Thus, each node is responsible for the region in the ring between it and its predecessor node. To know the detail about consistent hashing, please refer to this blog &lt;a href="http://www.tomkleinpeter.com/2008/03/17/programmers-toolbox-part-3-consistent-hashing"&gt;post&lt;/a&gt;.&lt;/p&gt;
+&lt;h4&gt;Virtual Node&lt;/h4&gt;
+&lt;p&gt;Dynamo uses the concept of "virtual nodes", and each physical node can be responsible for more than one virtual node on the ring. Using virtual nodes makes the key distribution load balancing more fine-grained and more uniform:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The load handled by an unavailable node is evenly dispersed across the remaining available nodes.&lt;/li&gt;
+&lt;li&gt;A new node accepts a roughly equivalent of load from each of the other available nodes.&lt;/li&gt;
+&lt;li&gt;The number of virtual nodes that a physical node is responsible can be decided by its capacity.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Replication&lt;/h4&gt;
+&lt;p&gt;To achieve high availability, each data is replicated at N storage hosts. Each key is assigned to a coordinator node. The coordinator stores each key locally and replicates at the N-1 clockwise successor nodes in the ring. The list of nodes responsible for storing a particular key is called the &lt;strong&gt;preference list&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3&gt;Object Versioning&lt;/h3&gt;
+&lt;p&gt;Dynamo provides &lt;a href="http://en.wikipedia.org/wiki/Eventual_consistency"&gt;eventual consistency&lt;/a&gt;, which allows for updates on replicas &lt;strong&gt;asynchronously&lt;/strong&gt;. Dynamo treats the result of every modification as a new and immutable version of data. It uses &lt;strong&gt;vector clocks&lt;/strong&gt; to capture causality between different versions of the same object. One verctor clock is associated with every version of every object. Upon processing a read request, Dynamo detects conflicts and employs application-assisted conflict resolution if necessary. &lt;/p&gt;
+&lt;h3&gt;Sloppy Quorum&lt;/h3&gt;
+&lt;p&gt;Dynamo uses a "sloppy quoram" instead of strict quorum. All read and write operations are performed on the first N healthy nodes in the preference list, skipping those that are down or inaccessible. To maintain consistency among its replicas, Dynamo uses a consistency protocol similar to quorum-based voting. This protocol has two key configurable values: R and W. R is the minimum number of nodes that must participate in a successful read operation. W is the minimum number of nodes that must participate in a successful write operation. Setting R and W such that R + W &amp;gt; N yields a quorum-like system. &lt;/p&gt;
+&lt;h3&gt;Merkle Tree&lt;/h3&gt;
+&lt;p&gt;A &lt;a href="http://en.wikipedia.org/wiki/Merkle_tree"&gt;Merke tree&lt;/a&gt; is a hash tree where leaves are hashes of the values of individual keys. Parent nodes higher in the tree are hashes of their respective children. If the hash values of the root of two trees are equal, then the values of the leaf nodes in the tree are equal and the nodes require no synchronization. If not, it implies that the values of some replicas are different. &lt;/p&gt;
+&lt;p&gt;Dynamo uses Merkle Trees for anti-entropy to keey the replicas synchronized. Each virtual node maintains a seperate Merkle tree for each key range it hosts. This allows nodes to compare whether the keys within a key range are up-to-date.&lt;/p&gt;
+&lt;h3&gt;Gossip-based Membership and Failure Detection&lt;/h3&gt;
+&lt;p&gt;Decentralized failure detection protocols use a simple gossip-style protocol that enable each node in the system to learn about the arrival or departure of other nodes.&lt;/p&gt;
+&lt;h3&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://muratbuffalo.blogspot.com/2010/11/dynamo-amazons-highly-available-key.html"&gt;Dynamo: Amazon's highly available key-value store&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://jsensarma.com/blog/?p=55"&gt;Dynamo: A flawed architecture&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.basho.com/riak/1.3.2/references/dynamo/"&gt;Riak docs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary><category term="key-value store"></category></entry><entry><title>Distributed Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/distributed-key-value-store.html" rel="alternate"></link><updated>2014-04-10T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-10:posts/2014/distributed-key-value-store.html</id><summary type="html">&lt;p&gt;Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
 a distributed key-value store system design.&lt;/p&gt;
 &lt;h2&gt;Overview&lt;/h2&gt;
 &lt;p&gt;This distributed key-value storage system has multiple clients communicating 
