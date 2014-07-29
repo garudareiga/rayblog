@@ -127,24 +127,39 @@
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.</p>
-<p>Bloom filter is a space-efficient <strong>probabilistic</strong> data structure used to test set membership. It tells us that the element either <em>definitely</em> is not in the set or <em>may be</em> in the set. In other words, <strong>fase positives</strong> are possible, however <strong>false negatives</strong> are not.</p>
+<p>Bloom filter is a space-efficient <strong>probabilistic</strong> data structure used to test set membership. It tells us that the element either <em>definitely</em> is not in the set or <em>may be</em> in the set. In other words, <strong>false positives</strong> are possible, however <strong>false negatives</strong> are not.</p>
 <h3>Data Structure</h3>
 <p>Bloom filter is not a key-value store. The base data structure of a bloom filter is a <strong>Bit Vector</strong>, a vector of bit buckets indicating the presence of an element in the filter. </p>
 <p>To add an element, we simply hash it a few times and set the bits in the bit vector at the bucket index of those hashes to 1. To test for membership, we simply hash the element with the same hash functions, then see if those values are set in the bit vector. If they aren't, we know that the element isn't in the set. If they are, we only know that it <em>might be</em>, because some combination of other elements could have set the same bits. Removing an element from the filter is not possible. The more elements that are added to the set, the larger the probability of false positives. The website <a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a> shows you how to add and test strings in the bloom filter.</p>
 <p><img alt="Alt text" src="http://www.raydevblog.us/images/bloom_filter.jpg" /></p>
 <h3>Hash Functions</h3>
-<p>The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include murmur, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.</p>
-<p>Let's assume a bloom filter with k hashes, m bits in the filter, and n elements that have been inserted. The false positive rate of our filter will be approximately:</p>
-<p>\begin{equation} fsr = (1 - e^{-kn/m})^k \end{equation}</p>
+<p>The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include <a href="https://code.google.com/p/smhasher">MurmurHash</a>, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.</p>
+<p>Let's assume a bloom filter with k hashes, m bits in the filter, and n elements to be inserted. <a href="http://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives">Wikipedia</a> provides the math for choosing these values. </p>
+<p>The false positive rate of our filter will be approximately:</p>
+<p>\begin{equation} fpr = (1 - e^{-kn/m})^k \end{equation}</p>
 <p>The more hash functions we have, the slower our bloom filter, and the quicker it fills up. If we have too few, we may suffer too many false positives. Given an m and an n, we have a function to choose the optimal value of k:</p>
 <p>\begin{equation} k_{opt} = \frac{m}{n}\ln 2 \approx 0.7\frac{m}{n} \end{equation}</p>
-<p>A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.</p>
+<p>This results in:</p>
+<p>\begin{equation} m = -\frac{n\ln fpr}{(\ln 2)^2} \end{equation}</p>
+<p>This means that for a given false positive probability fpr, the length of a Bloom filter m is proportionate to the the number of elements being filtered n. A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.</p>
 <h3>Extensions</h3>
 <p>Removing elments from the filter can be addressed with a <strong>counting</strong> bloom filter. A counting filter uses an n-bit counter instead of a single bit in each bucket. The insert operation increments the value of the buckets, and the delete operation decrements the value of the buckets. The n-bit counters must be large enough to avoid overflow.</p>
 <p><a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf">Almeida et al.</a> proposed a variant of Bloom filters that can adapt dynamically to the number of elements stored, while assuring a minimum false positive probability. If we can not estimate the number of elements to be inserted, we maybe better off with a scalable Bloom filter. </p>
-<h3>Applications</h3>
-<p>In terms of NoSQL database, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each Cassandra SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist.</p>
+<h3>Applications and Implementations</h3>
+<ul>
+<li>
+<p>Bloom filters are present in a lot of NoSQL systems. Take <a href="http://wiki.apache.org/cassandra/ArchitectureOverview">Cassandra</a> for example, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist. </p>
+</li>
+<li>
+<p>The URL shortening service company Bitly, Inc. open sourced a scalable, counting bloom filter library <strong><a href="https://github.com/bitly/dablooms">dablooms</a></strong>. You can read <a href="http://word.bitly.com/post/28558800777/dablooms-an-open-source-scalable-counting-bloom">bitly's engineering blog post</a> for implemetation details.</p>
+</li>
+<li>
 <p>I also found an interesting <a href="http://www.quora.com/Bloom-Filters/What-are-the-best-applications-of-Bloom-filters">discussion</a> on Quora about the best applications of Bloom filters.</p>
+</li>
+<li>
+<p>This blog <a href="http://maxburstein.com/blog/creating-a-simple-bloom-filter/">post</a> shows how to create a simple bloom filter using Python. We also have a Python implementation <strong><a href="https://github.com/jaybaird/python-bloomfilter">PyBloom</a></strong>. </p>
+</li>
+</ul>
 <h3>References</h3>
 <ul>
 <li><a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a></li>
@@ -212,33 +227,18 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-2">
-                    <a href="http://www.raydevblog.us/tag/python.html">
-                        python
-                    </a>
-                </li>
-                <li class="list-group-item tag-2">
                     <a href="http://www.raydevblog.us/tag/java.html">
                         java
                     </a>
                 </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                        two-phase commit
+                <li class="list-group-item tag-2">
+                    <a href="http://www.raydevblog.us/tag/python.html">
+                        python
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                        bloom filter
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                        consistent hashing
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/distributed.html">
-                        distributed
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -247,18 +247,8 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/json.html">
-                        json
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/data-structure.html">
                         data structure
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mongodb.html">
-                        mongodb
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -269,6 +259,31 @@
                 <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/data-mining.html">
                         data mining
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/json.html">
+                        json
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                        bloom filter
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                        two-phase commit
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                        consistent hashing
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/distributed.html">
+                        distributed
                     </a>
                 </li>
         </ul>
