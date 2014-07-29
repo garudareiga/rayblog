@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/index.html</loc>
-<lastmod>2014-07-24T21:28:02-00:00</lastmod>
+<lastmod>2014-07-28T22:00:10-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/archives.html</loc>
-<lastmod>2014-07-24T21:28:02-00:00</lastmod>
+<lastmod>2014-07-28T22:00:10-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/tags.html</loc>
-<lastmod>2014-07-24T21:28:02-00:00</lastmod>
+<lastmod>2014-07-28T22:00:10-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/categories.html</loc>
-<lastmod>2014-07-24T21:28:02-00:00</lastmod>
+<lastmod>2014-07-28T22:00:10-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://www.raydevblog.us/posts/2014/bloom-filter.html</loc>
+<lastmod>2014-07-28T10:00:00-00:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -48,13 +55,6 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>http://www.raydevblog.us/posts/2014/fibonacci-sequence.html</loc>
 <lastmod>2014-05-14T23:15:00-00:00</lastmod>
-<changefreq>monthly</changefreq>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html</loc>
-<lastmod>2014-04-25T22:07:00-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
@@ -109,15 +109,8 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://www.raydevblog.us/category/algorithm.html</loc>
-<lastmod>2014-05-14T23:15:00-00:00</lastmod>
-<changefreq>daily</changefreq>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>http://www.raydevblog.us/category/hadoop.html</loc>
-<lastmod>2014-04-25T22:07:00-00:00</lastmod>
+<loc>http://www.raydevblog.us/category/data-structure-and-algorithm.html</loc>
+<lastmod>2014-07-28T10:00:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -172,21 +165,14 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://www.raydevblog.us/tag/data-mining.html</loc>
+<loc>http://www.raydevblog.us/tag/machine-learning.html</loc>
 <lastmod>2013-12-08T10:00:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
-<loc>http://www.raydevblog.us/tag/algorithm.html</loc>
-<lastmod>2014-05-14T23:15:00-00:00</lastmod>
-<changefreq>daily</changefreq>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>http://www.raydevblog.us/tag/machine-learning.html</loc>
+<loc>http://www.raydevblog.us/tag/data-mining.html</loc>
 <lastmod>2013-12-08T10:00:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
@@ -209,20 +195,6 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
 <loc>http://www.raydevblog.us/tag/distributed.html</loc>
 <lastmod>2014-04-10T22:07:00-00:00</lastmod>
-<changefreq>daily</changefreq>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>http://www.raydevblog.us/tag/hadoop.html</loc>
-<lastmod>2014-04-25T22:07:00-00:00</lastmod>
-<changefreq>daily</changefreq>
-<priority>0.5</priority>
-</url>
-
-<url>
-<loc>http://www.raydevblog.us/tag/mapreduce.html</loc>
-<lastmod>2014-04-25T22:07:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -264,7 +236,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/author/ray-chen.html</loc>
-<lastmod>2014-07-20T22:07:00-00:00</lastmod>
+<lastmod>2014-07-28T10:00:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>

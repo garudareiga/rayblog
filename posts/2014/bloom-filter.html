@@ -3,7 +3,7 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
-    <title>Hadoop MapReduce - Running WordCount</title>
+    <title>Bloom Filter</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -12,9 +12,9 @@
     <!-- Open Graph tags -->
 
             <meta property="og:type" content="article"/>
-            <meta property="og:title" content="Hadoop MapReduce - Running WordCount"/>
-            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html"/>
-            <meta property="og:description" content="WordCount Example WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model. Generally Hadoop can be run in three modes: Standalone (or local) mode: There are no daemons running ..."/>
+            <meta property="og:title" content="Bloom Filter"/>
+            <meta property="og:url" content="http://www.raydevblog.us/posts/2014/bloom-filter.html"/>
+            <meta property="og:description" content="I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter. Bloom filter is a space-efficient probabilistic data structure used to test set membership. It tells us that the element either definitely ..."/>
 
     <!-- Bootstrap -->
         <link rel="stylesheet" href="http://www.raydevblog.us/theme/css/bootstrap.min.css" type="text/css"/>
@@ -68,11 +68,8 @@
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                        <li >
-                            <a href="http://www.raydevblog.us/category/algorithm.html">Algorithm</a>
-                        </li>
                         <li class="active">
-                            <a href="http://www.raydevblog.us/category/hadoop.html">Hadoop</a>
+                            <a href="http://www.raydevblog.us/category/data-structure-and-algorithm.html">Data Structure and Algorithm</a>
                         </li>
                         <li >
                             <a href="http://www.raydevblog.us/category/java.html">Java</a>
@@ -105,10 +102,10 @@
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html"
+                    <a href="http://www.raydevblog.us/posts/2014/bloom-filter.html"
                        rel="bookmark"
-                       title="Permalink to Hadoop MapReduce - Running WordCount">
-                        Hadoop MapReduce - Running WordCount
+                       title="Permalink to Bloom Filter">
+                        Bloom Filter
                     </a>
                 </h1>
             </header>
@@ -118,131 +115,37 @@
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="icon-calendar"></i>Fri 25 April 2014
+        <i class="icon-calendar"></i>Mon 28 July 2014
     </span>
 
 
 
-<span class="label label-default">Tags</span>
-	<a href="http://www.raydevblog.us/tag/hadoop.html">hadoop</a>
-        /
-	<a href="http://www.raydevblog.us/tag/mapreduce.html">mapreduce</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <h4>WordCount Example</h4>
-<p>WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model.</p>
-<p>Generally Hadoop can be run in three modes:</p>
+                <p>I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.</p>
+<p>Bloom filter is a space-efficient <strong>probabilistic</strong> data structure used to test set membership. It tells us that the element either <em>definitely</em> is not in the set or <em>may be</em> in the set. In other words, <strong>fase positives</strong> are possible, however <strong>false negatives</strong> are not.</p>
+<h2>Data Structure</h2>
+<p>Bloom filter is not a key-value store. The base data structure of a bloom filter is a <strong>Bit Vector</strong>, a vector of bit buckets indicating the presence of an element in the filter. </p>
+<p>To add an element, we simply hash it a few times and set the bits in the bit vector at the bucket index of those hashes to 1. To test for membership, we simply hash the element with the same hash functions, then see if those values are set in the bit vector. If they aren't, we know that the element isn't in the set. If they are, we only know that it <em>might be</em>, because some combination of other elements could have set the same bits. Removing an element from the filter is not possible. The more elements that are added to the set, the larger the probability of false positives. The website <a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a> shows you how to add and test strings in the bloom filter.</p>
+<p><img alt="Alt text" src="http://www.raydevblog.us/images/bloom_filter.jpg" /></p>
+<h2>Hash Functions</h2>
+<p>The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include murmur, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.</p>
+<p>Let's assume a bloom filter with k hashes, m bits in the filter, and n elements that have been inserted. The false positive rate of our filter will be approximately:</p>
+<p>\begin{equation} fsr = (1 - e^{-kn/m})^k \end{equation}</p>
+<p>The more hash functions we have, the slower our bloom filter, and the quicker it fills up. If we have too few, we may suffer too many false positives. Given an m and an n, we have a function to choose the optimal value of k:</p>
+<p>\begin{equation} k_{opt} = \frac{m}{n}\ln 2 \approx 0.7\frac{m}{n} \end{equation}</p>
+<p>A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.</p>
+<h3>Extensions</h3>
+<p>Removing elments from the filter can be addressed with a <strong>counting</strong> bloom filter. A counting filter uses an n-bit counter instead of a single bit in each bucket. The insert operation increments the value of the buckets, and the delete operation decrements the value of the buckets. The n-bit counters must be large enough to avoid overflow.</p>
+<p><a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf">Almeida et al.</a> proposed a variant of Bloom filters that can adapt dynamically to the number of elements stored, while assuring a minimum false positive probability. If we can not estimate the number of elements to be inserted, we maybe better off with a scalable Bloom filter. </p>
+<h3>Applications</h3>
+<p>In terms of NoSQL database, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each Cassandra SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist.</p>
+<p>I also found an interesting <a href="http://www.quora.com/Bloom-Filters/What-are-the-best-applications-of-Bloom-filters">discussion</a> on Quora about the best applications of Bloom filters.</p>
+<h3>References</h3>
 <ul>
-<li><strong>Standalone (or local) mode</strong>: There are no daemons running in this mode. Hadoop uses the local file system instead of HDFS.</li>
-<li><strong>Pseudo-distributed mode</strong>: All the daemons run on a single machine locally using the HDFS protocol and this setting mimics the behavior of a cluster.</li>
-<li><strong>Fully-distributed mode</strong>: This is how Hadoop runs on a real cluster.</li>
+<li><a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a></li>
+<li><a href="http://www.slideshare.net/quipo/modern-algorithms-and-data-structures-1-bloom-filters-merkle-trees">Modern Algorithms and Data Structures - Bloom Filters</a></li>
 </ul>
-<p>I run WordCount application in pesudo-distributed mode here.</p>
-<h4>Hadoop Installation</h4>
-<p>You can install Hadoop on your local machine following the <a href="http://www.bigdataplanet.info/2013/10/Hadoop-Installation-on-Local-Machine-Single-node-Cluster.html">instruction</a>, or you can download and use Cloudera Quickstart VM. I already have Hadoop version 1.2.1 installed on my Ubuntu 12.04 LTS.</p>
-<h4>Plain Java Version</h4>
-<p>You can download the WordCount Java source code from this <a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/HadoopTutorial/CDH4/Hadoop-Tutorial/ht_wordcount1_source.html">link</a>. Then I will show you how to prepare the data set in HDFS and submit Hadoop MapReduce job step by step:</p>
-<ul>
-<li>Create the input directory wordcount/input in HDFS:</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span>hadoop fs -mkdir wordcount/input
-</pre></div>
-
-
-<ul>
-<li>Create sample text files as input and move to the input directory:</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span><span class="nb">echo</span> <span class="s2">&quot;Hello Bye&quot;</span> &gt; file0 <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">&quot;Hello Goodbye&quot;</span> &gt; file1
-<span class="nv">$ </span>hadoop fs -copyFromLocal file* wordcount/input
-</pre></div>
-
-
-<ul>
-<li>Compile WordCount.java and create a JAR</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span>mkdir wordcount <span class="o">&amp;&amp;</span> javac -cp /usr/local/hadoop/hadoop-core-1.2.1.jar -d classes WordCount.java <span class="o">&amp;&amp;</span> jar -cvf wordcount.jar -C classes/ .
-</pre></div>
-
-
-<ul>
-<li>Run the application</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span>hadoop jar wordcount.jar us.raydevblog.hadoop.WordCount wordcount/input wordcount/output1
-</pre></div>
-
-
-<ul>
-<li>Examine the output:</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span>hadoop fs -cat wordcount/part-00000
-Bye 1
-Goodbye 1
-Hello   2
-</pre></div>
-
-
-<h4>Using Maven Project</h4>
-<p>If you are not familiar with Maven, You can find an excellent, short
-post on the Maven website called <a href="http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">"Maven in 5 minutes"</a>. I use the following commands to create a Maven project and adjust the POM:</p>
-<ul>
-<li>First thing is to create a project structure using Maven:</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span>mvn archetype:generate -DgroupId<span class="o">=</span>us.raydevblog.hadoop -DartifactId<span class="o">=</span>WordCountV2 -DarchetypeArtifactId<span class="o">=</span>maven-archetype-quickstart -DinteractiveMode<span class="o">=</span><span class="nb">false</span>
-</pre></div>
-
-
-<ul>
-<li>Reference the Hadoop libraries in the pom.xml:</li>
-</ul>
-<div class="highlight"><pre><span class="nt">&lt;dependency&gt;</span>
-  <span class="nt">&lt;groupId&gt;</span>org.apache.hadoop<span class="nt">&lt;/groupId&gt;</span>
-  <span class="nt">&lt;artifactId&gt;</span>hadoop-core<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;version&gt;</span>1.2.1<span class="nt">&lt;/version&gt;</span>
-<span class="nt">&lt;/dependency&gt;</span>
-</pre></div>
-
-
-<ul>
-<li>Inorder to make us an executable JAR, we need tell Maven what class is holding our "main" function. I create a <strong>build</strong> node and within that node create a <strong>plugins</strong> node and then add the following:</li>
-</ul>
-<div class="highlight"><pre><span class="nt">&lt;plugin&gt;</span>
-  <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
-  <span class="nt">&lt;artifactId&gt;</span>maven-jar-plugin<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;configuration&gt;</span>
-    <span class="nt">&lt;archive&gt;</span>
-      <span class="nt">&lt;manifest&gt;</span>
-        <span class="nt">&lt;addClasspath&gt;</span>true<span class="nt">&lt;/addClasspath&gt;</span>
-        <span class="nt">&lt;mainClass&gt;</span>us.raydevblog.hadoop.WordCount<span class="nt">&lt;/mainClass&gt;</span>
-      <span class="nt">&lt;/manifest&gt;</span>
-    <span class="nt">&lt;/archive&gt;</span>
-  <span class="nt">&lt;/configuration&gt;</span>
-<span class="nt">&lt;/plugin&gt;</span>
-</pre></div>
-
-
-<ul>
-<li>Also need add this plugin to use Java 1.7 for compilation. Otherwise, we will have the error "generics are not supported in -source 1.3":</li>
-</ul>
-<div class="highlight"><pre><span class="nt">&lt;plugin&gt;</span>
-  <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
-  <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
-  <span class="nt">&lt;configuration&gt;</span>
-    <span class="nt">&lt;source&gt;</span>1.7<span class="nt">&lt;/source&gt;</span>
-    <span class="nt">&lt;target&gt;</span>1.7<span class="nt">&lt;/target&gt;</span>
-  <span class="nt">&lt;/configuration&gt;</span>
-<span class="nt">&lt;/plugin&gt;</span>
-</pre></div>
-
-
-<ul>
-<li>I copy WordCount.java into src/main/java/us/raydevblog/hadoop/ and remove the template provided "App.java" in this folder. Now it is time to compile our project and run the application:</li>
-</ul>
-<div class="highlight"><pre><span class="nv">$ </span>mvn clean install
-<span class="nv">$ </span>hadoop jar target/WordCountV2-1.0-SNAPSHOT.jar wordcount/input wordcount/output2
-</pre></div>
-
-
-<p>We now have a WordCount Map-Reduce example running successfully on the Hadoop. You can download my WordCount maven project from my <a href="https://github.com/garudareiga/hadoopstudy/tree/master/wordcount">github reposity</a></p>
             </div>
             <!-- /.entry-content -->
     <hr />
@@ -252,8 +155,8 @@ post on the Maven website called <a href="http://maven.apache.org/guides/getting
         <script type="text/javascript">
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
-            var disqus_identifier = 'hadoop-mapreduce-running-wordcount';
-            var disqus_url = 'http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html';
+            var disqus_identifier = 'bloom-filter';
+            var disqus_url = 'http://www.raydevblog.us/posts/2014/bloom-filter.html';
 
             /* * * DON'T EDIT BELOW THIS LINE * * */
             (function () {
@@ -315,23 +218,8 @@ post on the Maven website called <a href="http://maven.apache.org/guides/getting
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                        consistent hashing
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/distributed.html">
-                        distributed
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/json.html">
-                        json
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                        two-phase commit
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -340,13 +228,8 @@ post on the Maven website called <a href="http://maven.apache.org/guides/getting
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mongodb.html">
-                        mongodb
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/logging.html">
-                        logging
+                    <a href="http://www.raydevblog.us/tag/json.html">
+                        json
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -355,18 +238,23 @@ post on the Maven website called <a href="http://maven.apache.org/guides/getting
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/algorithm.html">
-                        algorithm
+                    <a href="http://www.raydevblog.us/tag/distributed.html">
+                        distributed
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/hadoop.html">
-                        hadoop
+                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                        two-phase commit
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mapreduce.html">
-                        mapreduce
+                    <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                        consistent hashing
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/logging.html">
+                        logging
                     </a>
                 </li>
         </ul>

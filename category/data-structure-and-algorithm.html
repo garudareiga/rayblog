@@ -3,7 +3,7 @@
       xmlns:og="http://ogp.me/ns#"
       xmlns:fb="https://www.facebook.com/2008/fbml">
 <head>
-    <title>Ray's Thoughts and Writings - hadoop</title>
+    <title>Ray's Thoughts and Writings - Data Structure and Algorithm</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -46,11 +46,8 @@
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                        <li >
-                            <a href="http://www.raydevblog.us/category/algorithm.html">Algorithm</a>
-                        </li>
-                        <li >
-                            <a href="http://www.raydevblog.us/category/hadoop.html">Hadoop</a>
+                        <li class="active">
+                            <a href="http://www.raydevblog.us/category/data-structure-and-algorithm.html">Data Structure and Algorithm</a>
                         </li>
                         <li >
                             <a href="http://www.raydevblog.us/category/java.html">Java</a>
@@ -80,13 +77,23 @@
     <div class="row">
         <div class="col-lg-9">
             <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html">Hadoop MapReduce - Running WordCount</a></h2>
-                <div class="summary"><h4>WordCount Example</h4>
-<p>WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model.</p>
-<p>Generally Hadoop can be run in three modes:</p>
-<ul>
-<li><strong>Standalone (or local) mode</strong>: There are no daemons running ...</li></ul>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html">more ...</a>
+                <h2><a href="http://www.raydevblog.us/posts/2014/bloom-filter.html">Bloom Filter</a></h2>
+                <div class="summary"><p>I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.</p>
+<p>Bloom filter is a space-efficient <strong>probabilistic</strong> data structure used to test set membership. It tells us that the element either <em>definitely ...</em></p>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/bloom-filter.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">Fibonacci Sequence</a></h2>
+                <div class="summary"><p>Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. </p>
+<p>Fibonacci sequence is defined as:
+$f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.</p>
+<h3>Naive Recursive Solution</h3>
+<div class="highlight"><pre><span class="kt">int</span> <span class="nf">fib</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">n ...</span></pre></div>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">more ...</a>
                 </div>
             </article>
             <hr/>
@@ -134,23 +141,8 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                        consistent hashing
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/distributed.html">
-                        distributed
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/json.html">
-                        json
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                        two-phase commit
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -159,13 +151,8 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mongodb.html">
-                        mongodb
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/logging.html">
-                        logging
+                    <a href="http://www.raydevblog.us/tag/json.html">
+                        json
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -174,18 +161,23 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/algorithm.html">
-                        algorithm
+                    <a href="http://www.raydevblog.us/tag/distributed.html">
+                        distributed
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/hadoop.html">
-                        hadoop
+                    <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                        two-phase commit
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mapreduce.html">
-                        mapreduce
+                    <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                        consistent hashing
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/logging.html">
+                        logging
                     </a>
                 </li>
         </ul>

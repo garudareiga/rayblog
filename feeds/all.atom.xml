@@ -1,5 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/all.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-07-20T22:07:00-07:00</updated><entry><title>Dynamo: Amazon's Highly Available Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html" rel="alternate"></link><updated>2014-07-20T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-20:posts/2014/dynamo-amazons-highly-available-key-value-store.html</id><summary type="html">&lt;p&gt;This &lt;a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"&gt;paper&lt;/a&gt; was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/all.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-07-28T10:00:00-07:00</updated><entry><title>Bloom Filter</title><link href="http://www.raydevblog.us/posts/2014/bloom-filter.html" rel="alternate"></link><updated>2014-07-28T10:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-28:posts/2014/bloom-filter.html</id><summary type="html">&lt;p&gt;I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.&lt;/p&gt;
+&lt;p&gt;Bloom filter is a space-efficient &lt;strong&gt;probabilistic&lt;/strong&gt; data structure used to test set membership. It tells us that the element either &lt;em&gt;definitely&lt;/em&gt; is not in the set or &lt;em&gt;may be&lt;/em&gt; in the set. In other words, &lt;strong&gt;fase positives&lt;/strong&gt; are possible, however &lt;strong&gt;false negatives&lt;/strong&gt; are not.&lt;/p&gt;
+&lt;h2&gt;Data Structure&lt;/h2&gt;
+&lt;p&gt;Bloom filter is not a key-value store. The base data structure of a bloom filter is a &lt;strong&gt;Bit Vector&lt;/strong&gt;, a vector of bit buckets indicating the presence of an element in the filter. &lt;/p&gt;
+&lt;p&gt;To add an element, we simply hash it a few times and set the bits in the bit vector at the bucket index of those hashes to 1. To test for membership, we simply hash the element with the same hash functions, then see if those values are set in the bit vector. If they aren't, we know that the element isn't in the set. If they are, we only know that it &lt;em&gt;might be&lt;/em&gt;, because some combination of other elements could have set the same bits. Removing an element from the filter is not possible. The more elements that are added to the set, the larger the probability of false positives. The website &lt;a href="http://billmill.org/bloomfilter-tutorial"&gt;Bloom Filters by Example&lt;/a&gt; shows you how to add and test strings in the bloom filter.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Alt text" src="http://www.raydevblog.us/images/bloom_filter.jpg" /&gt;&lt;/p&gt;
+&lt;h2&gt;Hash Functions&lt;/h2&gt;
+&lt;p&gt;The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include murmur, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.&lt;/p&gt;
+&lt;p&gt;Let's assume a bloom filter with k hashes, m bits in the filter, and n elements that have been inserted. The false positive rate of our filter will be approximately:&lt;/p&gt;
+&lt;p&gt;\begin{equation} fsr = (1 - e^{-kn/m})^k \end{equation}&lt;/p&gt;
+&lt;p&gt;The more hash functions we have, the slower our bloom filter, and the quicker it fills up. If we have too few, we may suffer too many false positives. Given an m and an n, we have a function to choose the optimal value of k:&lt;/p&gt;
+&lt;p&gt;\begin{equation} k_{opt} = \frac{m}{n}\ln 2 \approx 0.7\frac{m}{n} \end{equation}&lt;/p&gt;
+&lt;p&gt;A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.&lt;/p&gt;
+&lt;h3&gt;Extensions&lt;/h3&gt;
+&lt;p&gt;Removing elments from the filter can be addressed with a &lt;strong&gt;counting&lt;/strong&gt; bloom filter. A counting filter uses an n-bit counter instead of a single bit in each bucket. The insert operation increments the value of the buckets, and the delete operation decrements the value of the buckets. The n-bit counters must be large enough to avoid overflow.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf"&gt;Almeida et al.&lt;/a&gt; proposed a variant of Bloom filters that can adapt dynamically to the number of elements stored, while assuring a minimum false positive probability. If we can not estimate the number of elements to be inserted, we maybe better off with a scalable Bloom filter. &lt;/p&gt;
+&lt;h3&gt;Applications&lt;/h3&gt;
+&lt;p&gt;In terms of NoSQL database, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each Cassandra SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist.&lt;/p&gt;
+&lt;p&gt;I also found an interesting &lt;a href="http://www.quora.com/Bloom-Filters/What-are-the-best-applications-of-Bloom-filters"&gt;discussion&lt;/a&gt; on Quora about the best applications of Bloom filters.&lt;/p&gt;
+&lt;h3&gt;References&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://billmill.org/bloomfilter-tutorial"&gt;Bloom Filters by Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.slideshare.net/quipo/modern-algorithms-and-data-structures-1-bloom-filters-merkle-trees"&gt;Modern Algorithms and Data Structures - Bloom Filters&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary></entry><entry><title>Dynamo: Amazon's Highly Available Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html" rel="alternate"></link><updated>2014-07-20T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-20:posts/2014/dynamo-amazons-highly-available-key-value-store.html</id><summary type="html">&lt;p&gt;This &lt;a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"&gt;paper&lt;/a&gt; was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.&lt;/p&gt;
 &lt;h3&gt;Introduction&lt;/h3&gt;
 &lt;p&gt;Dynamo is a completely decentralized system targeting applications that operate with weaker consistency and high availability. It is built to be an &lt;strong&gt;"always writeable"&lt;/strong&gt; data store. Hence, Dynamos allows conflicting updates in the system. &lt;/p&gt;
 &lt;p&gt;Dynamo achieves scalability and availability by the following technologies:&lt;/p&gt;
@@ -127,120 +150,7 @@ $f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.&lt;/p&gt;
     &lt;span class="o"&gt;}&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 &lt;span class="o"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary><category term="algorithm"></category></entry><entry><title>Hadoop MapReduce - Running WordCount</title><link href="http://www.raydevblog.us/posts/2014/hadoop-mapreduce-running-wordcount.html" rel="alternate"></link><updated>2014-04-25T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-25:posts/2014/hadoop-mapreduce-running-wordcount.html</id><summary type="html">&lt;h4&gt;WordCount Example&lt;/h4&gt;
-&lt;p&gt;WordCount is a simple program which counts the number of occurrences of each word in an input data set. It is a great example to understand the Hadoop MapReduce programming model.&lt;/p&gt;
-&lt;p&gt;Generally Hadoop can be run in three modes:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;Standalone (or local) mode&lt;/strong&gt;: There are no daemons running in this mode. Hadoop uses the local file system instead of HDFS.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Pseudo-distributed mode&lt;/strong&gt;: All the daemons run on a single machine locally using the HDFS protocol and this setting mimics the behavior of a cluster.&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;Fully-distributed mode&lt;/strong&gt;: This is how Hadoop runs on a real cluster.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;I run WordCount application in pesudo-distributed mode here.&lt;/p&gt;
-&lt;h4&gt;Hadoop Installation&lt;/h4&gt;
-&lt;p&gt;You can install Hadoop on your local machine following the &lt;a href="http://www.bigdataplanet.info/2013/10/Hadoop-Installation-on-Local-Machine-Single-node-Cluster.html"&gt;instruction&lt;/a&gt;, or you can download and use Cloudera Quickstart VM. I already have Hadoop version 1.2.1 installed on my Ubuntu 12.04 LTS.&lt;/p&gt;
-&lt;h4&gt;Plain Java Version&lt;/h4&gt;
-&lt;p&gt;You can download the WordCount Java source code from this &lt;a href="http://www.cloudera.com/content/cloudera-content/cloudera-docs/HadoopTutorial/CDH4/Hadoop-Tutorial/ht_wordcount1_source.html"&gt;link&lt;/a&gt;. Then I will show you how to prepare the data set in HDFS and submit Hadoop MapReduce job step by step:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Create the input directory wordcount/input in HDFS:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop fs -mkdir wordcount/input
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Create sample text files as input and move to the input directory:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Hello Bye&amp;quot;&lt;/span&gt; &amp;gt; file0 &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nb"&gt;echo&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;Hello Goodbye&amp;quot;&lt;/span&gt; &amp;gt; file1
-&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop fs -copyFromLocal file* wordcount/input
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Compile WordCount.java and create a JAR&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mkdir wordcount &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; javac -cp /usr/local/hadoop/hadoop-core-1.2.1.jar -d classes WordCount.java &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; jar -cvf wordcount.jar -C classes/ .
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Run the application&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop jar wordcount.jar us.raydevblog.hadoop.WordCount wordcount/input wordcount/output1
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Examine the output:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop fs -cat wordcount/part-00000
-Bye 1
-Goodbye 1
-Hello   2
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;h4&gt;Using Maven Project&lt;/h4&gt;
-&lt;p&gt;If you are not familiar with Maven, You can find an excellent, short
-post on the Maven website called &lt;a href="http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html"&gt;"Maven in 5 minutes"&lt;/a&gt;. I use the following commands to create a Maven project and adjust the POM:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;First thing is to create a project structure using Maven:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mvn archetype:generate -DgroupId&lt;span class="o"&gt;=&lt;/span&gt;us.raydevblog.hadoop -DartifactId&lt;span class="o"&gt;=&lt;/span&gt;WordCountV2 -DarchetypeArtifactId&lt;span class="o"&gt;=&lt;/span&gt;maven-archetype-quickstart -DinteractiveMode&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nb"&gt;false&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Reference the Hadoop libraries in the pom.xml:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.hadoop&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;hadoop-core&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;version&amp;gt;&lt;/span&gt;1.2.1&lt;span class="nt"&gt;&amp;lt;/version&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Inorder to make us an executable JAR, we need tell Maven what class is holding our "main" function. I create a &lt;strong&gt;build&lt;/strong&gt; node and within that node create a &lt;strong&gt;plugins&lt;/strong&gt; node and then add the following:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-jar-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
-    &lt;span class="nt"&gt;&amp;lt;archive&amp;gt;&lt;/span&gt;
-      &lt;span class="nt"&gt;&amp;lt;manifest&amp;gt;&lt;/span&gt;
-        &lt;span class="nt"&gt;&amp;lt;addClasspath&amp;gt;&lt;/span&gt;true&lt;span class="nt"&gt;&amp;lt;/addClasspath&amp;gt;&lt;/span&gt;
-        &lt;span class="nt"&gt;&amp;lt;mainClass&amp;gt;&lt;/span&gt;us.raydevblog.hadoop.WordCount&lt;span class="nt"&gt;&amp;lt;/mainClass&amp;gt;&lt;/span&gt;
-      &lt;span class="nt"&gt;&amp;lt;/manifest&amp;gt;&lt;/span&gt;
-    &lt;span class="nt"&gt;&amp;lt;/archive&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;Also need add this plugin to use Java 1.7 for compilation. Otherwise, we will have the error "generics are not supported in -source 1.3":&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nt"&gt;&amp;lt;plugin&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.apache.maven.plugins&lt;span class="nt"&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;maven-compiler-plugin&lt;span class="nt"&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;configuration&amp;gt;&lt;/span&gt;
-    &lt;span class="nt"&gt;&amp;lt;source&amp;gt;&lt;/span&gt;1.7&lt;span class="nt"&gt;&amp;lt;/source&amp;gt;&lt;/span&gt;
-    &lt;span class="nt"&gt;&amp;lt;target&amp;gt;&lt;/span&gt;1.7&lt;span class="nt"&gt;&amp;lt;/target&amp;gt;&lt;/span&gt;
-  &lt;span class="nt"&gt;&amp;lt;/configuration&amp;gt;&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;lt;/plugin&amp;gt;&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;ul&gt;
-&lt;li&gt;I copy WordCount.java into src/main/java/us/raydevblog/hadoop/ and remove the template provided "App.java" in this folder. Now it is time to compile our project and run the application:&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="nv"&gt;$ &lt;/span&gt;mvn clean install
-&lt;span class="nv"&gt;$ &lt;/span&gt;hadoop jar target/WordCountV2-1.0-SNAPSHOT.jar wordcount/input wordcount/output2
-&lt;/pre&gt;&lt;/div&gt;
-
-
-&lt;p&gt;We now have a WordCount Map-Reduce example running successfully on the Hadoop. You can download my WordCount maven project from my &lt;a href="https://github.com/garudareiga/hadoopstudy/tree/master/wordcount"&gt;github reposity&lt;/a&gt;&lt;/p&gt;</summary><category term="hadoop"></category><category term="mapreduce"></category></entry><entry><title>Numbers Everyone Should Know</title><link href="http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html" rel="alternate"></link><updated>2014-04-15T15:06:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-15:posts/2014/numbers-everyone-should-know.html</id><summary type="html">&lt;p&gt;"Numbers everyone should know" by Jeff Dean:&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;</summary></entry><entry><title>Numbers Everyone Should Know</title><link href="http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html" rel="alternate"></link><updated>2014-04-15T15:06:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-15:posts/2014/numbers-everyone-should-know.html</id><summary type="html">&lt;p&gt;"Numbers everyone should know" by Jeff Dean:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;L1 cache reference 0.5ns&lt;/li&gt;
 &lt;li&gt;L2 cache reference 7ns&lt;/li&gt;
