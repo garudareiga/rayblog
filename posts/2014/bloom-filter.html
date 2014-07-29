@@ -120,15 +120,19 @@
 
 
 
+<span class="label label-default">Tags</span>
+	<a href="http://www.raydevblog.us/tag/data-structure.html">data structure</a>
+        /
+	<a href="http://www.raydevblog.us/tag/bloom-filter.html">bloom filter</a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <p>I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.</p>
 <p>Bloom filter is a space-efficient <strong>probabilistic</strong> data structure used to test set membership. It tells us that the element either <em>definitely</em> is not in the set or <em>may be</em> in the set. In other words, <strong>fase positives</strong> are possible, however <strong>false negatives</strong> are not.</p>
-<h2>Data Structure</h2>
+<h3>Data Structure</h3>
 <p>Bloom filter is not a key-value store. The base data structure of a bloom filter is a <strong>Bit Vector</strong>, a vector of bit buckets indicating the presence of an element in the filter. </p>
 <p>To add an element, we simply hash it a few times and set the bits in the bit vector at the bucket index of those hashes to 1. To test for membership, we simply hash the element with the same hash functions, then see if those values are set in the bit vector. If they aren't, we know that the element isn't in the set. If they are, we only know that it <em>might be</em>, because some combination of other elements could have set the same bits. Removing an element from the filter is not possible. The more elements that are added to the set, the larger the probability of false positives. The website <a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a> shows you how to add and test strings in the bloom filter.</p>
 <p><img alt="Alt text" src="http://www.raydevblog.us/images/bloom_filter.jpg" /></p>
-<h2>Hash Functions</h2>
+<h3>Hash Functions</h3>
 <p>The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include murmur, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.</p>
 <p>Let's assume a bloom filter with k hashes, m bits in the filter, and n elements that have been inserted. The false positive rate of our filter will be approximately:</p>
 <p>\begin{equation} fsr = (1 - e^{-kn/m})^k \end{equation}</p>
@@ -208,38 +212,13 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-2">
-                    <a href="http://www.raydevblog.us/tag/java.html">
-                        java
-                    </a>
-                </li>
-                <li class="list-group-item tag-2">
                     <a href="http://www.raydevblog.us/tag/python.html">
                         python
                     </a>
                 </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/mongodb.html">
-                        mongodb
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/data-mining.html">
-                        data mining
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/json.html">
-                        json
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                        machine learning
-                    </a>
-                </li>
-                <li class="list-group-item tag-4">
-                    <a href="http://www.raydevblog.us/tag/distributed.html">
-                        distributed
+                <li class="list-group-item tag-2">
+                    <a href="http://www.raydevblog.us/tag/java.html">
+                        java
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
@@ -248,13 +227,48 @@
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                        bloom filter
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
                         consistent hashing
                     </a>
                 </li>
                 <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/distributed.html">
+                        distributed
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
                     <a href="http://www.raydevblog.us/tag/logging.html">
                         logging
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/json.html">
+                        json
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/data-structure.html">
+                        data structure
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/mongodb.html">
+                        mongodb
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                        machine learning
+                    </a>
+                </li>
+                <li class="list-group-item tag-4">
+                    <a href="http://www.raydevblog.us/tag/data-mining.html">
+                        data mining
                     </a>
                 </li>
         </ul>
