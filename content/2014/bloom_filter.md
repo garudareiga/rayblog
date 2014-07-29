@@ -6,7 +6,7 @@ Tags: data structure, bloom filter
 
 I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.
 
-Bloom filter is a space-efficient **probabilistic** data structure used to test set membership. It tells us that the element either *definitely* is not in the set or *may be* in the set. In other words, **fase positives** are possible, however **false negatives** are not.
+Bloom filter is a space-efficient **probabilistic** data structure used to test set membership. It tells us that the element either *definitely* is not in the set or *may be* in the set. In other words, **false positives** are possible, however **false negatives** are not.
 
 ### Data Structure
 
@@ -18,17 +18,23 @@ To add an element, we simply hash it a few times and set the bits in the bit vec
 
 ### Hash Functions
 
-The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include murmur, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.
+The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include [MurmurHash], the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.
 
-Let's assume a bloom filter with k hashes, m bits in the filter, and n elements that have been inserted. The false positive rate of our filter will be approximately:
+Let's assume a bloom filter with k hashes, m bits in the filter, and n elements to be inserted. [Wikipedia] provides the math for choosing these values. 
 
-\begin{equation} fsr = (1 - e^{-kn/m})^k \end{equation}
+The false positive rate of our filter will be approximately:
+
+\begin{equation} fpr = (1 - e^{-kn/m})^k \end{equation}
 
 The more hash functions we have, the slower our bloom filter, and the quicker it fills up. If we have too few, we may suffer too many false positives. Given an m and an n, we have a function to choose the optimal value of k:
 
 \begin{equation} k_{opt} = \frac{m}{n}\ln 2 \approx 0.7\frac{m}{n} \end{equation}
 
-A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.
+This results in:
+
+\begin{equation} m = -\frac{n\ln fpr}{(\ln 2)^2} \end{equation}
+
+This means that for a given false positive probability fpr, the length of a Bloom filter m is proportionate to the the number of elements being filtered n. A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.
 
 ### Extensions
 
@@ -36,11 +42,15 @@ Removing elments from the filter can be addressed with a **counting** bloom filt
 
 [Almeida et al.][1] proposed a variant of Bloom filters that can adapt dynamically to the number of elements stored, while assuring a minimum false positive probability. If we can not estimate the number of elements to be inserted, we maybe better off with a scalable Bloom filter. 
 
-### Applications
+### Applications and Implementations
 
-In terms of NoSQL database, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each Cassandra SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist.
+- Bloom filters are present in a lot of NoSQL systems. Take [Cassandra] for example, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist. 
 
-I also found an interesting [discussion] on Quora about the best applications of Bloom filters.
+- The URL shortening service company Bitly, Inc. open sourced a scalable, counting bloom filter library **[dablooms]**. You can read [bitly's engineering blog post](http://word.bitly.com/post/28558800777/dablooms-an-open-source-scalable-counting-bloom) for implemetation details.
+
+- I also found an interesting [discussion] on Quora about the best applications of Bloom filters.
+
+- This blog [post](http://maxburstein.com/blog/creating-a-simple-bloom-filter/) shows how to create a simple bloom filter using Python. We also have a Python implementation **[PyBloom]**. 
 
 ### References
 
@@ -50,35 +60,11 @@ I also found an interesting [discussion] on Quora about the best applications of
 [Bloom Filters by Example]:http://billmill.org/bloomfilter-tutorial
 [1]:http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf
 [discussion]:http://www.quora.com/Bloom-Filters/What-are-the-best-applications-of-Bloom-filters
-
-
-[Creating a Simple Bloom Filter]:http://maxburstein.com/blog/creating-a-simple-bloom-filter/
+[dablooms]:https://github.com/bitly/dablooms
+[MurmurHash]:https://code.google.com/p/smhasher
+[Wikipedia]:http://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives
 [PyBloom]:https://github.com/jaybaird/python-bloomfilter
+[Cassandra]:http://wiki.apache.org/cassandra/ArchitectureOverview
+
 [Stackoverflow: Modern, high performance bloom filter in Python?]:http://stackoverflow.com/questions/311202/modern-high-performance-bloom-filter-in-python
 [All you ever wanted to know about writing bloom filters]:http://spyced.blogspot.com/2009/01/all-you-ever-wanted-to-know-about.html
-[dablooms - an open source, scalable, counting bloom filter library]:http://word.bitly.com/post/28558800777/dablooms-an-open-source-scalable-counting-bloom
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
