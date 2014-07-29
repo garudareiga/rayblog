@@ -1,8 +1,7 @@
 Title: Fibonacci Sequence
 Date: 2014-05-14 23:15
 Author: Ray Chen
-Category: Algorithm
-Tags: algorithm
+Category: Data Structure and Algorithm
 
 Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. 
 
