@@ -2,12 +2,13 @@ Title: Bloom Filter
 Date: 2014-07-28 10:00 
 Author: Ray Chen 
 Category: Data Structure and Algorithm
+Tags: data structure, bloom filter
 
 I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.
 
 Bloom filter is a space-efficient **probabilistic** data structure used to test set membership. It tells us that the element either *definitely* is not in the set or *may be* in the set. In other words, **fase positives** are possible, however **false negatives** are not.
 
-## Data Structure
+### Data Structure
 
 Bloom filter is not a key-value store. The base data structure of a bloom filter is a **Bit Vector**, a vector of bit buckets indicating the presence of an element in the filter. 
 
@@ -15,7 +16,7 @@ To add an element, we simply hash it a few times and set the bits in the bit vec
 
 ![Alt text](http://www.raydevblog.us/images/bloom_filter.jpg)
 
-## Hash Functions
+### Hash Functions
 
 The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include murmur, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.
 
