@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ray's Thoughts and Writings</title><link>http://www.raydevblog.us/</link><description></description><atom:link href="http://www.raydevblog.us/feeds/ray-chen.rss.xml" rel="self"></atom:link><lastBuildDate>Mon, 28 Jul 2014 10:00:00 -0700</lastBuildDate><item><title>Bloom Filter</title><link>http://www.raydevblog.us/posts/2014/bloom-filter.html</link><description>&lt;p&gt;I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.&lt;/p&gt;
+&lt;p&gt;Bloom filter is a space-efficient &lt;strong&gt;probabilistic&lt;/strong&gt; data structure used to test set membership. It tells us that the element either &lt;em&gt;definitely&lt;/em&gt; is not in the set or &lt;em&gt;may be&lt;/em&gt; in the set. In other words, &lt;strong&gt;false positives&lt;/strong&gt; are possible, however &lt;strong&gt;false negatives&lt;/strong&gt; are not.&lt;/p&gt;
+&lt;h3&gt;Data Structure&lt;/h3&gt;
+&lt;p&gt;Bloom filter is not a key-value store. The base data structure of a bloom filter is a &lt;strong&gt;Bit Vector&lt;/strong&gt;, a vector of bit buckets indicating the presence of an element in the filter. &lt;/p&gt;
+&lt;p&gt;To add an element, we simply hash it a few times and set the bits in the bit vector at the bucket index of those hashes to 1. To test for membership, we simply hash the element with the same hash functions, then see if those values are set in the bit vector. If they aren't, we know that the element isn't in the set. If they are, we only know that it &lt;em&gt;might be&lt;/em&gt;, because some combination of other elements could have set the same bits. Removing an element from the filter is not possible. The more elements that are added to the set, the larger the probability of false positives. The website &lt;a href="http://billmill.org/bloomfilter-tutorial"&gt;Bloom Filters by Example&lt;/a&gt; shows you how to add and test strings in the bloom filter.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Alt text" src="http://www.raydevblog.us/images/bloom_filter.jpg" /&gt;&lt;/p&gt;
+&lt;h3&gt;Hash Functions&lt;/h3&gt;
+&lt;p&gt;The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include &lt;a href="https://code.google.com/p/smhasher"&gt;MurmurHash&lt;/a&gt;, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.&lt;/p&gt;
+&lt;p&gt;Let's assume a bloom filter with k hashes, m bits in the filter, and n elements to be inserted. &lt;a href="http://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives"&gt;Wikipedia&lt;/a&gt; provides the math for choosing these values. &lt;/p&gt;
+&lt;p&gt;The false positive rate of our filter will be approximately:&lt;/p&gt;
+&lt;p&gt;\begin{equation} fpr = (1 - e^{-kn/m})^k \end{equation}&lt;/p&gt;
+&lt;p&gt;The more hash functions we have, the slower our bloom filter, and the quicker it fills up. If we have too few, we may suffer too many false positives. Given an m and an n, we have a function to choose the optimal value of k:&lt;/p&gt;
+&lt;p&gt;\begin{equation} k_{opt} = \frac{m}{n}\ln 2 \approx 0.7\frac{m}{n} \end{equation}&lt;/p&gt;
+&lt;p&gt;This results in:&lt;/p&gt;
+&lt;p&gt;\begin{equation} m = -\frac{n\ln fpr}{(\ln 2)^2} \end{equation}&lt;/p&gt;
+&lt;p&gt;This means that for a given false positive probability fpr, the length of a Bloom filter m is proportionate to the the number of elements being filtered n. A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.&lt;/p&gt;
+&lt;h3&gt;Extensions&lt;/h3&gt;
+&lt;p&gt;Removing elments from the filter can be addressed with a &lt;strong&gt;counting&lt;/strong&gt; bloom filter. A counting filter uses an n-bit counter instead of a single bit in each bucket. The insert operation increments the value of the buckets, and the delete operation decrements the value of the buckets. The n-bit counters must be large enough to avoid overflow.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf"&gt;Almeida et al.&lt;/a&gt; proposed a variant of Bloom filters that can adapt dynamically to the number of elements stored, while assuring a minimum false positive probability. If we can not estimate the number of elements to be inserted, we maybe better off with a scalable Bloom filter. &lt;/p&gt;
+&lt;h3&gt;Applications and Implementations&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Bloom filters are present in a lot of NoSQL systems. Take &lt;a href="http://wiki.apache.org/cassandra/ArchitectureOverview"&gt;Cassandra&lt;/a&gt; for example, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist. &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The URL shortening service company Bitly, Inc. open sourced a scalable, counting bloom filter library &lt;strong&gt;&lt;a href="https://github.com/bitly/dablooms"&gt;dablooms&lt;/a&gt;&lt;/strong&gt;. You can read &lt;a href="http://word.bitly.com/post/28558800777/dablooms-an-open-source-scalable-counting-bloom"&gt;bitly's engineering blog post&lt;/a&gt; for implemetation details.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;I also found an interesting &lt;a href="http://www.quora.com/Bloom-Filters/What-are-the-best-applications-of-Bloom-filters"&gt;discussion&lt;/a&gt; on Quora about the best applications of Bloom filters.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;This blog &lt;a href="http://maxburstein.com/blog/creating-a-simple-bloom-filter/"&gt;post&lt;/a&gt; shows how to create a simple bloom filter using Python. We also have a Python implementation &lt;strong&gt;&lt;a href="https://github.com/jaybaird/python-bloomfilter"&gt;PyBloom&lt;/a&gt;&lt;/strong&gt;. &lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;References&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://billmill.org/bloomfilter-tutorial"&gt;Bloom Filters by Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.slideshare.net/quipo/modern-algorithms-and-data-structures-1-bloom-filters-merkle-trees"&gt;Modern Algorithms and Data Structures - Bloom Filters&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Mon, 28 Jul 2014 10:00:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-07-28:posts/2014/bloom-filter.html</guid><category>data structure</category><category>bloom filter</category></item><item><title>Dynamo: Amazon's Highly Available Key-Value Store</title><link>http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html</link><description>&lt;p&gt;This &lt;a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"&gt;paper&lt;/a&gt; was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.&lt;/p&gt;
+&lt;h3&gt;Introduction&lt;/h3&gt;
+&lt;p&gt;Dynamo is a completely decentralized system targeting applications that operate with weaker consistency and high availability. It is built to be an &lt;strong&gt;"always writeable"&lt;/strong&gt; data store. Hence, Dynamos allows conflicting updates in the system. &lt;/p&gt;
+&lt;p&gt;Dynamo achieves scalability and availability by the following technologies:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Data is partitioned and replicated using consistent hashing.&lt;/li&gt;
+&lt;li&gt;Consistency is facilitated by object versioning. &lt;/li&gt;
+&lt;li&gt;The consistency among replicas during updates is maintained by a quorum-like technique and a decentralized replica synchronization protocol. &lt;/li&gt;
+&lt;li&gt;A gossip based distributed failure detection and membership protocol. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;System Architecture&lt;/h3&gt;
+&lt;p&gt;Table 1 presents a summary of the list of techniques Dynamo uses and their respective advantages.
+&lt;img alt="Alt text" src="http://www.raydevblog.us/images/dynamo.jpeg" /&gt;&lt;/p&gt;
+&lt;p&gt;The paper gives details on the partitioning, replication, versioning, membership, and failure handling components of Dynamo.&lt;/p&gt;
+&lt;h3&gt;Partitioning&lt;/h3&gt;
+&lt;h4&gt;Consistent Hashing&lt;/h4&gt;
+&lt;p&gt;Dynamo's partitioning scheme relies on a variant of consistent hashing for load balancing. It applies a MD5 hash on the key to generate a 128-bit identifier, which is used to determine the storage nodes. The hash output range forms a ring, and each node in the system is assigned a position on the ring. Thus, each node is responsible for the region in the ring between it and its predecessor node. To know the detail about consistent hashing, please refer to this blog &lt;a href="http://www.tomkleinpeter.com/2008/03/17/programmers-toolbox-part-3-consistent-hashing"&gt;post&lt;/a&gt;.&lt;/p&gt;
+&lt;h4&gt;Virtual Node&lt;/h4&gt;
+&lt;p&gt;Dynamo uses the concept of "virtual nodes", and each physical node can be responsible for more than one virtual node on the ring. Using virtual nodes makes the key distribution load balancing more fine-grained and more uniform:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The load handled by an unavailable node is evenly dispersed across the remaining available nodes.&lt;/li&gt;
+&lt;li&gt;A new node accepts a roughly equivalent of load from each of the other available nodes.&lt;/li&gt;
+&lt;li&gt;The number of virtual nodes that a physical node is responsible can be decided by its capacity.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;Replication&lt;/h4&gt;
+&lt;p&gt;To achieve high availability, each data is replicated at N storage hosts. Each key is assigned to a coordinator node. The coordinator stores each key locally and replicates at the N-1 clockwise successor nodes in the ring. The list of nodes responsible for storing a particular key is called the &lt;strong&gt;preference list&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3&gt;Object Versioning&lt;/h3&gt;
+&lt;p&gt;Dynamo provides &lt;a href="http://en.wikipedia.org/wiki/Eventual_consistency"&gt;eventual consistency&lt;/a&gt;, which allows for updates on replicas &lt;strong&gt;asynchronously&lt;/strong&gt;. Dynamo treats the result of every modification as a new and immutable version of data. It uses &lt;strong&gt;vector clocks&lt;/strong&gt; to capture causality between different versions of the same object. One verctor clock is associated with every version of every object. Upon processing a read request, Dynamo detects conflicts and employs application-assisted conflict resolution if necessary. &lt;/p&gt;
+&lt;h3&gt;Sloppy Quorum&lt;/h3&gt;
+&lt;p&gt;Dynamo uses a "sloppy quoram" instead of strict quorum. All read and write operations are performed on the first N healthy nodes in the preference list, skipping those that are down or inaccessible. To maintain consistency among its replicas, Dynamo uses a consistency protocol similar to quorum-based voting. This protocol has two key configurable values: R and W. R is the minimum number of nodes that must participate in a successful read operation. W is the minimum number of nodes that must participate in a successful write operation. Setting R and W such that R + W &amp;gt; N yields a quorum-like system. &lt;/p&gt;
+&lt;h3&gt;Merkle Tree&lt;/h3&gt;
+&lt;p&gt;A &lt;a href="http://en.wikipedia.org/wiki/Merkle_tree"&gt;Merke tree&lt;/a&gt; is a hash tree where leaves are hashes of the values of individual keys. Parent nodes higher in the tree are hashes of their respective children. If the hash values of the root of two trees are equal, then the values of the leaf nodes in the tree are equal and the nodes require no synchronization. If not, it implies that the values of some replicas are different. &lt;/p&gt;
+&lt;p&gt;Dynamo uses Merkle Trees for anti-entropy to keey the replicas synchronized. Each virtual node maintains a seperate Merkle tree for each key range it hosts. This allows nodes to compare whether the keys within a key range are up-to-date.&lt;/p&gt;
+&lt;h3&gt;Gossip-based Membership and Failure Detection&lt;/h3&gt;
+&lt;p&gt;Decentralized failure detection protocols use a simple gossip-style protocol that enable each node in the system to learn about the arrival or departure of other nodes.&lt;/p&gt;
+&lt;h3&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://muratbuffalo.blogspot.com/2010/11/dynamo-amazons-highly-available-key.html"&gt;Dynamo: Amazon's highly available key-value store&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://jsensarma.com/blog/?p=55"&gt;Dynamo: A flawed architecture&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://docs.basho.com/riak/1.3.2/references/dynamo/"&gt;Riak docs&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Sun, 20 Jul 2014 22:07:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-07-20:posts/2014/dynamo-amazons-highly-available-key-value-store.html</guid><category>key-value store</category></item><item><title>Java Reentrant Lock</title><link>http://www.raydevblog.us/posts/2014/java-reentrant-lock.html</link><description>&lt;h3&gt;Intrinsic Lock&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Synchronized&lt;/strong&gt; uses intrinsic locks. Every object in Java has an associated intrinsic lock. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock on that object.&lt;/p&gt;
+&lt;p&gt;The intrinsic locking mechanism have some limitations as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;It is not possible to attempt to acquire a lock without being willing to wait for it forever. &lt;/li&gt;
+&lt;li&gt;It is not possible to interrupt a thread waiting to acquire a lock.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;As an alternative, ReentrantLock provides more control on lock acquisition. ReentrantLock allows threads to re-request locks they already own. It provides timed or polled lock acquisition. It also has support for configurable fairness policy, allowing more flexible thread scheduling.&lt;/p&gt;
+&lt;h3&gt;Polled and Timed Lock Acquisition&lt;/h3&gt;
+&lt;p&gt;Let's see some example code:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;float&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;synchronized&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="kd"&gt;synchronized&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;debit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+            &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;credit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In &lt;em&gt;transferMoney()&lt;/em&gt; method above, there is a possibility of &lt;strong&gt;deadlock&lt;/strong&gt; when two threads A and B are trying to transfer money at the same time. For example, when thread A has acquired a lock on &lt;em&gt;account_1&lt;/em&gt; object and is waiting to acquire a lock on the &lt;em&gt;account_2&lt;/em&gt; object, thread B has acquired a lock on the &lt;em&gt;account_2&lt;/em&gt; object and is waiting for a lock on &lt;em&gt;account_1&lt;/em&gt;. This will lead to deadlock.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;account_1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;account_2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;account_2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;account_1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Using &lt;em&gt;tryLock&lt;/em&gt;, a &lt;strong&gt;timed and polled lock acquisition&lt;/strong&gt; mechanism lets you regain control if you can not acquire all the required locks, release the ones you have acquired and retry. If we can not acquire both, we will release if one of these has been acquired, then retry. If the locks can not be acquired within the specified time, the transferMoney method will return a failure.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;boolean&lt;/span&gt; &lt;span class="nf"&gt;transferMoney&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;Account&lt;/span&gt; &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;float&lt;/span&gt; &lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;startTime&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;nanoTime&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+    &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;tryLock&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;tryLock&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                    &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                        &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;debit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+                        &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;credit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;amount&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+                    &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;finally&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                        &lt;span class="n"&gt;to&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;unlock&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+                    &lt;span class="o"&gt;}&lt;/span&gt;
+                &lt;span class="o"&gt;}&lt;/span&gt;
+            &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;finally&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+                &lt;span class="n"&gt;from&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getReentrantLock&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;unlock&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+            &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;nanoTime&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;startTime&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="mi"&gt;5000&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="kc"&gt;false&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+        &lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Mon, 02 Jun 2014 20:10:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-06-02:posts/2014/java-reentrant-lock.html</guid><category>java</category><category>concurrency</category></item><item><title>Fibonacci Sequence</title><link>http://www.raydevblog.us/posts/2014/fibonacci-sequence.html</link><description>&lt;p&gt;Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. &lt;/p&gt;
+&lt;p&gt;Fibonacci sequence is defined as:
+$f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.&lt;/p&gt;
+&lt;h3&gt;Naive Recursive Solution&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;fib&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;else&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nf"&gt;fib&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;fib&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;   
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It is not difficult to notice that there are many duplicate nodes after we draw a recursion tree. The number of duplicated nodes increases dramatically when &lt;strong&gt;n&lt;/strong&gt; increases.&lt;/p&gt;
+&lt;h3&gt;Optimized Recursive Solution&lt;/h3&gt;
+&lt;p&gt;Since $Fibonacci_{n}$ needs to add the previous two Fibonacci numbers, it makes more sense to define a Fibonnacci function that keeps track of the two previous values.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;fib&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fib_recursive&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;fib_recursive&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;p0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt; &lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="n"&gt;fib_recursive&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Iterative Solution&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="nf"&gt;fib&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="o"&gt;||&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="n"&gt;n&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;result&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;p0&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;p1&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+        &lt;span class="n"&gt;p1&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Wed, 14 May 2014 23:15:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-05-14:posts/2014/fibonacci-sequence.html</guid></item><item><title>Numbers Everyone Should Know</title><link>http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html</link><description>&lt;p&gt;"Numbers everyone should know" by Jeff Dean:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;L1 cache reference 0.5ns&lt;/li&gt;
+&lt;li&gt;L2 cache reference 7ns&lt;/li&gt;
+&lt;li&gt;Main memory reference 100ns&lt;/li&gt;
+&lt;li&gt;Disk seek 10,000,000ns&lt;/li&gt;
+&lt;li&gt;Read 1MB sequentially from memory 250,000ns&lt;/li&gt;
+&lt;li&gt;Read 1MB sequentially from network 10,000,000ns&lt;/li&gt;
+&lt;li&gt;Read 1MB sequentially from disk 30,000,000ns&lt;/li&gt;
+&lt;li&gt;Mutex lock/unlock 100ns&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Related Articles:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://highscalability.com/numbers-everyone-should-know"&gt;Numbers Everyone Should Know&lt;/a&gt; from highscalability.com &lt;/li&gt;
+&lt;li&gt;&lt;a href="http://highscalability.com/blog/2011/1/26/google-pro-tip-use-back-of-the-envelope-calculations-to-choo.html"&gt;Google Pro Tip: Use Back-Of-The-Envelope-Calculations To Choose The Best Design&lt;/a&gt; from highscalability.com&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Tue, 15 Apr 2014 15:06:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-04-15:posts/2014/numbers-everyone-should-know.html</guid></item><item><title>Distributed Key-Value Store</title><link>http://www.raydevblog.us/posts/2014/distributed-key-value-store.html</link><description>&lt;p&gt;Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
+a distributed key-value store system design.&lt;/p&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This distributed key-value storage system has multiple clients communicating 
+with a single master server in a given messaging format. The master server contains a set-associative 
+cache, and it uses the cache to serve GET requests without going to the key-value slave servers it
+coordinates. The slave servers are contacted for a GET request only upon a cache miss on the master. 
+The master will forward PUT and DEL client requests to multiple slave servers and follow the two-phase 
+commit protocol (2PC) for atomic PUT and DEL operations across multiple slave servers.&lt;/p&gt;
+&lt;p&gt;The figure below shows an example distributed key-value storage system.
+Three clients send a master server simultaneous requests, and the master server coordinates with three
+slave servers.
+&lt;img alt="Alt text" src="http://www.raydevblog.us/images/distributed_kvstore_master.jpeg" /&gt;&lt;/p&gt;
+&lt;h2&gt;Registration&lt;/h2&gt;
+&lt;p&gt;Slave servers will send to the master a registration message with a 64-bit globally unique ID 
+when they start.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The master listens for registration requests from slaves on port 9090.&lt;/li&gt;
+&lt;li&gt;When a slave starts it should listen in a random free port for 2PC requests, and register that port
+number with the master so that the master can send requests to it.&lt;/li&gt;
+&lt;li&gt;Assuming no errors regarding registration, the master sends a response and the slave accepts the response.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Consistent Hashing&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Each key will be stored using 2PC in &lt;strong&gt;two&lt;/strong&gt; slave servers; the first of them will be selected using
+consistent hashing, while the second will be placed in the successor of the first one.&lt;/li&gt;
+&lt;li&gt;The master will hash the key to 64-bit address space, because each slave server has a unique 64-bit ID.&lt;/li&gt;
+&lt;li&gt;Each slave will store the first copies of key with hash values greater than the ID of its immediate
+predecessor up to its own ID, and also the keys whose first copies are stored in its predecessor. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Two-phase Commit&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;The master will select replica locations using consistent hashing.&lt;/li&gt;
+&lt;li&gt;A slave will send vote-abort to the master if the key does not exist for DEL, or invalid key/value;&lt;/li&gt;
+&lt;li&gt;When sending phase-1 requests, the master must contact slaves, even if the first slave sends an abort. The master
+does this by sequentially making the requests or concurrently by forking off threads.&lt;/li&gt;
+&lt;li&gt;Only a single 2PC operation can be executed at a time. The master does not support concurrent update
+operations across different keys, but GET operations of different keys must be concurrent unless restricted
+by an ongoing update operation on the same set.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Failures, Timeouts, and Recovery&lt;/h2&gt;
+&lt;p&gt;For this particular design, assume that the master will never go down. However, slave servers must log
+necessary information to survive from failures.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;When the slave comes back with the same ID, it will be rebuilt using the log, and know if the last 
+request it received was a phase-1 or phase-2 request.&lt;/li&gt;
+&lt;li&gt;If a slave crashes during phase-1, if master does not get a vote within a single timeout period, it should
+assume the slave voted abort.&lt;/li&gt;
+&lt;li&gt;If a slave crashes during phase-2, the master must retry until it receives a response to its decision. 
+Note that when the slave restarts, it may bind to a new port and re-register. The master must retry with
+the latest port the slave has registered with. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Components&lt;/h2&gt;
+&lt;p&gt;Master Server = TPCMaster + SocketServer attached (port 8080) with KVClientHandler
+TPCMaster = Master Cache + SocketServer attached (port 9090) with TPCRegistrationHandler
+Slave Server = TPCLog + KVServer + SocketServer (free port) attached with TPCMasterHandler&lt;/p&gt;
+&lt;h2&gt;Java Source Code Breakdown&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;TPCMasterHandler.java: a network handler to handler 2PC operation requests from the master server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The latest Java source code of my implementation is available in my &lt;a href="https://github.com/garudareiga/computer_system_design/tree/master/distributed_kvstore/src/edu/berkeley/cs162"&gt;github repository&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Thu, 10 Apr 2014 22:07:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-04-10:posts/2014/distributed-key-value-store.html</guid><category>key-value store</category><category>concurrency</category><category>distributed</category><category>two-phase commit</category><category>consistent hashing</category></item><item><title>A Single Server Key-Value Store</title><link>http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html</link><description>&lt;p&gt;On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;Multiple clients will be communicating with a single-node key-value server by sending and receiving
+formatted messages through sockets. The sever uses a thread pool to support concurrent operations
+accross multiple sets and a set-associative cache, which is backed by a disk storage.&lt;/p&gt;
+&lt;p&gt;The figure below shows a single-node key-value server with three clients making simultaneous requests:
+&lt;img alt="Alt text" src="http://www.raydevblog.us/images/kvstore.jpg" /&gt;&lt;/p&gt;
+&lt;h2&gt;Requirements&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;The key-value server will support 3 interfaces:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;em&gt;Value GET (Key k)&lt;/em&gt;: Retrieves the key-value pair corresponding to the provided key.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;PUT (Key k, Value v)&lt;/em&gt;: Inserts the key-value pair into the store.&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;DEL (Key k)&lt;/em&gt;: Removes the key-value pair corresponding to the provided key from the store.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The key-value server has a set-associative cache with the second-change eviction policy within each set.
+  Each set in the cache will have a fixed number of entries, and evict entries using the second-chance algorithm.
+  The cache follows a write-through caching policy. If a key exists in the cache for a &lt;em&gt;GET&lt;/em&gt; request, do not access
+  the store.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;All requests (get/put/del) are atomic in that they must modify the state of both the cache and the store together.&lt;br /&gt;
+  Requests must be parallel across different sets and serial with the same set. The threadpool in the server shall
+  maintain a queue of tasks, assign free threads to tasks and execute them asynchronously.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;The server will create a serversocket that listens on a port for connections, and service requests from the client.
+  A socket shall be passed to the client handler for each request that comes in.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Source Code&lt;/h2&gt;
+&lt;p&gt;The latest source code of my implementation is available in my &lt;a href="https://github.com/garudareiga/computer_system_design/tree/master/kvstore/src/edu/berkeley/cs162"&gt;github repository&lt;/a&gt;&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Mon, 31 Mar 2014 22:11:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-03-31:posts/2014/a-single-server-key-value-store.html</guid><category>key-value store</category><category>concurrency</category></item><item><title>Java Thread Pool Example</title><link>http://www.raydevblog.us/posts/2014/java-thread-pool-example.html</link><description>&lt;p&gt;A thread pool from the executor implementation in &lt;em&gt;java.util.concurrent&lt;/em&gt; manages the pool 
+of &lt;em&gt;worker threads&lt;/em&gt;. Using worker threads minimizes the overhead due to thread creation.&lt;/p&gt;
+&lt;p&gt;The &lt;em&gt;java.util.concurrent.Executor&lt;/em&gt; interface accepts the collection of &lt;em&gt;Runnable&lt;/em&gt; objects and 
+running worker threads execute &lt;em&gt;Runnable&lt;/em&gt; objects from the task queue. The queue holds extra
+tasks whenever there are more active tasks than threads.&lt;/p&gt;
+&lt;p&gt;First, let's have a Runnable class.&lt;/p&gt;
+&lt;p&gt;WorkerThread.java&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;WorkerThread&lt;/span&gt; &lt;span class="kd"&gt;implements&lt;/span&gt; &lt;span class="n"&gt;Runnable&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;SECONDS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;WorkerThread&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;msg&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+
+    &lt;span class="nd"&gt;@Override&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;run&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;currentThread&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;getName&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;quot; start.&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;msg&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;try&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;sleep&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;SECONDS&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mi"&gt;1000&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt; &lt;span class="k"&gt;catch&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;InterruptedException&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;printStackTrace&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;currentThread&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;getName&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;quot; end.&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;There are two common type of thread pools: the fixed thread pool &lt;em&gt;newFixedThreadPool&lt;/em&gt;
+and the expandable thread pool &lt;em&gt;newCachedTheadPool&lt;/em&gt;. Let's use a fixed thread pool here&lt;/p&gt;
+&lt;p&gt;FixedThreadPool.java&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.concurrent.Executors&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.concurrent.ExecutorService&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;FixedThreadPool&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;NUM_WORK_THREADS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; 
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;ExecutorService&lt;/span&gt; &lt;span class="n"&gt;executor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Executors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;newFixedThreadPool&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="n"&gt;NUM_WORK_THREADS&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;Runnable&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;WorkerThread&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Hello from worker thread &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+            &lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;execute&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;shutdown&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;(!&lt;/span&gt;&lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;isTerminated&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{}&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Threads all done!&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In above program, we create a fixed thread pool of 2 worker threads, and submit 3 tasks
+to this pool. Here is the output of the above program:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;pool&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kr"&gt;thread&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Threads&lt;/span&gt; &lt;span class="n"&gt;all&lt;/span&gt; &lt;span class="n"&gt;done&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The output confirms that there are two threads in the pool named as "pool-1-thread-1" 
+and "pool-1-thread-2". With the &lt;em&gt;ThreadFactory&lt;/em&gt;, we can set more descriptive thread names.
+Here is the implementation of &lt;em&gt;ThreadFactory&lt;/em&gt; and we use &lt;em&gt;CachedThreadPool&lt;/em&gt; instead.&lt;/p&gt;
+&lt;p&gt;WorkerThreadFactory.java&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.concurrent.*&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;WorkerTreadFactory&lt;/span&gt; &lt;span class="kd"&gt;implements&lt;/span&gt; &lt;span class="n"&gt;ThreadFactory&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;counter&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="nf"&gt;WorkerTreadFactory&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;prefix&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+
+    &lt;span class="nd"&gt;@Override&lt;/span&gt;
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="n"&gt;Thread&lt;/span&gt; &lt;span class="nf"&gt;newThread&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Runnable&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nf"&gt;Thread&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;prefix&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;quot; - &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;counter&lt;/span&gt;&lt;span class="o"&gt;++);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;CachedThreadPool.java&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.concurrent.ExecutorService&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;java.util.concurrent.Executors&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
+
+&lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CachedThreadPool&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+    &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;NUM_WORK_THREADS&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; 
+
+    &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;static&lt;/span&gt; &lt;span class="kt"&gt;void&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt;&lt;span class="o"&gt;[]&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="kd"&gt;throws&lt;/span&gt; &lt;span class="n"&gt;InterruptedException&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+        &lt;span class="n"&gt;ExecutorService&lt;/span&gt; &lt;span class="n"&gt;executor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Executors&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;newCachedThreadPool&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;WorkerTreadFactory&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;WorkerThread&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;));&lt;/span&gt;
+        &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;=&lt;/span&gt; &lt;span class="n"&gt;NUM_WORK_THREADS&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;++)&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+            &lt;span class="n"&gt;Runnable&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="n"&gt;WorkerThread&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Hello from worker thread &amp;quot;&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;i&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+            &lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;submit&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+        &lt;span class="o"&gt;}&lt;/span&gt;
+        &lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;shutdown&lt;/span&gt;&lt;span class="o"&gt;();&lt;/span&gt;
+        &lt;span class="k"&gt;while&lt;/span&gt; &lt;span class="o"&gt;(!&lt;/span&gt;&lt;span class="n"&gt;executor&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;isTerminated&lt;/span&gt;&lt;span class="o"&gt;())&lt;/span&gt; &lt;span class="o"&gt;{}&lt;/span&gt;
+        &lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Threads all done!&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;);&lt;/span&gt;
+    &lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The output of above program will be:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Hello&lt;/span&gt; &lt;span class="n"&gt;from&lt;/span&gt; &lt;span class="n"&gt;worker&lt;/span&gt; &lt;span class="kr"&gt;thread&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;WorkerThread&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt; &lt;span class="n"&gt;end&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+&lt;span class="n"&gt;Threads&lt;/span&gt; &lt;span class="n"&gt;all&lt;/span&gt; &lt;span class="n"&gt;done&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Thu, 20 Mar 2014 22:06:00 -0700</pubDate><guid>tag:www.raydevblog.us,2014-03-20:posts/2014/java-thread-pool-example.html</guid><category>java</category><category>concurrency</category></item><item><title>Python Logging Tutorial</title><link>http://www.raydevblog.us/posts/2014/python-logging-tutorial.html</link><description>&lt;p&gt;The Python &lt;a href="http://docs.python.org/2/library/logging.html"&gt;logging documentation&lt;/a&gt; is initially confusing to me, therefore I decide to write this tutorial as a quick reference.&lt;/p&gt;
+&lt;h2&gt;Root Logger&lt;/h2&gt;
+&lt;p&gt;We can use the default (&lt;em&gt;root&lt;/em&gt;) logger directly on module level. You can view and download the file 
+&lt;a href="https://gist.github.com/garudareiga/8451107"&gt;logger0.py&lt;/a&gt; from my Gist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logger0&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger0&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;As we can see the message emitted by the root logger, the &lt;em&gt;debug&lt;/em&gt; and &lt;em&gt;info&lt;/em&gt; messages are ignored. 
+Besides, it prefixes all outputs by something like WARNING:root. It is because the root logger's
+severity level is set to &lt;em&gt;WARN&lt;/em&gt; by default, and it has its own formatter. Let's quickly confirm
+that and then change the level from &lt;em&gt;WARN&lt;/em&gt; to &lt;em&gt;DEBUG&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;level&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;WARN&lt;/span&gt;
+&lt;span class="bp"&gt;True&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;handlers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;formatter&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;_fmt&lt;/span&gt;
+&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;&lt;span class="si"&gt;%(levelname)s&lt;/span&gt;&lt;span class="s"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(name)s&lt;/span&gt;&lt;span class="s"&gt;:&lt;/span&gt;&lt;span class="si"&gt;%(message)s&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger0&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;root&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Customized Logger&lt;/h2&gt;
+&lt;p&gt;Let me introduce four main objects in the Python standard logging module - &lt;strong&gt;Logger&lt;/strong&gt;, &lt;strong&gt;Handler&lt;/strong&gt;,
+&lt;strong&gt;Formatter&lt;/strong&gt; and &lt;strong&gt;LogRecord&lt;/strong&gt;, to understand how the logging process works.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Logger, Handler and LogRecord have a &lt;em&gt;severity&lt;/em&gt; level.&lt;/li&gt;
+&lt;li&gt;We can messages to a Logger using the Logger's log method. The log method needs two parameters -
+  a msg (message) and a severity level. Logger also has a few methods defined - &lt;em&gt;debug&lt;/em&gt;, &lt;em&gt;info&lt;/em&gt;, 
+  &lt;em&gt;warn&lt;/em&gt;, &lt;em&gt;error&lt;/em&gt;, and 'critical'. Each of them has a pre-defined severity level.&lt;/li&gt;
+&lt;li&gt;Logger looks at the message and ignores it if the message level is less severe than its own level.
+  If not, it creates a LogRecord object from the message string and pass to its Handlers. A Logger 
+  can have multiple custom Handlers such as StreamHandler, FileHandler, HTTPHandler etc.&lt;/li&gt;
+&lt;li&gt;Handler is responsible for emitting messages to a stream, file, socket etc. THe Handerl also has
+  its own level. After receiving the LogRecord, Handler ignores any LogRecord that has a less severe 
+  level, otherwise it passes the LogRecord to its Formatter.&lt;/li&gt;
+&lt;li&gt;Formatter formats the LogRecord message and then sends back to its Handler. A Handler is associated 
+  with exactly one Formatter.&lt;/li&gt;
+&lt;li&gt;Finally the Handler emits the formatted LogRecord message to our destination.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Now, let's use our own logger instead of root. You can view and download the file 
+&lt;a href="https://gist.github.com/garudareiga/8446080"&gt;logger1.py&lt;/a&gt; from my Gist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logger1&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger1&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;logger1.log&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;DEBUG&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;WARNING&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;ERROR&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;CRITICAL&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We ask logging for a reference using the &lt;strong&gt;getLogger&lt;/strong&gt; function. If the logger with that 
+name does not exist it is created, else a reference is returned.
+We add two handlers to the logger, one is a StreamHandler which by default prints to stderr,
+while the other is a FileHandler which writes to a file &lt;strong&gt;logger1.log&lt;/strong&gt;, and both of them 
+use a custom formatter. In the example above, we log all messages to a file and log messages
+with a severity level of INFO or higher to stderr.&lt;/p&gt;
+&lt;h3&gt;Log Hierarchy&lt;/h3&gt;
+&lt;p&gt;Loggers are arranged in a hierarchy based on their names as python module names. So we choose 
+to use the module name as the logger name, with '.' dots separating hierarchy levels. 
+The root logger is at the top of this hierarchy. The name of the root logger is an empty string.
+The hierarchy is created and managed automatically by the logging system. All message send to a
+logger is automatically sent to its parent. We can turn off this upward propagation by setting the
+attribute &lt;strong&gt;propagate&lt;/strong&gt; to false. Configuring the parent logger will cascade down to the other loggers.  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;appLogger&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;getLogger&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;myapp&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;appLogger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;setLevel&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;INFO&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All myapp.* loggers will have the level INFO as their default.&lt;/p&gt;
+&lt;h3&gt;Exception with Traceback&lt;/h3&gt;
+&lt;p&gt;In reality, it is helpful to record whith traceback when something goes wrong.
+By calling logger methods with &lt;em&gt;exc_info=True&lt;/em&gt; parameter, traceback is dumped
+to the logger.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="n"&gt;record&lt;/span&gt; &lt;span class="ow"&gt;in&lt;/span&gt; &lt;span class="n"&gt;database&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="k"&gt;try&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;process&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;changed&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+            &lt;span class="n"&gt;update&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;record&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="n"&gt;execpt&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ne"&gt;KeyboardInterrupt&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="ne"&gt;SystemExit&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;raise&lt;/span&gt;
+    &lt;span class="k"&gt;except&lt;/span&gt; &lt;span class="ne"&gt;Exception&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;logger&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;error&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;Failed to process record&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;exc_info&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="bp"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Use RotatingFileHandler&lt;/h3&gt;
+&lt;p&gt;When we use FileHandler for writing the log, the size of log file grows quickly
+with time. We'd better use RotatingFileHandler instead of FileHandler in production 
+environment.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;handler_rotate_file&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;RoFileHandler&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;filename&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;__name__&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;.log&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;maxBytes&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;10485760&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;backupCount&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;20&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Use JSON Logging Configuration&lt;/h2&gt;
+&lt;p&gt;It is not flexible to configure out logging system in Python code. Instead, we can load the logging configuration from a JSON file. You can download the following three files &lt;a href="https://gist.github.com/garudareiga/8445508"&gt;logging.json&lt;/a&gt;, &lt;a href="https://gist.github.com/garudareiga/8445881"&gt;logger2.py&lt;/a&gt;, &lt;a href="https://gist.github.com/garudareiga/8445890"&gt;logger3.py&lt;/a&gt; from my Gist.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;logging.config&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;json&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;logger2&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nn"&gt;logger3&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;with&lt;/span&gt; &lt;span class="nb"&gt;open&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;logging.son&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;r&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="n"&gt;config&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;json&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;loads&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;read&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logging&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dictConfig&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;config&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger2&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;DEBUG&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;INFO&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;info&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;WARNING&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;ERROR&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;error&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="n"&gt;logger2&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;CRITICAL&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;critical&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;logger3&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;logger3&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;WARNING&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;Dump&lt;/span&gt; &lt;span class="n"&gt;warn&lt;/span&gt; &lt;span class="n"&gt;message&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Pay attention to the argument name "disable_existing_loggers". When we create the logger at module level, and them import the module before we load the logging configuration, the &lt;strong&gt;logging.dictConfig&lt;/strong&gt; disable existing loggers by default, unless we set "disable_existing_loggers" to false. For example, if we set "disable_existing_loggers" to true, logger3.foo() will not print out anything.&lt;/p&gt;
+&lt;p&gt;I hope this blog can help clear up Python's logging module for you.&lt;/p&gt;
+&lt;h2&gt;Extra Links&lt;/h2&gt;
+&lt;p&gt;Some credits go to the following links which help me understand the Python logging module.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://victorlin.me/posts/2012/08/26/good-logging-practice-in-python"&gt;Good logging practice in Python&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.shutupandship.com/2012/02/how-python-logging-module-works.html"&gt;How Python logging module works&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://eric.themoritzfamily.com/learning-python-logging.html"&gt;Learning Python logging&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://www.red-dove.com/python_logging.html"&gt;A Logging System for Python&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Tue, 14 Jan 2014 22:38:00 -0800</pubDate><guid>tag:www.raydevblog.us,2014-01-14:posts/2014/python-logging-tutorial.html</guid><category>python</category><category>logging</category></item><item><title>Making Recommendations Part I - Item-based Collaborative Filtering</title><link>http://www.raydevblog.us/posts/2013/making-recommendations-part-i-item-based-collaborative-filtering.html</link><description>&lt;p&gt;Recommender systems are popular on e-commerce web sites, to make personalized
+recommendations for products or services. Using the &lt;a href="http://www.grouplens.org/datasets/movielens"&gt;MovieLens 100k&lt;/a&gt; 
+dataset, I plan to build a recommnender system, which makes automatic recommendations 
+when a user inputs a list of movie ratings.&lt;/p&gt;
+&lt;p&gt;The "MovieLens 100k" data set consists of:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;10K ratings (1-5) from &lt;em&gt;943&lt;/em&gt; users on &lt;em&gt;1682&lt;/em&gt; movies.&lt;/li&gt;
+&lt;li&gt;Each user has rated at least 20 movies.&lt;/li&gt;
+&lt;li&gt;Simple demographic info for the users (age, gender, occupation, zip)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;User-based or Item-based Collaborative Filtering&lt;/h1&gt;
+&lt;p&gt;Collaborative Filtering (CF) is the most popular recommendation technique. CF works by
+building a database of preferences for items by users, and generates recommendations or
+makes predictions based on user-user similarity or item-item similarity. A user-based 
+CF algorithm represents a user as a N-dimensinal vector of items, where N is the number 
+of distinct items. The algorithm generates recommendations for a user based on a few other 
+users who are most similar to him/her. Rather than matching user to user, item-based CF 
+represents an item as a M-dimensinal vector of users, where M is the number of distinct users.
+It matches an user's rated items to similar items, then combines those similar items into 
+a recommendation list.&lt;/p&gt;
+&lt;p&gt;After parsing the "MovieLens 100K" data set, we have a user-item representation matrix (943x1682).
+In the case of user-based CF the similarity is computed along the rows of the matrix, while in the case of 
+item-based CF the similarity is computed along the column. In practice, user-based CF shows
+weakness evaluating large, sparse datasets. Thus, I choose item-based CF to build my recommender. 
+The main idea here is to analyze the user-item matrix to identify relations between different items
+and then to use these relations to compute the prediction score for a given user-item pair.&lt;/p&gt;
+&lt;h1&gt;Similarity Computation&lt;/h1&gt;
+&lt;p&gt;One critical step in the item-based CF algorithm is to compute the similarity between the items.
+The basic idea in similarity computation between two items i and j is to first isolate the users
+who have rated both of these items, and then to apply a similarity computation technique to determine
+the similarity. There are a number of different ways to compute the similarity between items, such
+as Euclidean distance, Jaccord coefficient, cosine similarity, Pearson's correlation coefficient. 
+Euclidean distance is often used for dense, continuous data. For sparse data, which often consists 
+of asymmetric attributes, we typically employ Jaccord coefficient or cosine similarity that ignore 
+0-0 matches. However, Jaccord coefficient or cosine similariy does not take the scale of data into 
+account. Thus, I choose adjusted cosine similarity and Pearson's correlation for similarity compuation. 
+After similarity compuation, we can build a item similarity dictionary.&lt;/p&gt;
+&lt;h3&gt;Pearson's Correlation&lt;/h3&gt;
+&lt;p&gt;The similarity between two item i and j is measured by Pearson's correlation.  Let the set of users 
+who both rated i and j are denoted by U, then the correlation is given by &lt;/p&gt;
+&lt;p&gt;\begin{equation}
+sim(i, j) = \frac{\sum_{u \in U}(R_{u,i} - \overline{R_{i}})(R_{u,j} - \overline{R_{j}})}{\sqrt{\sum_{u \in U}(R_{u,i} - \overline{R_{i}})^2}\sqrt{\sum_{u \in U}(R_{u,j} - \overline{R_{j}})^2}}
+\end{equation}&lt;/p&gt;
+&lt;h3&gt;Adjusted Consine Similarity&lt;/h3&gt;
+&lt;p&gt;The adjusted consine similarity substracts the corresponding user average from each co-rated pair.
+The similarity between items i and j is given by&lt;/p&gt;
+&lt;p&gt;\begin{equation}
+sim(i, j) = \frac{\sum_{u \in U}(R_{u,i} - \overline{R_{u}})(R_{u,j} - \overline{R_{u}})}{\sqrt{\sum_{u \in U}(R_{u,i} - \overline{R_{u}})^2}\sqrt{\sum_{u \in U}(R_{u,j} - \overline{R_{u}})^2}}
+\end{equation}&lt;/p&gt;
+&lt;h1&gt;Recommendation Generation&lt;/h1&gt;
+&lt;p&gt;On an item i for a user u, we computes the prediction by computing the sum of ratings given by the user on the items
+similar to i. Each rating is weighted by the corresponding similarity $s_{i,j}$ between items i and j. We can denote
+the similar item set of item i as N, and the prediction $P_{u,i}$ as&lt;/p&gt;
+&lt;p&gt;\begin{equation}
+P_{u,i} = \frac{\sum_{j \in N}(s_{i,j}*R_{u,j})} {\sum_{j \in N}(\mid s_{i,j} \mid)}
+\end{equation}&lt;/p&gt;
+&lt;p&gt;The recommendations will consist of a set of similar items with high prediction values.&lt;/p&gt;
+&lt;h1&gt;Python Implementation&lt;/h1&gt;
+&lt;p&gt;A Python module of my recommender system is availabe in my &lt;a href="https://github.com/garudareiga/PyDMML/blob/master/recommendation_movie_lens/Recommendation.py"&gt;github reposity&lt;/a&gt;. The method to build a recommender system is as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;Recommendation&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;num_user&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;943&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;num_item&lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="mi"&gt;1682&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;parse_data&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;ml-100k/u.data&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;do_item_based_collaborative_filtering&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;similarity&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;item_similarity_pearson&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;num_similar_items&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Next, it makes prediction for a random user as follows:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;user_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;random&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;randint&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;num_user&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;obj&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;make_recommendations&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;user_id&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h1&gt;Performance&lt;/h1&gt;
+&lt;p&gt;In a practical scenario, we usually have a set of item that is static compared to the number of users
+that changes most often. The static nature of items makes precomputing the item similarities possible.
+One possible way is to compute all-to-all similarity and then performing a quick table look-up to retrieve
+the similarity values. This offline computation of the similar-items table is extremely time intensive,
+with $O(N^2M)$ as worst case. However, it's close to $O(NM)$ in practice, as most customers have very few
+purchases. Although building the item similarity takes a long item, recommendations are 
+almost instantaneous afterwards. Therefore, item-based CF is efficient for a large dataset, with the additional 
+overhead of maintining the item similarity dictionary. This method, although saves time, requires an
+$O(M^2)$ space for &lt;em&gt;M&lt;/em&gt; items. In fact, we only need a small number of similar items to compute predictions.
+For each item, we retain only the &lt;em&gt;K&lt;/em&gt; most similar items, where &lt;em&gt;K&lt;/em&gt; &amp;lt;&amp;lt; &lt;em&gt;M&lt;/em&gt;, and record these item similarities.
+Obviously, we observe a quality-performance trade-off: to ensure good quality we need have a large value &lt;em&gt;K&lt;/em&gt;, which
+leads to the performance problem. &lt;/p&gt;
+&lt;p&gt;In my project, the offline similarity precomputing takes about 30~40 minutes using Pearson's corelation to&lt;br /&gt;
+compute item similarity. For each item, I retain 100 most similar items and provide an option to store their similarity
+values in a local JSON disk file, or in a MongoDB collection (One document correspond to one item with its 100 most
+similar items and their similarity scores). At the start of recommendation, I simply load the precomputed similarity
+information from the local JSON disk file or the MongoDB collection.&lt;/p&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Sun, 08 Dec 2013 10:00:00 -0800</pubDate><guid>tag:www.raydevblog.us,2013-12-08:posts/2013/making-recommendations-part-i-item-based-collaborative-filtering.html</guid><category>data mining</category><category>machine learning</category><category>json</category><category>mongodb</category></item><item><title>Python Function Parameter Using * and ** Operators</title><link>http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html</link><description>&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
+&lt;h2&gt;Using * operator for positional arguments&lt;/h2&gt;
+&lt;p&gt;A parameter name that begins with * &lt;em&gt;gathers&lt;/em&gt; arguments into a tuple. You can
+only provide one such variable after the ordinary positional parameters in
+the function definition. For example, &lt;em&gt;printall&lt;/em&gt; takes any number of arguments
+and print them:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;print_all&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;args&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;args&lt;/span&gt;
+        &lt;span class="n"&gt;print_all&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;foo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mf"&gt;2.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;foo&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The complement of gather is &lt;em&gt;scatter&lt;/em&gt;. If you have a sequence of values and you 
+want to pass it to a function as multiple arguments, you can use the * operator.
+For example, &lt;em&gt;divmond&lt;/em&gt; takes exactly two argument:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;t&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;divmond&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;t&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;em&gt;chain&lt;/em&gt; function from the &lt;em&gt;itertools&lt;/em&gt; module provides an example for gather
+and scatter:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;itertools&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;myList&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;]]&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;iterools&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;chain&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;myList&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Using ** operator for keyword arguments&lt;/h2&gt;
+&lt;p&gt;A parameter name that begins with ** gathers arguments into a dictionary: &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;print_kwargs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;**&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="n"&gt;kwargs&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;print_kwargs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;c&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;b&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can also use ** operator as a scatter when calling a function:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;print_args&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;arg1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;arg2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;print&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;arg1:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;arg1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;arg2:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;arg2&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;kwargs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="s"&gt;&amp;#39;arg1&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;arg2&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="o"&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;print_args&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kwargs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;arg1&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt; &lt;span class="n"&gt;arg2&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">Ray Chen</dc:creator><pubDate>Sun, 08 Sep 2013 13:00:00 -0700</pubDate><guid>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</guid><category>python</category></item></channel></rss>

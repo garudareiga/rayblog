@@ -37,7 +37,37 @@
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://billmill.org/bloomfilter-tutorial"&gt;Bloom Filters by Example&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://www.slideshare.net/quipo/modern-algorithms-and-data-structures-1-bloom-filters-merkle-trees"&gt;Modern Algorithms and Data Structures - Bloom Filters&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</summary><category term="data structure"></category><category term="bloom filter"></category></entry><entry><title>Fibonacci Sequence</title><link href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html" rel="alternate"></link><updated>2014-05-14T23:15:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-05-14:posts/2014/fibonacci-sequence.html</id><summary type="html">&lt;p&gt;Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. &lt;/p&gt;
+&lt;/ul&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</summary><category term="data structure"></category><category term="bloom filter"></category></entry><entry><title>Fibonacci Sequence</title><link href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html" rel="alternate"></link><updated>2014-05-14T23:15:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-05-14:posts/2014/fibonacci-sequence.html</id><summary type="html">&lt;p&gt;Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. &lt;/p&gt;
 &lt;p&gt;Fibonacci sequence is defined as:
 $f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.&lt;/p&gt;
 &lt;h3&gt;Naive Recursive Solution&lt;/h3&gt;
@@ -74,4 +104,34 @@ $f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.&lt;/p&gt;
     &lt;span class="o"&gt;}&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 &lt;span class="o"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary></entry></feed>
+&lt;/pre&gt;&lt;/div&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</summary></entry></feed>

@@ -37,7 +37,37 @@
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="http://billmill.org/bloomfilter-tutorial"&gt;Bloom Filters by Example&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://www.slideshare.net/quipo/modern-algorithms-and-data-structures-1-bloom-filters-merkle-trees"&gt;Modern Algorithms and Data Structures - Bloom Filters&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</summary><category term="data structure"></category><category term="bloom filter"></category></entry><entry><title>Dynamo: Amazon's Highly Available Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html" rel="alternate"></link><updated>2014-07-20T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-20:posts/2014/dynamo-amazons-highly-available-key-value-store.html</id><summary type="html">&lt;p&gt;This &lt;a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"&gt;paper&lt;/a&gt; was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.&lt;/p&gt;
+&lt;/ul&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</summary><category term="data structure"></category><category term="bloom filter"></category></entry><entry><title>Dynamo: Amazon's Highly Available Key-Value Store</title><link href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html" rel="alternate"></link><updated>2014-07-20T22:07:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-20:posts/2014/dynamo-amazons-highly-available-key-value-store.html</id><summary type="html">&lt;p&gt;This &lt;a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html"&gt;paper&lt;/a&gt; was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.&lt;/p&gt;
 &lt;h3&gt;Introduction&lt;/h3&gt;
 &lt;p&gt;Dynamo is a completely decentralized system targeting applications that operate with weaker consistency and high availability. It is built to be an &lt;strong&gt;"always writeable"&lt;/strong&gt; data store. Hence, Dynamos allows conflicting updates in the system. &lt;/p&gt;
 &lt;p&gt;Dynamo achieves scalability and availability by the following technologies:&lt;/p&gt;
@@ -165,7 +195,37 @@ $f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.&lt;/p&gt;
     &lt;span class="o"&gt;}&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;result&lt;/span&gt;&lt;span class="o"&gt;;&lt;/span&gt;
 &lt;span class="o"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;</summary></entry><entry><title>Numbers Everyone Should Know</title><link href="http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html" rel="alternate"></link><updated>2014-04-15T15:06:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-15:posts/2014/numbers-everyone-should-know.html</id><summary type="html">&lt;p&gt;"Numbers everyone should know" by Jeff Dean:&lt;/p&gt;
+&lt;/pre&gt;&lt;/div&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</summary></entry><entry><title>Numbers Everyone Should Know</title><link href="http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html" rel="alternate"></link><updated>2014-04-15T15:06:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-04-15:posts/2014/numbers-everyone-should-know.html</id><summary type="html">&lt;p&gt;"Numbers everyone should know" by Jeff Dean:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;L1 cache reference 0.5ns&lt;/li&gt;
 &lt;li&gt;L2 cache reference 7ns&lt;/li&gt;
@@ -625,7 +685,37 @@ leads to the performance problem. &lt;/p&gt;
 compute item similarity. For each item, I retain 100 most similar items and provide an option to store their similarity
 values in a local JSON disk file, or in a MongoDB collection (One document correspond to one item with its 100 most
 similar items and their similarity scores). At the start of recommendation, I simply load the precomputed similarity
-information from the local JSON disk file or the MongoDB collection.&lt;/p&gt;</summary><category term="data mining"></category><category term="machine learning"></category><category term="json"></category><category term="mongodb"></category></entry><entry><title>Python Function Parameter Using * and ** Operators</title><link href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html" rel="alternate"></link><updated>2013-09-08T13:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</id><summary type="html">&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
+information from the local JSON disk file or the MongoDB collection.&lt;/p&gt;&lt;script type= "text/javascript"&gt;
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+&lt;/script&gt;
+</summary><category term="data mining"></category><category term="machine learning"></category><category term="json"></category><category term="mongodb"></category></entry><entry><title>Python Function Parameter Using * and ** Operators</title><link href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html" rel="alternate"></link><updated>2013-09-08T13:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</id><summary type="html">&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
 &lt;h2&gt;Using * operator for positional arguments&lt;/h2&gt;
 &lt;p&gt;A parameter name that begins with * &lt;em&gt;gathers&lt;/em&gt; arguments into a tuple. You can
 only provide one such variable after the ordinary positional parameters in
