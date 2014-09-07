@@ -1,5 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/ray-chen.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-07-28T10:00:00-07:00</updated><entry><title>Bloom Filter</title><link href="http://www.raydevblog.us/posts/2014/bloom-filter.html" rel="alternate"></link><updated>2014-07-28T10:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-28:posts/2014/bloom-filter.html</id><summary type="html">&lt;p&gt;I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/ray-chen.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-09-05T10:00:00-07:00</updated><entry><title>Implementing a Multi-Client Echo Server using Go</title><link href="http://www.raydevblog.us/posts/2014/implementing-a-multi-client-echo-server-using-go.html" rel="alternate"></link><updated>2014-09-05T10:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-09-05:posts/2014/implementing-a-multi-client-echo-server-using-go.html</id><summary type="html">&lt;h3&gt;Server Characteristic&lt;/h3&gt;
+&lt;p&gt;The multi-client echo server must have the following characteristics:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The server must manage and interact with its clients concurrently using goroutines and channels. Multiple clients should be able to connect/disconnect to the server simultaneously. &lt;/li&gt;
+&lt;li&gt;When the server reads a newline-terminated message from a client, it must respond by writing that exact message to all connected clients. &lt;/li&gt;
+&lt;li&gt;The server must be responsive to slow-reading clients. Consider when a client does not call &lt;em&gt;Read&lt;/em&gt; for an extended period of time. If during this time the server continues to write messages to the client's TCP connection, eventually the TCP connection's output buffer will reach maximum capacity and subsequent calls to &lt;em&gt;Write&lt;/em&gt; made by the server will block. The server should keep a queue of at most 100 outgoing messages to be written to the client. Messages sent to a slow-reading client whose outgoing message buffer has reached the maximum capacity of 100 should simply be dropped.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Go's Concurrency Model&lt;/h3&gt;
+&lt;p&gt;Go's approach to concurrency differs from the traditional use of threads and shared memory. Go encourages an approach in which shared values are passed around on channels and never actively shared by separate threads of execution. It can be summarized:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Don't communicate by sharing memory; share memory by communicating.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As a high-level approach, using channels to control access makes it easier to write clear, correct programs.&lt;/p&gt;
+&lt;h4&gt;Goroutines&lt;/h4&gt;
+&lt;p&gt;Goroutine is a functon executing concurrently with other goroutines in the same address space. They are lightweight and cheap, costing little more than the allocation of small stack space. Goroutines are multiplexed onto multiple OS threads, hiding the complexities of thread creation and management. They silently manages their own threading, and silently returns when they have finished.&lt;/p&gt;
+&lt;h4&gt;Channels&lt;/h4&gt;
+&lt;p&gt;Channels act like pipes. By default, the channel is unbuffered, which provides communication with synchronization. A buffered channel is asynchronous; sending or receiving will not wait unless the channel is full. It can be used like a semaphore, for instance to limit throughput. Channels allow you to pass references to data structures between goroutines. If consider this as passing around ownership of the data (the ability to read and write it), it becomes a powerful synchronization mechanism.&lt;/p&gt;
+&lt;h3&gt;Echo Server Implementation&lt;/h3&gt;
+&lt;p&gt;Next I'll explain some Go-specific mechanisms to meet the design requirement. &lt;/p&gt;
+&lt;h4&gt;Support Clients Concurrently&lt;/h4&gt;
+&lt;p&gt;When the server starts, it creates a central goroutine that opens a socket and keeps listening for incoming TCP requests on a given port. For each TCP request from a client, the server creates two goroutines for reading from and writing to the connection. When client disconnects from the server, these two goroutines will finish silently. Thus, server is able to interact with mutliple clients concurrently.&lt;/p&gt;
+&lt;h4&gt;Avoid Data Race&lt;/h4&gt;
+&lt;p&gt;A data race occurs when two goroutines access the same variable concurrently and at least one of the accesses is a write. The server manages clients using a map, unique client ids as keys and pointers of client objects as values. This map is a goroutine-global variable. In order to avoid data race, its ownership has to be passed around goroutines, adding/deleting clients when clients connect/disconnect to the server concurrently. I choose to use a channel &lt;strong&gt;eclChan&lt;/strong&gt; of size one, that stores the map and acts like a binary semaphore (or mutex) to provide synchronization among goroutines.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// New creates and returns (but does not start) a new MultiEchoServer.&lt;/span&gt;
+&lt;span class="kd"&gt;func&lt;/span&gt; &lt;span class="nx"&gt;New&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="nx"&gt;MultiEchoServer&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;ptrServer&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&lt;/span&gt;&lt;span class="nx"&gt;multiEchoServer&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;host&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;    &lt;span class="s"&gt;&amp;quot;localhost&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="nx"&gt;eclChan&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;make&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;chan&lt;/span&gt; &lt;span class="kd"&gt;map&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kt"&gt;int&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="nx"&gt;echoClient&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+        &lt;span class="nx"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;    &lt;span class="nb"&gt;make&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;chan&lt;/span&gt; &lt;span class="kt"&gt;bool&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;MultiEchoServer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;ptrServer&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Use Message Queue&lt;/h4&gt;
+&lt;p&gt;To be responsive to possible slow &lt;strong&gt;READ&lt;/strong&gt; clients, we need a message queue of at most 100 outgoing messages for each client. Apparently, a buffered string channel named as &lt;strong&gt;"ch"&lt;/strong&gt; fits this role:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;type&lt;/span&gt; &lt;span class="nx"&gt;echoClient&lt;/span&gt; &lt;span class="kd"&gt;struct&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;conn&lt;/span&gt; &lt;span class="nx"&gt;net&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Conn&lt;/span&gt;
+    &lt;span class="nx"&gt;ch&lt;/span&gt;   &lt;span class="kd"&gt;chan&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To drop messages when the channel is full, I asked for some help from &lt;a href="http://stackoverflow.com/questions/25657207/golang-how-to-know-a-buffered-channel-is-full?noredirect=1#comment40125761_25657207"&gt;stackoverflow&lt;/a&gt; and solve the issue using the &lt;strong&gt;select&lt;/strong&gt; statement:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;select&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nx"&gt;echoClient&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ch&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nx"&gt;msg&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="k"&gt;default&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="c1"&gt;// discard value if channel is full&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h4&gt;Stop Server Gracefully&lt;/h4&gt;
+&lt;p&gt;When the server stops, I need terminate the central goroutine listening on a given port gracefully. Here, an unbuffered boolean channel &lt;strong&gt;stop&lt;/strong&gt; (defined in &lt;strong&gt;MultiEchoServer&lt;/strong&gt; type above) will pass the termination signal to the central goroutine, and the magic &lt;strong&gt;select&lt;/strong&gt; statement again decide when to emit the signal:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="c1"&gt;// central goroutine&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;err&lt;/span&gt; &lt;span class="o"&gt;:=&lt;/span&gt; &lt;span class="nx"&gt;mes&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;ln&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Accept&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;// listen for TCP connections&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="nx"&gt;err&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="kc"&gt;nil&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;select&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt;&lt;span class="nx"&gt;mes&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;stop&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="c1"&gt;// stop listening&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt;
+        &lt;span class="k"&gt;default&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+        &lt;span class="k"&gt;continue&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="c1"&gt;// create goroutines for each connection from clients ...&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;Finished&lt;/h3&gt;
+&lt;p&gt;We now have a fully functional echo server that supports multiple clients concurrently. The full source code for a multi-client echo server is available &lt;a href="https://github.com/garudareiga/cmu-440/tree/master/p0"&gt;here&lt;/a&gt;. Your criticism or suggestion is welcome.&lt;/p&gt;</summary></entry><entry><title>Bloom Filter</title><link href="http://www.raydevblog.us/posts/2014/bloom-filter.html" rel="alternate"></link><updated>2014-07-28T10:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-07-28:posts/2014/bloom-filter.html</id><summary type="html">&lt;p&gt;I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.&lt;/p&gt;
 &lt;p&gt;Bloom filter is a space-efficient &lt;strong&gt;probabilistic&lt;/strong&gt; data structure used to test set membership. It tells us that the element either &lt;em&gt;definitely&lt;/em&gt; is not in the set or &lt;em&gt;may be&lt;/em&gt; in the set. In other words, &lt;strong&gt;false positives&lt;/strong&gt; are possible, however &lt;strong&gt;false negatives&lt;/strong&gt; are not.&lt;/p&gt;
 &lt;h3&gt;Data Structure&lt;/h3&gt;
 &lt;p&gt;Bloom filter is not a key-value store. The base data structure of a bloom filter is a &lt;strong&gt;Bit Vector&lt;/strong&gt;, a vector of bit buckets indicating the presence of an element in the filter. &lt;/p&gt;
