@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/ray-chen.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-09-05T10:00:00-07:00</updated><entry><title>Implementing a Multi-Client Echo Server using Go</title><link href="http://www.raydevblog.us/posts/2014/implementing-a-multi-client-echo-server-using-go.html" rel="alternate"></link><updated>2014-09-05T10:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-09-05:posts/2014/implementing-a-multi-client-echo-server-using-go.html</id><summary type="html">&lt;h3&gt;Server Characteristic&lt;/h3&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/ray-chen.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-09-25T21:00:00-07:00</updated><entry><title>Teach Myself Distributed Systems</title><link href="http://www.raydevblog.us/posts/2014/teach-myself-distributed-systems.html" rel="alternate"></link><updated>2014-09-25T21:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-09-25:posts/2014/teach-myself-distributed-systems.html</id><summary type="html">&lt;h3&gt;Overview&lt;/h3&gt;
+&lt;h3&gt;Courses&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://www.cs.columbia.edu/~du/ds"&gt;W4995-1 Distributed Systems&lt;/a&gt; provided by Columbia University&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.cs.cmu.edu/~dga/15-440/S14/index.html"&gt;15-440/640 Distributed Systems&lt;/a&gt; provided by CMU&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://css.csail.mit.edu/6.824"&gt;6.824 Distributed Systems&lt;/a&gt; provided by MIT&lt;/p&gt;
+&lt;h3&gt;Guides&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://www.somethingsimilar.com/2013/01/14/notes-on-distributed-systems-for-young-bloods"&gt;Notes on Distributed Systems for Young Bloods&lt;/a&gt; from &lt;a href="http://www.somethingsimilar.com/about"&gt;Jeff Hodges&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://the-paper-trail.org/blog/distributed-systems-theory-for-the-distributed-systems-engineer/"&gt;Distributed systems theory for the distributed systems engineer&lt;/a&gt; from "Paper Trail"&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://book.mixu.net/distsys/"&gt;Distributed systems for fun and profit&lt;/a&gt; from &lt;a href="http://book.mixu.net/distsys/"&gt;Mikito Takada&lt;/a&gt; &lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.incubaid.com/2012/03/28/the-game-of-distributed-systems-programming-which-level-are-you"&gt;The Game of Distributed Systems Programming. Which Level Are You?&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;Talks &amp;amp; Presentations&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://distributedpodcast.com"&gt;Distributed Podcast&lt;/a&gt;
+&lt;a href="http://thinkdistributed.io"&gt;thinkdistributed&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;Golang&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://talks.golang.org/2013/distsys.slide#1"&gt;Go, for Distributed Systems&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://blog.gopheracademy.com/writing-a-distributed-system-library"&gt;Writing a Distributed Systems Library in Go&lt;/a&gt;&lt;/p&gt;
+&lt;h3&gt;Pages &amp;amp; Blogs&lt;/h3&gt;
+&lt;p&gt;&lt;a href="http://pdos.csail.mit.edu/~neha"&gt;Neha Narula&lt;/a&gt;&lt;/p&gt;</summary></entry><entry><title>Implementing a Multi-Client Echo Server using Go</title><link href="http://www.raydevblog.us/posts/2014/implementing-a-multi-client-echo-server-using-go.html" rel="alternate"></link><updated>2014-09-05T10:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-09-05:posts/2014/implementing-a-multi-client-echo-server-using-go.html</id><summary type="html">&lt;h3&gt;Server Characteristic&lt;/h3&gt;
 &lt;p&gt;The multi-client echo server must have the following characteristics:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;The server must manage and interact with its clients concurrently using goroutines and channels. Multiple clients should be able to connect/disconnect to the server simultaneously. &lt;/li&gt;
@@ -786,7 +803,7 @@ information from the local JSON disk file or the MongoDB collection.&lt;/p&gt;&l
         (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
     }
 &lt;/script&gt;
-</summary><category term="data mining"></category><category term="machine learning"></category><category term="json"></category><category term="mongodb"></category></entry><entry><title>Python Function Parameter Using * and ** Operators</title><link href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html" rel="alternate"></link><updated>2013-09-08T13:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</id><summary type="html">&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
+</summary><category term="machine learning"></category><category term="json"></category><category term="mongodb"></category></entry><entry><title>Python Function Parameter Using * and ** Operators</title><link href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html" rel="alternate"></link><updated>2013-09-08T13:00:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2013-09-08:posts/2013/python-function-parameter-using-and-operators.html</id><summary type="html">&lt;p&gt;Python lets us define a function that can take a variable number of arguments. &lt;/p&gt;
 &lt;h2&gt;Using * operator for positional arguments&lt;/h2&gt;
 &lt;p&gt;A parameter name that begins with * &lt;em&gt;gathers&lt;/em&gt; arguments into a tuple. You can
 only provide one such variable after the ordinary positional parameters in
