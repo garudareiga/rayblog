@@ -1,8 +1,8 @@
 Title: Making Recommendations Part I - Item-based Collaborative Filtering
 Date: 2013-12-08 10:00
 Author: Ray Chen
-Category: Machine Learning 
-Tags: data mining, machine learning, json, mongodb 
+Category: Data
+Tags: machine learning, json, mongodb 
 
 Recommender systems are popular on e-commerce web sites, to make personalized
 recommendations for products or services. Using the [MovieLens 100k](http://www.grouplens.org/datasets/movielens) 

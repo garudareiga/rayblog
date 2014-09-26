@@ -1,7 +1,7 @@
 Title: Bloom Filter
 Date: 2014-07-28 10:00 
 Author: Ray Chen 
-Category: Data Structure and Algorithm
+Category: Algorithm
 Tags: data structure, bloom filter
 
 I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.

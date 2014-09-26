@@ -1,7 +1,7 @@
 Title: A Single Server Key-Value Store 
 Date: 2014-03-31 22:11
 Author: Ray Chen
-Category: System Design 
+Category: System
 Tags: key-value store, concurrency 
 
 On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.

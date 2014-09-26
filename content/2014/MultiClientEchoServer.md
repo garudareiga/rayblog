@@ -1,7 +1,7 @@
 Title: Implementing a Multi-Client Echo Server using Go
 Date: 2014-09-05 10:00 
 Author: Ray Chen 
-Category: System design
+Category: System
 
 ### Server Characteristic 
 

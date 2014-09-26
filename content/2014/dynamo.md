@@ -1,7 +1,7 @@
 Title: Dynamo: Amazon's Highly Available Key-Value Store
 Date: 2014-07-20 22:07
 Author: Ray Chen
-Category: System Design 
+Category: System
 Tags: key-value store 
 
 This [paper](http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html) was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper and briefly describe some well-know technologies implemented by Dynamo.

@@ -1,7 +1,7 @@
 Title: Numbers Everyone Should Know
 Date: 2014-04-15 15:06
 Author: Ray Chen
-Category: Miscellaneous
+Category: Misc
 
 "Numbers everyone should know" by Jeff Dean:
 

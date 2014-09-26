@@ -1,7 +1,7 @@
 Title: Distributed Key-Value Store 
 Date: 2014-04-10 22:07
 Author: Ray Chen
-Category: System Design 
+Category: System
 Tags: key-value store, concurrency, distributed, two-phase commit, consistent hashing 
 
 Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
