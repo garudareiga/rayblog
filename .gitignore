@@ -5,3 +5,4 @@
 output/
 pelican-themes/
 pelican-plugins/
+cache/
