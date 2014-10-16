@@ -2,7 +2,7 @@
 <html lang="en"
 >
 <head>
-    <title>Python - Ray's Thoughts and Writings</title>
+    <title>CAP Theorem and NoSQL Database Systems - Ray's Thoughts and Writings</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -10,16 +10,11 @@
 
 
 
+<link rel="canonical" href="http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html">
 
-    <meta name="author" content="Ray Chen" />
-    <meta name="keywords" content="Python" />
+        <meta name="author" content="Ray Chen" />
+        <meta name="description" content="CAP Theorem CAP is an abbreviation for consistency, availability, and partition tolerance. The CAP Theorem states that in a distributed system, you can have only two of these properties, but not all three at once. One of them must be sacrificed. Consistency A read request in a distributed system sees ..." />
 
-    <!-- Open Graph tags -->
-        <meta property="og:site_name" content="Ray's Thoughts and Writings" />
-        <meta property="og:type" content="website"/>
-        <meta property="og:title" content="Ray's Thoughts and Writings"/>
-        <meta property="og:url" content="http://www.raydevblog.us"/>
-        <meta property="og:description" content="Ray's Thoughts and Writings"/>
 
 
     <!-- Bootstrap -->
@@ -61,10 +56,10 @@ Ray's Thoughts and Writings            </a>
                         <li >
                             <a href="http://www.raydevblog.us/category/misc.html">Misc</a>
                         </li>
-                        <li class="active">
+                        <li >
                             <a href="http://www.raydevblog.us/category/python.html">Python</a>
                         </li>
-                        <li >
+                        <li class="active">
                             <a href="http://www.raydevblog.us/category/system.html">System</a>
                         </li>
             </ul>
@@ -80,30 +75,113 @@ Ray's Thoughts and Writings            </a>
     <div class="row">
         <div class="col-sm-9">
 
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html">Python Logging Tutorial</a></h2>
-                <div class="summary"><p>The Python <a href="http://docs.python.org/2/library/logging.html">logging documentation</a> is initially confusing to me, therefore I decide to write this tutorial as a quick reference.</p>
-<h2>Root Logger</h2>
-<p>We can use the default (<em>root</em>) logger directly on module level. You can view and download the file 
-<a href="https://gist.github.com/garudareiga/8451107">logger0.py</a> from my Gist.</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logger0</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">logger0</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
-<span class="n">WARNING ...</span></pre></div>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html">more ...</a>
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html"
+                       rel="bookmark"
+                       title="Permalink to CAP Theorem and NoSQL Database Systems">
+                        CAP Theorem and NoSQL Database Systems
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2014-09-25T21:00:00"> Thu 25 September 2014</time>
+    </span>
+
+
+
+    
+</footer><!-- /.post-info -->                    </div>
                 </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html">Python Function Parameter Using * and ** Operators</a></h2>
-                <div class="summary"><p>Python lets us define a function that can take a variable number of arguments. </p>
-<h2>Using * operator for positional arguments</h2>
-<p>A parameter name that begins with * <em>gathers</em> arguments into a tuple. You can
-only provide one such variable after the ordinary positional parameters in
-the function definition. For example, <em>printall</em> takes ...</p>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2013/python-function-parameter-using-and-operators.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
+                <h2>CAP Theorem</h2>
+<p>CAP is an abbreviation for consistency, availability, and partition tolerance. The <a href="http://en.wikipedia.org/wiki/CAP_theorem">CAP Theorem</a> states that in a distributed system, you can have only two of these properties, but not all three at once. One of them must be sacrificed. </p>
+<h3>Consistency</h3>
+<p>A read request in a distributed system sees all previously completed writes. Traditional ways to achieve this in relational database systems are distributed transactions. </p>
+<h3>Availability</h3>
+<p>The distributed system guarantees responses for requests within a reasonable amount of time, even though one or more nodes are down. To achieve availability data in a cluster must be replicated to a number of nodes, and every node must be ready to claim master status at any time.</p>
+<h3>Partition Tolerance</h3>
+<p>Nodes can be physically separated from each other, and are not able to reach each other at any point and for any length of time, when network partitions occur. During the partition, the distributed system should still be able to serve both read and write quests.</p>
+<h3>CP and AP</h3>
+<p>Given completely unreliable networks, we must tolerate partitions in a distributed system. It's considered impossible to offer both full consistency and 100% availability at the same time, there will always be trade-offs involved. </p>
+<ul>
+<li>CP - Consistency/Partition Tolerance: choose consistency over availability when your business requirements dictate atomic reads and writes.</li>
+<li>AP - Availability/Partition Tolerance: choose availability over consistency when your business requirements allow for some flexibility and the system needs to continue to function in spite of external errors.</li>
+</ul>
+<p><img alt="Alt text" src="http://www.raydevblog.us/images/nosql.png" /></p>
+<h2>NoSQL Database Systems</h2>
+<h3>Key-based NoSQL Data Models</h3>
+<p>The data model of a database specifies how data is logically organized. Its query model dictates how the data can be retrieved and updated. Common data models are the relational model, key-oriented storage model, or various graph models. Query languages include SQL, key lookups, and MapReduce <a href="http://aosabook.org/en/nosql.html">1</a>.</p>
+<p>The key-based lookup model is beneficial because the database has a consistent query pattern - the entire workload consists of key lookups whose performance is relatively uniform and predictable.</p>
+<h4>Key-Value Stores</h4>
+<p>In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value containing arbitrary data. The key-value store has no knowledge of the contents of its payload, and it might map the key to a <a href="http://en.wikipedia.org/wiki/Binary_large_object">blob</a> containing JSON or binary format. In order to use structured formats to store complex data for a key, developers must operate against the data in the application space. Key-value stores shine in the simplicity of their query model.</p>
+<h4>Key-Data Structure Stores</h4>
+<p>Key-data structure stores assign each value a type. In Redis, the available types are integer, string, list, set, and sorted set. By providing simple type-specific functionality while avoiding multi-key operations such as aggregation or joins, Redis balances functionality and performance.</p>
+<h4>Key-Document Stores</h4>
+<p>Key-document stores, such as CouchDB9, MongoDB10, and Riak11, map a key to some document that contains structured information. These systems store documents in a JSON or JSON-like format. They store lists and dictionaries, which can be embedded recursively inside one-another.</p>
+<h4>BigTable Column Family Stores</h4>
+<p>HBase and Cassandra are based on Google's BigTable. In this model, a key identifies a row, which contains data stored in one or more Column Families (CFs). Within a CF, each row can contain multiple columns. The values within each column are timestamped, so that several versions of a row-column mapping can live within a CF. Conceptually, one can think of Column Families as storing complex keys of the form (row ID, CF, column, timestamp), mapping to values which are sorted by their keys.</p>
+<h3>Data Durability</h3>
+<p>Different NoSQL systems make different data durability guarantees in order to improve performance.</p>
+<h4>Single-server Durability</h4>
+<p>The single-server durability usually means writing the changed data to disk, which often bottlenecks your workload. To ensure efficient single-server durability, we need limit the number of random writes between <em>fsync</em> system calls, and increase the number of sequential writes per hard drive.</p>
+<ul>
+<li>Control <em>fsync</em> frequency: Memcached offers no on-disk durability in exchange of extremely fast in-memory operations. Redis offers developers several options for when to call <em>fsync</em>.</li>
+<li>Increase sequential writes by logging: To reduce random writes, systems such as Cassandra, HBase, Redis, and Riak append update operations to a sequentially-written log file, which is frequently fsynced.</li>
+</ul>
+<h4>Multi-server Durability</h4>
+<p>Many NoSQL systems offer multi-server durability by copying data across nodes.</p>
+<ul>
+<li>Redis takes a traditional master-slave approach to replicating data. All operations executed against a master are communicated in a log-like fashion to slave machines, which replicate the operations on their own hardware. CouchDB facilitates a similar form of directional replication.</li>
+<li>MongoDB provides the notion of replica sets, where some number of servers are responsible for storing each document. </li>
+<li>HBase receives multi-server durability through HDFS. All writes are replicated to two or more HDFS nodes before returning control to the user, ensuring multi-server durability.</li>
+<li>Riak, Cassandra, and Voldemort support quorum-based configurable forms of replication.</li>
+</ul>
+<h3>References</h3>
+<ul>
+<li><a href="http://robertgreiner.com/2014/08/cap-theorem-revisited">CAP Theorem: Revisited</a></li>
+<li><a href="http://aosabook.org/en/nosql.html">The NoSQL Ecosystem</a></li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'cap-theorem-and-nosql-database-systems';
+                var disqus_url = 'http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
 
         </div>
         <div class="col-sm-3 well well-sm" id="sidebar">
