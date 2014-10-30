@@ -34,7 +34,7 @@ DEFAULT_PAGINATION = 5
 #RELATIVE_URLS = True
 THEME='pelican-themes/pelican-bootstrap3'
 PLUGIN_PATH='pelican-plugins'
-PLUGINS=['sitemap', 'latex']
+PLUGINS=['sitemap', 'latex', 'pelican_gist']
 
 SITEMAP = {
     'format': 'xml',
