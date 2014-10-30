@@ -80,6 +80,13 @@ Ray's Thoughts and Writings            </a>
         <div class="col-sm-9">
 
             <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html">Dynamo: Amazon's Highly Available Key-Value Store</a></h2>
+                <div class="summary"><p>This <a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html">paper</a> was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper ...</p>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://www.raydevblog.us/posts/2014/java-reentrant-lock.html">Java Reentrant Lock</a></h2>
                 <div class="summary"><h3>Intrinsic Lock</h3>
 <p><strong>Synchronized</strong> uses intrinsic locks. Every object in Java has an associated intrinsic lock. Whenever a thread tries to access a synchronized block or method, it acquires the intrinsic lock on that object.</p>
@@ -161,17 +168,6 @@ cache, and it ...</p>
                 </div>
             </article>
             <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html">A Single Server Key-Value Store</a></h2>
-                <div class="summary"><p>On the basis of Bekerley CS163 project 3, I will implement a single-node key-value storage system using Java.</p>
-<h2>Summary</h2>
-<p>Multiple clients will be communicating with a single-node key-value server by sending and receiving
-formatted messages through sockets. The sever uses a thread pool to support concurrent operations
-accross multiple sets ...</p>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/a-single-server-key-value-store.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
 
         <ul class="pagination">
                 <li class="prev"><a href="http://www.raydevblog.us/author/ray-chen.html">&laquo;</a>
@@ -205,18 +201,13 @@ accross multiple sets ...</p>
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/concurrency.html">
-                                concurrency
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://www.raydevblog.us/tag/key-value-store.html">
                                 key-value store
                             </a>
                         </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://www.raydevblog.us/tag/java.html">
-                                java
+                        <li class="list-group-item tag-1">
+                            <a href="http://www.raydevblog.us/tag/concurrency.html">
+                                concurrency
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -224,29 +215,29 @@ accross multiple sets ...</p>
                                 python
                             </a>
                         </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/json.html">
-                                json
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
+                        <li class="list-group-item tag-2">
+                            <a href="http://www.raydevblog.us/tag/java.html">
+                                java
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/bloom-filter.html">
                                 bloom filter
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                                two-phase commit
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -260,13 +251,18 @@ accross multiple sets ...</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
+                            <a href="http://www.raydevblog.us/tag/json.html">
+                                json
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                                two-phase commit
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
                             </a>
                         </li>
                     </ul>

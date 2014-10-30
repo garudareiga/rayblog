@@ -2,7 +2,7 @@
 <html lang="en"
 >
 <head>
-    <title>Bloom Filter - Ray's Thoughts and Writings</title>
+    <title>SOLID Design Principles in Java - Ray's Thoughts and Writings</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -10,11 +10,10 @@
 
 
 
-<link rel="canonical" href="http://www.raydevblog.us/posts/2014/bloom-filter.html">
+<link rel="canonical" href="http://www.raydevblog.us/posts/2014/solid-design-principles-in-java.html">
 
         <meta name="author" content="Ray Chen" />
-        <meta name="keywords" content="data structure,bloom filter" />
-        <meta name="description" content="I&#39;ve never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter. Bloom filter is a space-efficient probabilistic data structure used to test set membership. It tells us that the element either definitely ..." />
+        <meta name="description" content="A summary of SOLID design principles of OOP in Java. S: Single Responsibility Principle O: Open Closed Principle L: Liskov Substitution Principle I: Interface Segregation Principle D: Dependency Inversion Principle Single Responsibility Principle - Classes should change for only a single reason Key Points: The responsibility of a class is the ..." />
 
 
 
@@ -45,13 +44,13 @@ Ray's Thoughts and Writings            </a>
         </div>
         <div class="collapse navbar-collapse navbar-ex1-collapse">
             <ul class="nav navbar-nav">
-                        <li class="active">
+                        <li >
                             <a href="http://www.raydevblog.us/category/algorithm.html">Algorithm</a>
                         </li>
                         <li >
                             <a href="http://www.raydevblog.us/category/data.html">Data</a>
                         </li>
-                        <li >
+                        <li class="active">
                             <a href="http://www.raydevblog.us/category/java.html">Java</a>
                         </li>
                         <li >
@@ -80,10 +79,10 @@ Ray's Thoughts and Writings            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/bloom-filter.html"
+                    <a href="http://www.raydevblog.us/posts/2014/solid-design-principles-in-java.html"
                        rel="bookmark"
-                       title="Permalink to Bloom Filter">
-                        Bloom Filter
+                       title="Permalink to SOLID Design Principles in Java">
+                        SOLID Design Principles in Java
                     </a>
                 </h1>
             </header>
@@ -93,87 +92,284 @@ Ray's Thoughts and Writings            </a>
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="fa fa-calendar"></i><time datetime="2014-07-28T10:00:00"> Mon 28 July 2014</time>
+        <i class="fa fa-calendar"></i><time datetime="2014-10-28T16:00:00"> Tue 28 October 2014</time>
     </span>
 
 
 
-<span class="label label-default">Tags</span>
-	<a href="http://www.raydevblog.us/tag/data-structure.html">data structure</a>
-        /
-	<a href="http://www.raydevblog.us/tag/bloom-filter.html">bloom filter</a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>I've never used Bloom filters in practice, but I often heard about them. All I intended to do here is study general ideas and applications about Bloom filter.</p>
-<p>Bloom filter is a space-efficient <strong>probabilistic</strong> data structure used to test set membership. It tells us that the element either <em>definitely</em> is not in the set or <em>may be</em> in the set. In other words, <strong>false positives</strong> are possible, however <strong>false negatives</strong> are not.</p>
-<h3>Data Structure</h3>
-<p>Bloom filter is not a key-value store. The base data structure of a bloom filter is a <strong>Bit Vector</strong>, a vector of bit buckets indicating the presence of an element in the filter. </p>
-<p>To add an element, we simply hash it a few times and set the bits in the bit vector at the bucket index of those hashes to 1. To test for membership, we simply hash the element with the same hash functions, then see if those values are set in the bit vector. If they aren't, we know that the element isn't in the set. If they are, we only know that it <em>might be</em>, because some combination of other elements could have set the same bits. Removing an element from the filter is not possible. The more elements that are added to the set, the larger the probability of false positives. The website <a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a> shows you how to add and test strings in the bloom filter.</p>
-<p><img alt="Alt text" src="http://www.raydevblog.us/images/bloom_filter.jpg" /></p>
-<h3>Hash Functions</h3>
-<p>The hash functions used in a bloom filter should be independent, uniformly distributed and as fast as possible. Examples of fast, simple hashes include <a href="https://code.google.com/p/smhasher">MurmurHash</a>, the fnv series of hashes, and Jenkins Hashes. Cryptographic hashes such as sha1 and MD5 are not very good choices.</p>
-<p>Let's assume a bloom filter with k hashes, m bits in the filter, and n elements to be inserted. <a href="http://en.wikipedia.org/wiki/Bloom_filter#Probability_of_false_positives">Wikipedia</a> provides the math for choosing these values. </p>
-<p>The false positive rate of our filter will be approximately:</p>
-<p>\begin{equation} fpr = (1 - e^{-kn/m})^k \end{equation}</p>
-<p>The more hash functions we have, the slower our bloom filter, and the quicker it fills up. If we have too few, we may suffer too many false positives. Given an m and an n, we have a function to choose the optimal value of k:</p>
-<p>\begin{equation} k_{opt} = \frac{m}{n}\ln 2 \approx 0.7\frac{m}{n} \end{equation}</p>
-<p>This results in:</p>
-<p>\begin{equation} m = -\frac{n\ln fpr}{(\ln 2)^2} \end{equation}</p>
-<p>This means that for a given false positive probability fpr, the length of a Bloom filter m is proportionate to the the number of elements being filtered n. A bloom filter with an optimal value for k and 1% error rate only needs 9.6 bits per key. Add 4.8 bits/key and the error rate decreases by 10 times.</p>
-<h3>Extensions</h3>
-<p>Removing elments from the filter can be addressed with a <strong>counting</strong> bloom filter. A counting filter uses an n-bit counter instead of a single bit in each bucket. The insert operation increments the value of the buckets, and the delete operation decrements the value of the buckets. The n-bit counters must be large enough to avoid overflow.</p>
-<p><a href="http://gsd.di.uminho.pt/members/cbm/ps/dbloom.pdf">Almeida et al.</a> proposed a variant of Bloom filters that can adapt dynamically to the number of elements stored, while assuring a minimum false positive probability. If we can not estimate the number of elements to be inserted, we maybe better off with a scalable Bloom filter. </p>
-<h3>Applications and Implementations</h3>
+                <p>A summary of SOLID design principles of OOP in Java.</p>
 <ul>
-<li>
-<p>Bloom filters are present in a lot of NoSQL systems. Take <a href="http://wiki.apache.org/cassandra/ArchitectureOverview">Cassandra</a> for example, Bloom filter provides a lightweight in-memory structure to reduce the number of I/O reads when performing a key loopup. Each SSTable has a bloom filter associated with it. Cassandra checks before doing any disk seeks, skipping queries for keys that don't exist. </p>
-</li>
-<li>
-<p>The URL shortening service company Bitly, Inc. open sourced a scalable, counting bloom filter library <strong><a href="https://github.com/bitly/dablooms">dablooms</a></strong>. You can read <a href="http://word.bitly.com/post/28558800777/dablooms-an-open-source-scalable-counting-bloom">bitly's engineering blog post</a> for implemetation details.</p>
-</li>
-<li>
-<p>I also found an interesting <a href="http://www.quora.com/Bloom-Filters/What-are-the-best-applications-of-Bloom-filters">discussion</a> on Quora about the best applications of Bloom filters.</p>
-</li>
-<li>
-<p>This blog <a href="http://maxburstein.com/blog/creating-a-simple-bloom-filter/">post</a> shows how to create a simple bloom filter using Python. We also have a Python implementation <strong><a href="https://github.com/jaybaird/python-bloomfilter">PyBloom</a></strong>. </p>
-</li>
+<li>S: Single Responsibility Principle</li>
+<li>O: Open Closed Principle</li>
+<li>L: Liskov Substitution Principle</li>
+<li>I: Interface Segregation Principle</li>
+<li>D: Dependency Inversion Principle</li>
 </ul>
-<h3>References</h3>
+<h3>Single Responsibility Principle - Classes should change for only a single reason</h3>
+<p>Key Points:</p>
 <ul>
-<li><a href="http://billmill.org/bloomfilter-tutorial">Bloom Filters by Example</a></li>
-<li><a href="http://www.slideshare.net/quipo/modern-algorithms-and-data-structures-1-bloom-filters-merkle-trees">Modern Algorithms and Data Structures - Bloom Filters</a></li>
-</ul><script type= "text/javascript">
-    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-        var mathjaxscript = document.createElement('script');
-        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-        mathjaxscript.type = 'text/javascript';
-        mathjaxscript.src = 'https:' == document.location.protocol
-                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
-                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
-        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
-            "MathJax.Hub.Config({" +
-            "    config: ['MMLorHTML.js']," +
-            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
-            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-            "    displayAlign: 'center'," +
-            "    displayIndent: '0em'," +
-            "    showMathMenu: true," +
-            "    tex2jax: { " +
-            "        inlineMath: [ ['$','$'] ], " +
-            "        displayMath: [ ['$$','$$'] ]," +
-            "        processEscapes: true," +
-            "        preview: 'TeX'," +
-            "    }, " +
-            "    'HTML-CSS': { " +
-            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
-            "    } " +
-            "}); ";
-        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+<li>The responsibility of a class is the only reason for the class to change.</li>
+<li>If a class has more than one responsibility, then responsibilities become coupled. Changes to one responsibility may impact other responsibilities. The class should be broken up into smaller components.</li>
+<li>This principle promotes cohesion of software components.</li>
+</ul>
+<div class="gist">
+    <script src='https://gist.github.com/df9f7250c484983a584c.js?file=single-responsibility-principle.java'></script>
+    <noscript>
+        <pre><code>public class ServerConnectionManager {
+    public void createConnection(String host, String path, String port) {
+        // Code
     }
-</script>
+    public void sendRequest(Object request) {
+        // Code
+    }
+}
 
+// The above class provides two operations: make a connection and send a request. 
+// Two responsibilities are mixed up. It can be designed as follows:
+public class ServerConnectionManager {
+    public void createConnection(String host, String path, String port) {
+        // Code
+    }
+}
+public class ServerConnection {
+    public void sendRequest(Object request) {
+        // Code
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h3>Open Closed Principle - Classes should open for extension but closed to modification</h3>
+<p>Key Points:</p>
+<ul>
+<li>This principle enables us to add features without modifying the existing components.</li>
+<li>Java supports this through extending parent classes and implementing of interfaces.</li>
+<li>Instead of modifying the parent class which is more abstract consider creating a sub class with the more specific attributes and methods.</li>
+</ul>
+<div class="gist">
+    <script src='https://gist.github.com/df9f7250c484983a584c.js?file=open-closed-principle.java'></script>
+    <noscript>
+        <pre><code>public class EmailSender {
+    public void sendEmail(Object emailData, String formatType) {
+        String rContent = null;
+        if (formatType.equalsIgnoreCase("HTML")) {
+            rContent = renderInHtml(emailData);
+        } else if (formatType.equalsIgnoreCase("TEXT")) {
+            rContent = renderInText(emailData);
+        }
+        sendEmail(rContent);
+    }
+
+    private void sendEmail(String rContent) {
+        // Code
+    }
+
+    public String renderInHtml(Object emailData) {
+        // Code
+    }
+    public String renderInText(Object emailData) {
+        // Code
+    }
+}
+
+// If we need support JSON format, we need modify the existing code which violates the principle. 
+// It can be designed as follows for good extension:
+public class EmailSender {
+    public void sendEmail(Object emailData, IReader render) {
+        String rContent = null;
+        rContent = render.render(emailData);
+        sendEmail(rContent);
+    }
+
+    private void sendEmail(String rContent) {
+        // Code
+    }
+}
+
+public interface IRender {
+    public String render(Object data);
+}
+
+public class HtmlReader implements IReader {
+    @Override public String render(Object data) {
+        // Code
+    }
+}
+
+public class TextReader implements IReader {
+    @Override public String render(Object data) {
+        // Code
+    }
+}
+
+public class JsonReader implements IReader {
+    @Override public String render(Object data) {
+        // Code
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h3>Liskov Substitution Principle - Objects in a program should be replaceable with instances of their sub types without altering the correctness of that program</h3>
+<p>Key Points:</p>
+<ul>
+<li>Care must be taken to ensure that a class hierarchy does not violate this principle.</li>
+<li>Any subclass fullfills the IS-A contract with its parent class may or may not fullfill this principle.</li>
+</ul>
+<div class="gist">
+    <script src='https://gist.github.com/df9f7250c484983a584c.js?file=liskov-substitution-principle.java'></script>
+    <noscript>
+        <pre><code>class Bird {
+    public void eat() {}
+    public void fly() {}
+}
+class Raven extends Bird {}
+class Ostrich extends Bird {
+    fly() { throw new UnsupportedOperationException(); }
+}
+
+List<Bird> birds = new ArrayList<Bird>();
+birds.add(new Bird());
+birds.add(new Raven());
+birds.add(new Ostrich());
+for (Bird b : birds) { b.fly(); }
+
+// The above code throws exception when an Ostrich instance is passed. 
+// The sub type Ostrich is not replaceable for the super type Bird. 
+// It can be designed as follows:
+class Bird {
+    public void eat() {}
+}
+class FlyBird extends Bird {
+    public void fly();
+}
+class NonFlyBird extends Bird {}</code></pre>
+    </noscript>
+</div>
+<h3>Interface Segregation Principle - Many specific interfaces are better than a single generic interface</h3>
+<p>Key Points:</p>
+<ul>
+<li>Larger Java interfaces should be broken down into smaller and more specific ones.</li>
+<li>A client should never be made to depend on methods it does not use.</li>
+<li>Adherence to this principle reduces the change footprint in the system when interfaces are modified.</li>
+</ul>
+<div class="gist">
+    <script src='https://gist.github.com/df9f7250c484983a584c.js?file=interface-segregation-principle.java'></script>
+    <noscript>
+        <pre><code>public inteface IWorker {
+    public void work();
+    public void eat();
+}
+
+class Worker implements IWorker {
+    @Overwrite public void work() {
+        // Code
+    }
+    @Overwrite public void eat() {
+        // Code
+    }
+}
+
+// If we need support the new Robot class, we can split the IWorker interface as foolows:
+interface IWorkable {
+    public void work();
+}
+interface IFeedable {
+    public void eat();
+}
+interface IWorker extends IWorkable, IFeedable {}
+
+class Worker implements IWorker {
+    @Overwrite public void work() {
+        // Code
+    }
+    @Overwrite public void eat() {
+        // Code
+    }
+} 
+
+class Robot implements IWorkable {
+    @Overwrite public void work() {
+        // Code
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h3>Dependency Inversion Principle - Depend on abstraction not on concretions</h3>
+<p>Key Points:</p>
+<ul>
+<li>High-level modules should not depend on low-level modules. Both should depend on abstractions.</li>
+<li>Abstractions should not depend on details. Details should depend upon abstractions.</li>
+</ul>
+<div class="gist">
+    <script src='https://gist.github.com/df9f7250c484983a584c.js?file=dependency-inversion-rinciple.java'></script>
+    <noscript>
+        <pre><code>public class Switch {
+    private Engine engine;
+    private boolean on;
+    
+    public Switch(Engine engine) {
+        this.engine = engine;
+        this.on = false;
+    }
+    
+    public boolean switchOn() {
+        return this.on;
+    }
+    
+    public void flip() {
+        if (switchOn()) { this.on = false; engine.off(); }
+        else { this.on = true; engine.on(); }
+    }
+}
+
+//The Switch class is dependent on the Engine class which violates 
+//dependency inversion principle. It is tightly coupled with the Engine
+//class, not reusable with any other objects. It can be designed as follows:
+public interface AbstractSwitch {
+    public boolean getState();
+    public void flip();
+}
+
+public interface SwitchClient {
+    public void on();
+    public void off();
+}
+
+public class Switch implements AbstractSwitch {
+    private SwitchClient client;
+    private boolean on;
+    
+    public Switch(SwitchClient client) {
+        this.client = client;
+    }
+
+    public boolean getState() {
+        return this.on;
+    }
+
+    public void flip() {
+        if (getState()) { this.on = false; client.off(); }
+        else { this.on = true; client.on(); }
+    }
+}
+
+public class Engine implements SwitchClient {
+    public void on() {
+        System.out.println("Engine is on!");
+    }
+    public void off() {
+        System.out.println("Engine is off!");
+    }
+}
+
+Engine engine = new Engine();
+Switch switch = new Switch(engine);
+switch.flip();
+switch.flip();</code></pre>
+    </noscript>
+</div>
             </div>
             <!-- /.entry-content -->
     <hr/>
@@ -185,8 +381,8 @@ Ray's Thoughts and Writings            </a>
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
 
-                    var disqus_identifier = 'bloom-filter';
-                var disqus_url = 'http://www.raydevblog.us/posts/2014/bloom-filter.html';
+                    var disqus_identifier = 'solid-design-principles-in-java';
+                var disqus_url = 'http://www.raydevblog.us/posts/2014/solid-design-principles-in-java.html';
 
             var disqus_config = function () {
                 this.language = "en";
