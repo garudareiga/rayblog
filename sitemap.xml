@@ -5,29 +5,36 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/index.html</loc>
-<lastmod>2014-10-29T22:09:56-00:00</lastmod>
+<lastmod>2014-10-30T23:56:16-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/archives.html</loc>
-<lastmod>2014-10-29T22:09:56-00:00</lastmod>
+<lastmod>2014-10-30T23:56:16-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/tags.html</loc>
-<lastmod>2014-10-29T22:09:56-00:00</lastmod>
+<lastmod>2014-10-30T23:56:16-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/categories.html</loc>
-<lastmod>2014-10-29T22:09:56-00:00</lastmod>
+<lastmod>2014-10-30T23:56:16-00:00</lastmod>
 <changefreq>daily</changefreq>
+<priority>0.5</priority>
+</url>
+
+<url>
+<loc>http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html</loc>
+<lastmod>2014-10-30T20:50:00-00:00</lastmod>
+<changefreq>monthly</changefreq>
 <priority>0.5</priority>
 </url>
 
@@ -173,7 +180,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/category/system.html</loc>
-<lastmod>2014-10-15T21:00:00-00:00</lastmod>
+<lastmod>2014-10-30T20:50:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -271,7 +278,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/author/ray-chen.html</loc>
-<lastmod>2014-10-28T16:00:00-00:00</lastmod>
+<lastmod>2014-10-30T20:50:00-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
