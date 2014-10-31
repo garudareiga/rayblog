@@ -14,7 +14,7 @@ Memcache vs. memchached
 
 Facebook rely on **memcache** to lighten the read load on databases, as a *demand-filled look-aside* cache as shown in Figure:
 
-![Alt text](http://www.raydevblog.us/images/memcache_wr.png)
+![Alt text](http://www.raydevblog.us/images/memcache_wr.jpg)
 
 Memcache Usage at Facebook
 
@@ -61,7 +61,7 @@ Facebook split web and memcached servers into multiple **frontend clusters**. Th
 
 The figure below illustrates the final architecture of organizing co-located clusters into regions.
 
-![Alt text](http://www.raydevblog.us/images/memcache.png)
+![Alt text](http://www.raydevblog.us/images/memcache.jpg)
 
 ## Across Regions: Consistency
 
