@@ -7,7 +7,7 @@
 &lt;li&gt;Memcache is the distributed caching system&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Facebook rely on &lt;strong&gt;memcache&lt;/strong&gt; to lighten the read load on databases, as a &lt;em&gt;demand-filled look-aside&lt;/em&gt; cache as shown in Figure:&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Alt text" src="http://www.raydevblog.us/images/memcache_wr.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Alt text" src="http://www.raydevblog.us/images/memcache_wr.jpg" /&gt;&lt;/p&gt;
 &lt;p&gt;Memcache Usage at Facebook&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Caching results of complex RPC calls, such as timeline aggregations&lt;/li&gt;
@@ -48,7 +48,7 @@
 &lt;h2&gt;In a Region: Replication&lt;/h2&gt;
 &lt;p&gt;Facebook split web and memcached servers into multiple &lt;strong&gt;frontend clusters&lt;/strong&gt;. These clusters, along with a storage cluster that contain the databases, define a &lt;strong&gt;region&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;The figure below illustrates the final architecture of organizing co-located clusters into regions.&lt;/p&gt;
-&lt;p&gt;&lt;img alt="Alt text" src="http://www.raydevblog.us/images/memcache.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Alt text" src="http://www.raydevblog.us/images/memcache.jpg" /&gt;&lt;/p&gt;
 &lt;h2&gt;Across Regions: Consistency&lt;/h2&gt;
 &lt;p&gt;Facebook designate one region to hold the master databases and the other regions to contain read-only replicas. They rely on MySQL's replication mechanism to keep replica databases up-to-date with their masters. Replica databases may lag behind the master database. &lt;/p&gt;
 &lt;h2&gt;Reference&lt;/h2&gt;

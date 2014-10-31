@@ -108,7 +108,7 @@ Ray's Thoughts and Writings            </a>
 <li>Memcache is the distributed caching system</li>
 </ul>
 <p>Facebook rely on <strong>memcache</strong> to lighten the read load on databases, as a <em>demand-filled look-aside</em> cache as shown in Figure:</p>
-<p><img alt="Alt text" src="http://www.raydevblog.us/images/memcache_wr.png" /></p>
+<p><img alt="Alt text" src="http://www.raydevblog.us/images/memcache_wr.jpg" /></p>
 <p>Memcache Usage at Facebook</p>
 <ul>
 <li>Caching results of complex RPC calls, such as timeline aggregations</li>
@@ -149,7 +149,7 @@ Ray's Thoughts and Writings            </a>
 <h2>In a Region: Replication</h2>
 <p>Facebook split web and memcached servers into multiple <strong>frontend clusters</strong>. These clusters, along with a storage cluster that contain the databases, define a <strong>region</strong>.</p>
 <p>The figure below illustrates the final architecture of organizing co-located clusters into regions.</p>
-<p><img alt="Alt text" src="http://www.raydevblog.us/images/memcache.png" /></p>
+<p><img alt="Alt text" src="http://www.raydevblog.us/images/memcache.jpg" /></p>
 <h2>Across Regions: Consistency</h2>
 <p>Facebook designate one region to hold the master databases and the other regions to contain read-only replicas. They rely on MySQL's replication mechanism to keep replica databases up-to-date with their masters. Replica databases may lag behind the master database. </p>
 <h2>Reference</h2>
@@ -232,8 +232,8 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -242,18 +242,8 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/json.html">
-                                json
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -267,13 +257,23 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
                                 consistent hashing
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/json.html">
+                                json
                             </a>
                         </li>
                     </ul>
