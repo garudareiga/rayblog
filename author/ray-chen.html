@@ -80,6 +80,39 @@ Ray's Thoughts and Writings            </a>
         <div class="col-sm-9">
 
             <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html">Distributed Unique Id Generation</a></h2>
+                <div class="summary"><p>Real-World Case Studies:</p>
+<ul>
+<li>Flickr needs globally unique primary keys for their MySQL shards, because they need to migrate data between databases, and also their MySQL shards are built as master-master replicant pairs. <a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap">1</a></li>
+<li>Twitter needs unique, roughly sortable, 64-bit unsigned integers for Tweet IDs. <a href="https://blog.twitter.com/2010/announcing-snowflake">2</a></li>
+</ul>
+<h3>Why not UUID?</h3>
+<p>The intent ...</p>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html">Creational Patterns in Java - Factory</a></h2>
+                <div class="summary"><h3>Factory Pattern</h3>
+<p><strong>Factory pattern</strong> is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating <strong>Currency</strong> in a factory.</p>
+<div class="gist">
+    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'></script>
+    <noscript>
+        <pre><code>interface Currency {
+    String getSymbol();
+}
+
+class Rupee implements Currency {
+    @Override public String getSymbol() { return "Rs"; }
+}
+
+class SGDDollar ...</code></pre></noscript></div>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html">Scaling Memcache at Facebook</a></h2>
                 <div class="summary"><p>A summary of how Facebook took <strong>memcached</strong> as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described ...</p>
                     <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html">more ...</a>
@@ -111,32 +144,6 @@ Ray's Thoughts and Writings            </a>
 <h4>Consistency</h4>
 <p>A read request in a distributed system sees ...</p>
                     <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/teach-myself-distributed-systems.html">Teach Myself Distributed Systems</a></h2>
-                <div class="summary"><h3>Overview</h3>
-<h3>Courses</h3>
-<p><a href="https://www.cs.columbia.edu/~du/ds">W4995-1 Distributed Systems</a> provided by Columbia University</p>
-<p><a href="http://www.cs.cmu.edu/~dga/15-440/S14/index.html">15-440/640 Distributed Systems</a> provided by CMU</p>
-<p><a href="http://css.csail.mit.edu/6.824">6.824 Distributed Systems</a> provided by MIT</p>
-<h3>Guides</h3>
-<p><a href="http://www.somethingsimilar.com/2013/01/14/notes-on-distributed-systems-for-young-bloods">Notes on Distributed Systems for Young Bloods</a> from <a href="http://www.somethingsimilar.com/about">Jeff Hodges</a></p>
-<p><a href="http://the-paper-trail.org/blog/distributed-systems-theory-for-the-distributed-systems-engineer/">Distributed systems theory for the distributed systems engineer</a> from "Paper Trail"</p>
-<p><a href="http://book.mixu.net/distsys/">Distributed systems for fun and ...</a></p>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/teach-myself-distributed-systems.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/implementing-a-multi-client-echo-server-using-go.html">Implementing a Multi-Client Echo Server using Go</a></h2>
-                <div class="summary"><h3>Server Characteristic</h3>
-<p>The multi-client echo server must have the following characteristics:</p>
-<ul>
-<li>The server must manage and interact with its clients concurrently using goroutines and channels. Multiple clients should be able to connect/disconnect to the server simultaneously. </li>
-<li>When the server reads a newline-terminated message from a client, it must respond ...</li></ul>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/implementing-a-multi-client-echo-server-using-go.html">more ...</a>
                 </div>
             </article>
             <hr/>
@@ -174,13 +181,13 @@ Ray's Thoughts and Writings            </a>
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/concurrency.html">
-                                concurrency
+                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
+                                key-value store
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
-                                key-value store
+                            <a href="http://www.raydevblog.us/tag/concurrency.html">
+                                concurrency
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -194,28 +201,8 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                                two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -224,8 +211,8 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -234,8 +221,28 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                                two-phase commit
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
                             </a>
                         </li>
                     </ul>

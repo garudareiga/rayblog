@@ -1,5 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-10-30T20:50:00-07:00</updated><entry><title>Scaling Memcache at Facebook</title><link href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html" rel="alternate"></link><updated>2014-10-30T20:50:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-10-30:posts/2014/scaling-memcache-at-facebook.html</id><summary type="html">&lt;p&gt;A summary of how Facebook took &lt;strong&gt;memcached&lt;/strong&gt; as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described in the paper "&lt;a href="http://pdos.csail.mit.edu/6.824-2013/papers/memcache-fb.pdf"&gt;Scaling Memcache at Facebook&lt;/a&gt;".&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/system.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-11-04T16:20:00-08:00</updated><entry><title>Distributed Unique Id Generation</title><link href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html" rel="alternate"></link><updated>2014-11-04T16:20:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-04:posts/2014/distributed-unique-id-generation.html</id><summary type="html">&lt;p&gt;Real-World Case Studies:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Flickr needs globally unique primary keys for their MySQL shards, because they need to migrate data between databases, and also their MySQL shards are built as master-master replicant pairs. &lt;a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap"&gt;1&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Twitter needs unique, roughly sortable, 64-bit unsigned integers for Tweet IDs. &lt;a href="https://blog.twitter.com/2010/announcing-snowflake"&gt;2&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Why not UUID?&lt;/h3&gt;
+&lt;p&gt;The intent of Universally Unique Identifier (&lt;strong&gt;UUID&lt;/strong&gt;) is to enable distributed systems to uniquely identify information without significant central coordination. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="n"&gt;System&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;out&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;println&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;UUID&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="na"&gt;randomUUID&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="na"&gt;toString&lt;/span&gt;&lt;span class="o"&gt;());&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Why not just use UUID?&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A UUID is a 128-bit number. There are big overhead when &lt;strong&gt;indexes&lt;/strong&gt; in DBs refer to the primary key using UUIDs. We need keep indexes in memory to make database fast. They must fit into &lt;strong&gt;64 bits&lt;/strong&gt;.&lt;/li&gt;
+&lt;li&gt;UUIDs are generated random (Version 4) or using MAC address &amp;amp; date-time (Version 1). Their lexical ordering is essentially meaningless. When fetching data in continuous pages, we can see performance loss, because primary keys using UUIDs are random and data is scattered across the B+ Tree. Ids need to be roughly &lt;strong&gt;sortable&lt;/strong&gt;. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Requirements in Distributed Unique Id Generation&lt;/h3&gt;
+&lt;p&gt;The requirements to generate a unique Id within a distributed environment in consideration of scalability are as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ids must be guaranteed globally unique.&lt;/li&gt;
+&lt;li&gt;Ids must fit into 64-bits.&lt;/li&gt;
+&lt;li&gt;Ids must be roughly sortable.&lt;/li&gt;
+&lt;li&gt;The assigned Id is gone forever after the client's request and can't be reused for subsequent assignment.&lt;/li&gt;
+&lt;li&gt;Id generation service must be running on multiple nodes to avoid SPOFs.&lt;/li&gt;
+&lt;li&gt;Id generation service needs to be scalable with respects to growth of requests.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;General Solution&lt;/h3&gt;
+&lt;p&gt;Using a general distributed computing scheme, there will be a pool of Id generators ("&lt;strong&gt;workers&lt;/strong&gt;") residing in many inter-connected commodity machines. Clients requesting a unique Id may locate in the same worker, or reside inseperate workers. A load balancer may sit between the clients and the workers to evenly distribute workload. Workers must coordinate with each other to guarantee globally unique Ids.&lt;/p&gt;
+&lt;h3&gt;Centralized Ticket Server&lt;/h3&gt;
+&lt;p&gt;One straightword approach is to provide a centralized ticket server which maintains an auto-incremental integer number. For example, Flickr uses MySQL-based ticket server. To generate a new globally unique 64-bit Id, issue the following SQL:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="k"&gt;REPLACE&lt;/span&gt; &lt;span class="k"&gt;INTO&lt;/span&gt; &lt;span class="n"&gt;Tickets64&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;stub&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="k"&gt;VALUES&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;SELECT&lt;/span&gt; &lt;span class="n"&gt;LAST_INSERT_ID&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To avoid SPOF issue, Flickr achieve "&lt;strong&gt;high availability&lt;/strong&gt;" by running two ticket servers, and divide responsibility by dividing the ID space, evens and odds. Then, they round robin between the two servers to load balance.&lt;/p&gt;
+&lt;h3&gt;Decentralized Snowflake Service&lt;/h3&gt;
+&lt;p&gt;Twitter's Snowflake provides a service to generate unique Tweet Ids. These Tweet Ids are unique 64-bit unsigned integers, sequential based on time. To generate the roughly-sorted 64-bit Ids in an &lt;strong&gt;uncoordinated&lt;/strong&gt; manner, Snowflake generates Ids composed of: &lt;strong&gt;timestamp&lt;/strong&gt;, &lt;strong&gt;worker id&lt;/strong&gt; and &lt;strong&gt;sequence number&lt;/strong&gt;. Sequence numbers are per-thread and worker ids are chosen at startup via ZooKeeper. Worker id is required to avoid any conflict between the unique ids generated by multiple machines.&lt;/p&gt;
+&lt;h3&gt;Other Options&lt;/h3&gt;
+&lt;p&gt;This blog post "Distributed UUID Generation" proposed several good approaches:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Use a centralized server to maintains a counter. Workers (Id generators) can request a "&lt;em&gt;Id range&lt;/em&gt;" instead of the Id itself, and Id assignment is done locally by the worker.&lt;/li&gt;
+&lt;li&gt;Use peer multicast to re-allocate Id ranges between workers. &lt;/li&gt;
+&lt;li&gt;Use distributed hashtable to distribute Id ranges implicitly within a ring of works.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Reference&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap"&gt;Ticket Servers: Distributed Unique Primary Keys on the Cheap&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://blog.twitter.com/2010/announcing-snowflake"&gt;Announcing Snowflake&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram"&gt;Sharding &amp;amp; IDs at Instagram&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://horicky.blogspot.com/2007/11/distributed-uuid-generation.html"&gt;Distributed UUID Generation&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary></entry><entry><title>Scaling Memcache at Facebook</title><link href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html" rel="alternate"></link><updated>2014-10-30T20:50:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-10-30:posts/2014/scaling-memcache-at-facebook.html</id><summary type="html">&lt;p&gt;A summary of how Facebook took &lt;strong&gt;memcached&lt;/strong&gt; as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described in the paper "&lt;a href="http://pdos.csail.mit.edu/6.824-2013/papers/memcache-fb.pdf"&gt;Scaling Memcache at Facebook&lt;/a&gt;".&lt;/p&gt;
 &lt;h2&gt;Overview&lt;/h2&gt;
 &lt;p&gt;Memcache vs. memchached&lt;/p&gt;
 &lt;ul&gt;

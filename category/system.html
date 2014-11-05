@@ -81,6 +81,19 @@ Ray's Thoughts and Writings            </a>
         <div class="col-sm-9">
 
             <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html">Distributed Unique Id Generation</a></h2>
+                <div class="summary"><p>Real-World Case Studies:</p>
+<ul>
+<li>Flickr needs globally unique primary keys for their MySQL shards, because they need to migrate data between databases, and also their MySQL shards are built as master-master replicant pairs. <a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap">1</a></li>
+<li>Twitter needs unique, roughly sortable, 64-bit unsigned integers for Tweet IDs. <a href="https://blog.twitter.com/2010/announcing-snowflake">2</a></li>
+</ul>
+<h3>Why not UUID?</h3>
+<p>The intent ...</p>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html">Scaling Memcache at Facebook</a></h2>
                 <div class="summary"><p>A summary of how Facebook took <strong>memcached</strong> as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described ...</p>
                     <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html">more ...</a>
@@ -123,13 +136,6 @@ Ray's Thoughts and Writings            </a>
                 </div>
             </article>
             <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html">Dynamo: Amazon's Highly Available Key-Value Store</a></h2>
-                <div class="summary"><p>This <a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html">paper</a> was first released in SOSP'07, describes Dynamo, the underlying storage technology for several core services in Amazon's e-commerce platform. Since then, Several Dynamo-inspired databases have appeared (either entirely or partially) by this paper, such as Riak, Cassandra and Voldemort. Hence, I decide to read this paper ...</p>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/dynamo-amazons-highly-available-key-value-store.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
 
         <ul class="pagination">
                 <li class="prev disabled"><a href="#">&laquo;</a></li>
@@ -160,13 +166,13 @@ Ray's Thoughts and Writings            </a>
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/concurrency.html">
-                                concurrency
+                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
+                                key-value store
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
-                                key-value store
+                            <a href="http://www.raydevblog.us/tag/concurrency.html">
+                                concurrency
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -180,28 +186,8 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                                two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -210,8 +196,8 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -220,8 +206,28 @@ Ray's Thoughts and Writings            </a>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                                two-phase commit
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
                             </a>
                         </li>
                     </ul>

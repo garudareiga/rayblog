@@ -80,6 +80,65 @@ Ray's Thoughts and Writings            </a>
         <div class="col-sm-9">
 
             <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">Fibonacci Sequence</a></h2>
+                <div class="summary"><p>Problem: Implement a function which returns the n-th number in Fibonacci sequence with an input n. </p>
+<p>Fibonacci sequence is defined as:
+$f_{n} = f_{n-1} + f_{n-2}$, with seed values $f_{0} = 0, f_{1} = 1$.</p>
+<h3>Naive Recursive Solution</h3>
+<div class="highlight"><pre><span class="kt">int</span> <span class="nf">fib</span><span class="o">(</span><span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span>
+        <span class="k">return</span> <span class="n">n ...</span></pre></div><script type= "text/javascript">
+    if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+        var mathjaxscript = document.createElement('script');
+        mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+        mathjaxscript.type = 'text/javascript';
+        mathjaxscript.src = 'https:' == document.location.protocol
+                ? 'https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+                : 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+        mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+            "MathJax.Hub.Config({" +
+            "    config: ['MMLorHTML.js']," +
+            "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+            "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+            "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+            "    displayAlign: 'center'," +
+            "    displayIndent: '0em'," +
+            "    showMathMenu: true," +
+            "    tex2jax: { " +
+            "        inlineMath: [ ['$','$'] ], " +
+            "        displayMath: [ ['$$','$$'] ]," +
+            "        processEscapes: true," +
+            "        preview: 'TeX'," +
+            "    }, " +
+            "    'HTML-CSS': { " +
+            "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+            "    } " +
+            "}); ";
+        (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+    }
+</script>
+
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/fibonacci-sequence.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html">Numbers Everyone Should Know</a></h2>
+                <div class="summary"><p>"Numbers everyone should know" by Jeff Dean:</p>
+<ul>
+<li>L1 cache reference 0.5ns</li>
+<li>L2 cache reference 7ns</li>
+<li>Main memory reference 100ns</li>
+<li>Disk seek 10,000,000ns</li>
+<li>Read 1MB sequentially from memory 250,000ns</li>
+<li>Read 1MB sequentially from network 10,000,000ns</li>
+<li>Read 1MB sequentially from disk 30,000,000ns</li>
+<li>Mutex lock ...</li></ul>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/numbers-everyone-should-know.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
                 <h2><a href="http://www.raydevblog.us/posts/2014/distributed-key-value-store.html">Distributed Key-Value Store</a></h2>
                 <div class="summary"><p>Special thanks go to Berkeley CS162 course providing a nice document and starter code for 
 a distributed key-value store system design.</p>
@@ -109,32 +168,6 @@ of <em>worker threads</em>. Using worker threads minimizes the overhead due to t
 <p>The <em>java.util.concurrent.Executor</em> interface accepts the collection of <em>Runnable</em> objects and 
 running worker threads execute <em>Runnable</em> objects from the task queue ...</p>
                     <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/java-thread-pool-example.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html">Python Logging Tutorial</a></h2>
-                <div class="summary"><p>The Python <a href="http://docs.python.org/2/library/logging.html">logging documentation</a> is initially confusing to me, therefore I decide to write this tutorial as a quick reference.</p>
-<h2>Root Logger</h2>
-<p>We can use the default (<em>root</em>) logger directly on module level. You can view and download the file 
-<a href="https://gist.github.com/garudareiga/8451107">logger0.py</a> from my Gist.</p>
-<div class="highlight"><pre><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">logger0</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">logger0</span><span class="o">.</span><span class="n">foo</span><span class="p">()</span>
-<span class="n">WARNING ...</span></pre></div>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/python-logging-tutorial.html">more ...</a>
-                </div>
-            </article>
-            <hr/>
-            <article>
-                <h2><a href="http://www.raydevblog.us/posts/2013/making-recommendations-part-i-item-based-collaborative-filtering.html">Making Recommendations Part I - Item-based Collaborative Filtering</a></h2>
-                <div class="summary"><p>Recommender systems are popular on e-commerce web sites, to make personalized
-recommendations for products or services. Using the <a href="http://www.grouplens.org/datasets/movielens">MovieLens 100k</a> 
-dataset, I plan to build a recommnender system, which makes automatic recommendations 
-when a user inputs a list of movie ratings.</p>
-<p>The "MovieLens 100k" data set consists of:</p>
-<ul>
-<li>10K ratings ...</li></ul>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2013/making-recommendations-part-i-item-based-collaborative-filtering.html">more ...</a>
                 </div>
             </article>
             <hr/>
@@ -173,13 +206,13 @@ when a user inputs a list of movie ratings.</p>
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/concurrency.html">
-                                concurrency
+                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
+                                key-value store
                             </a>
                         </li>
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
-                                key-value store
+                            <a href="http://www.raydevblog.us/tag/concurrency.html">
+                                concurrency
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -193,28 +226,8 @@ when a user inputs a list of movie ratings.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                                two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -223,8 +236,8 @@ when a user inputs a list of movie ratings.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -233,8 +246,28 @@ when a user inputs a list of movie ratings.</p>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                                two-phase commit
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
                             </a>
                         </li>
                     </ul>
