@@ -192,19 +192,19 @@ public interface IRender {
     public String render(Object data);
 }
 
-public class HtmlReader implements IReader {
+public class HtmlRender implements IRender {
     @Override public String render(Object data) {
         // Code
     }
 }
 
-public class TextReader implements IReader {
+public class TextRender implements IRender {
     @Override public String render(Object data) {
         // Code
     }
 }
 
-public class JsonReader implements IReader {
+public class JsonRender implements IRender {
     @Override public String render(Object data) {
         // Code
     }
@@ -257,7 +257,7 @@ class NonFlyBird extends Bird {}</code></pre>
 <div class="gist">
     <script src='https://gist.github.com/df9f7250c484983a584c.js?file=interface-segregation-principle.java'></script>
     <noscript>
-        <pre><code>public inteface IWorker {
+        <pre><code>public interface IWorker {
     public void work();
     public void eat();
 }
@@ -324,9 +324,10 @@ class Robot implements IWorkable {
     }
 }
 
-//The Switch class is dependent on the Engine class which violates 
-//dependency inversion principle. It is tightly coupled with the Engine
-//class, not reusable with any other objects. It can be designed as follows:
+// The Switch class is dependent on the Engine class which violates 
+// dependency inversion principle. It is tightly coupled with the Engine
+// class, not reusable with any other objects. It can be designed as follows:
+// High Level Classes (Switch) -> Abstraction Layer (SwitchClient) -> Low Level Classes (Engine)
 public interface AbstractSwitch {
     public boolean getState();
     public void flip();
@@ -425,18 +426,13 @@ switch.flip();</code></pre>
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
-                                key-value store
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://www.raydevblog.us/tag/concurrency.html">
                                 concurrency
                             </a>
                         </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://www.raydevblog.us/tag/python.html">
-                                python
+                        <li class="list-group-item tag-1">
+                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
+                                key-value store
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -444,14 +440,9 @@ switch.flip();</code></pre>
                                 java
                             </a>
                         </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
+                        <li class="list-group-item tag-2">
+                            <a href="http://www.raydevblog.us/tag/python.html">
+                                python
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -460,23 +451,8 @@ switch.flip();</code></pre>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/json.html">
-                                json
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
                                 two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -485,8 +461,33 @@ switch.flip();</code></pre>
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/data-structure.html">
                                 data structure
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/json.html">
+                                json
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                     </ul>

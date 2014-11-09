@@ -2,7 +2,7 @@
 <html lang="en"
 >
 <head>
-    <title>Creational Patterns in Java - Factory - Ray's Thoughts and Writings</title>
+    <title>Behavioral Patterns in Java - Factory - Ray's Thoughts and Writings</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -10,10 +10,9 @@
 
 
 
-<link rel="canonical" href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html">
+<link rel="canonical" href="http://www.raydevblog.us/posts/2014/behavioral-patterns-in-java-factory.html">
 
         <meta name="author" content="Ray Chen" />
-        <meta name="description" content="Factory Pattern Factory pattern is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating Currency in a factory. interface Currency { String getSymbol(); } class Rupee implements Currency { @Override public String getSymbol() { return &#34;Rs&#34;; } } class SGDDollar ..." />
 
 
 
@@ -79,10 +78,10 @@ Ray's Thoughts and Writings            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html"
+                    <a href="http://www.raydevblog.us/posts/2014/behavioral-patterns-in-java-factory.html"
                        rel="bookmark"
-                       title="Permalink to Creational Patterns in Java - Factory">
-                        Creational Patterns in Java - Factory
+                       title="Permalink to Behavioral Patterns in Java - Factory">
+                        Behavioral Patterns in Java - Factory
                     </a>
                 </h1>
             </header>
@@ -92,7 +91,7 @@ Ray's Thoughts and Writings            </a>
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="fa fa-calendar"></i><time datetime="2014-11-01T10:30:00"> Sat 01 November 2014</time>
+        <i class="fa fa-calendar"></i><time datetime="2014-11-11T10:30:00"> Tue 11 November 2014</time>
     </span>
 
 
@@ -100,99 +99,7 @@ Ray's Thoughts and Writings            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <h3>Factory Pattern</h3>
-<p><strong>Factory pattern</strong> is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating <strong>Currency</strong> in a factory.</p>
-<div class="gist">
-    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'></script>
-    <noscript>
-        <pre><code>interface Currency {
-    String getSymbol();
-}
-
-class Rupee implements Currency {
-    @Override public String getSymbol() { return "Rs"; }
-}
-
-class SGDDollar implements Currency {
-    @Override public String getSymbol() { return "SGD"; }
-}
-
-class USDollar implements Currency {
-    @Override public String getSymbol() { return "USD"; }
-}
-
-class CurrencyFactory {
-    public static Currency createCurrency(String country) {
-        if (country.equalsIgnoreCase("India")) {
-            return new Rupee();
-        } else if (country.equalsIgnoreCase("Singapore")) {
-            return new SGDDollar();
-        } else if (country.equalsIgnoreCase("US")) {
-            return new USDollar();
-        }
-        throw new IllegalArgumentException("No such currency");
-    }
-}
-
-// Factory client code
-public class Factory {
-    public static void main(String[] args) {
-        String country = args[0];
-        Currency currency = CurrencyFactory.createCurrency(country);
-        System.out.println(currency.getSymbol());
-    }
-}</code></pre>
-    </noscript>
-</div>
-<h3>Factory Method Pattern</h3>
-<p><strong>The Factory Method Pattern</strong> defines an interface for creating an object, but lets subclasses decide
-which class to instantiate. Factory Method lets a class defer instantiation to subclasses.</p>
-<div class="gist">
-    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-method-pattern.java'></script>
-    <noscript>
-        <pre><code>//The Product classes
-public abstract class Pizza {
-    String name;
-    String sauce;
-
-    abstract void prepare();
-    void bake() { System.out.println("Baking ..."); }
-}
-
-public class NYStyleCheesePizza extends Pizza {
-    public NYStyleCheesePizza() {
-        name = "NY Style Cheese Pizza";
-        sauce = "Marinara Sauce";
-    }
-}
-
-//The Creator classes
-public abstract class PizzaStore {
-    public Pizza orderPizza(String type) {
-        Pizza = createPizza(type);
-        pizza.prepare();
-        pizza.bake();
-        return pizza;
-    }
-
-    // A factory method handles object creation and encapsulates it in a subclass
-    protected abstract Pizza createPizza(String type);
-}
-
-public class NYPizzaStore extends PizzaStore {
-    Pizza createPizza(String type) {
-        if (type.equalsIgnoreCase("cheese")) {
-            return new NYStyleCheesePizza();
-        } else if (type.equalsIgnoreCase("veggie")) {
-            return new NYStyleVeggiePizza();
-        }
-        throw new IllegalArgumentException("No such pizza type");
-    }
-}</code></pre>
-    </noscript>
-</div>
-<h3>Abstract Factory Pattern</h3>
-<p>The abstract factory pattern provides an interface for creating families of related or dependent objects without specifying their concrete classes.</p>
+                
             </div>
             <!-- /.entry-content -->
     <hr/>
@@ -204,8 +111,8 @@ public class NYPizzaStore extends PizzaStore {
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
 
-                    var disqus_identifier = 'creational-patterns-in-java-factory';
-                var disqus_url = 'http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html';
+                    var disqus_identifier = 'behavioral-patterns-in-java-factory';
+                var disqus_url = 'http://www.raydevblog.us/posts/2014/behavioral-patterns-in-java-factory.html';
 
             var disqus_config = function () {
                 this.language = "en";
@@ -248,18 +155,13 @@ public class NYPizzaStore extends PizzaStore {
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
-                                key-value store
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://www.raydevblog.us/tag/concurrency.html">
                                 concurrency
                             </a>
                         </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://www.raydevblog.us/tag/python.html">
-                                python
+                        <li class="list-group-item tag-1">
+                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
+                                key-value store
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -267,14 +169,9 @@ public class NYPizzaStore extends PizzaStore {
                                 java
                             </a>
                         </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
+                        <li class="list-group-item tag-2">
+                            <a href="http://www.raydevblog.us/tag/python.html">
+                                python
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -283,23 +180,8 @@ public class NYPizzaStore extends PizzaStore {
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/json.html">
-                                json
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
                                 two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -308,8 +190,33 @@ public class NYPizzaStore extends PizzaStore {
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/data-structure.html">
                                 data structure
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/json.html">
+                                json
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                     </ul>

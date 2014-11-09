@@ -2,7 +2,7 @@
 <html lang="en"
 >
 <head>
-    <title>Scaling Memcache at Facebook - Ray's Thoughts and Writings</title>
+    <title>Creational Patterns in Java - Ray's Thoughts and Writings</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -10,10 +10,10 @@
 
 
 
-<link rel="canonical" href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html">
+<link rel="canonical" href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html">
 
         <meta name="author" content="Ray Chen" />
-        <meta name="description" content="A summary of how Facebook took memcached as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described ..." />
+        <meta name="description" content="Factory Design Pattern Factory Pattern Factory pattern is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating Pizza in a factory: Pizza: product of the factory CheesePizza/VeggiePizza: concrete products that implement the Pizza ..." />
 
 
 
@@ -50,7 +50,7 @@ Ray's Thoughts and Writings            </a>
                         <li >
                             <a href="http://www.raydevblog.us/category/data.html">Data</a>
                         </li>
-                        <li >
+                        <li class="active">
                             <a href="http://www.raydevblog.us/category/java.html">Java</a>
                         </li>
                         <li >
@@ -59,7 +59,7 @@ Ray's Thoughts and Writings            </a>
                         <li >
                             <a href="http://www.raydevblog.us/category/python.html">Python</a>
                         </li>
-                        <li class="active">
+                        <li >
                             <a href="http://www.raydevblog.us/category/system.html">System</a>
                         </li>
             </ul>
@@ -79,10 +79,10 @@ Ray's Thoughts and Writings            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html"
+                    <a href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html"
                        rel="bookmark"
-                       title="Permalink to Scaling Memcache at Facebook">
-                        Scaling Memcache at Facebook
+                       title="Permalink to Creational Patterns in Java">
+                        Creational Patterns in Java
                     </a>
                 </h1>
             </header>
@@ -92,7 +92,7 @@ Ray's Thoughts and Writings            </a>
 <footer class="post-info">
     <span class="label label-default">Date</span>
     <span class="published">
-        <i class="fa fa-calendar"></i><time datetime="2014-10-30T20:50:00"> Thu 30 October 2014</time>
+        <i class="fa fa-calendar"></i><time datetime="2014-11-09T10:30:00"> Sun 09 November 2014</time>
     </span>
 
 
@@ -100,62 +100,221 @@ Ray's Thoughts and Writings            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <p>A summary of how Facebook took <strong>memcached</strong> as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described in the paper "<a href="http://pdos.csail.mit.edu/6.824-2013/papers/memcache-fb.pdf">Scaling Memcache at Facebook</a>".</p>
-<h2>Overview</h2>
-<p>Memcache vs. memchached</p>
+                <h2>Factory Design Pattern</h2>
+<h3>Factory Pattern</h3>
+<p><strong>Factory pattern</strong> is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating <strong>Pizza</strong> in a factory:</p>
 <ul>
-<li>memcached is the standalone server software</li>
-<li>Memcache is the distributed caching system</li>
+<li>Pizza: product of the factory</li>
+<li>CheesePizza/VeggiePizza: concrete products that implement the Pizza interface</li>
+<li>PizzaFactory: factory where create concrete products</li>
+<li>PizzaStore: client of the factory</li>
 </ul>
-<p>Facebook rely on <strong>memcache</strong> to lighten the read load on databases, as a <em>demand-filled look-aside</em> cache as shown in Figure:</p>
-<p><img alt="Alt text" src="http://www.raydevblog.us/images/memcache_wr.jpg" /></p>
-<p>Memcache Usage at Facebook</p>
+<p>In design patterns, the phrase "implement an interface" does NOT always mean "write a class that implements a Java interface, by using the <strong>implements</strong> keyword in the class declaration." In the general use of the phrase, a concrete class implementing a method from a <strong>supertype</strong> (which could be a class OR interface) is still considered to be "implementing the interface" of that supertype.</p>
+<div class="gist">
+    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'></script>
+    <noscript>
+        <pre><code>interface Pizza {
+    String getName();
+}
+ 
+class CheesePizza implements Pizza {
+    @Override public String getName() { return "CheesePizza"; }
+}
+ 
+class VeggiePizza implements Pizza {
+    @Override public String getSymbol() { return "VeggiePizza"; }
+}
+ 
+class PizzaFactory {
+    public static Pizza createPizza(String type) {
+        if (type.equalsIgnoreCase("cheese")) {
+            return new CheesePizza();
+        } else if (type.equalsIgnoreCase("veggie")) {
+            return new VeggiePizza();
+        }
+        throw new IllegalArgumentException("No such pizza type");
+    }
+}
+
+// Factory client code
+public class Factory {
+    public static void main(String[] args) {
+        String type = args[0];
+        Pizza pizza = PizzaFactory.createPizza(type);
+        System.out.println(pizza.getName());
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h3>Factory Method Pattern</h3>
+<p><strong>The Factory Method Pattern</strong> defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses. This decouples the client code in the superclass from the object creation code in the subclass.</p>
+<div class="highlight"><pre><span class="kd">abstract</span> <span class="n">Product</span> <span class="nf">factoryMethod</span><span class="o">(</span><span class="n">String</span> <span class="n">type</span><span class="o">)</span>
+</pre></div>
+
+
+<p>The example below is about creating Pizza using a factory method:</p>
+<div class="gist">
+    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-method-pattern.java'></script>
+    <noscript>
+        <pre><code>//The Product classes
+public abstract class Pizza {
+    String name;
+    String sauce;
+
+    abstract void prepare();
+    void bake() { System.out.println("Baking ..."); }
+}
+
+public class NYStyleCheesePizza extends Pizza {
+    public NYStyleCheesePizza() {
+        name = "NY Style Cheese Pizza";
+        sauce = "Marinara Sauce";
+    }
+}
+
+//The Creator classes
+public abstract class PizzaStore {
+    public Pizza orderPizza(String type) {
+        Pizza = createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        return pizza;
+    }
+
+    // A factory method handles object creation and encapsulates it in a subclass
+    protected abstract Pizza createPizza(String type);
+}
+
+public class NYPizzaStore extends PizzaStore {
+    Pizza createPizza(String type) {
+        if (type.equalsIgnoreCase("cheese")) {
+            return new NYStyleCheesePizza();
+        } else if (type.equalsIgnoreCase("veggie")) {
+            return new NYStyleVeggiePizza();
+        }
+        throw new IllegalArgumentException("No such pizza type");
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h3>Abstract Factory Pattern</h3>
+<p>The abstract factory pattern provides an interface for creating families of related or dependent objects without specifying their concrete classes.</p>
+<p>The example below is about creating Pizza using abstrace factory pattern:</p>
 <ul>
-<li>Caching results of complex RPC calls, such as timeline aggregations</li>
-<li>Query cache for expensive TAO/DB queries, such as birthday index, typeahead bootstrap data</li>
-<li>Write-heavy, non-durable storage, such as complex calculation analytics</li>
+<li>PizzaIngredientFactory: defines the interface that all concrete factories must implement.</li>
+<li>NYPizzaIngredientFactory: concrete pizza factory making pizza ingredients.</li>
+<li>NYPizzaStore: client which composed at runtime with an actual factory.</li>
+<li>Dough/Cheese/Pepperoni: product family. Each concrete factory can produce a different set of products.</li>
 </ul>
-<h2>Latency and Load</h2>
-<p>Within a cluster, Facebook focus on reducing either the latency of fetching cached data or the road imposed due to a cache miss.</p>
-<h3>Reducing Latency</h3>
-<p>The latency of memcache's response is a critical factor in the response time of a user's request. Facebook provision hundreds of memcached servers in a cluster to reduce load on databases. Items are distributed across the memcached servers through consistent hashing. All web servers communicate with every memcached server. This all-to-all communication pattern can cause a single server to become the bottleneck for many web servers. Facebook reduce latency from memcache client, which runs on each web server.</p>
+<div class="gist">
+    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=abstract-factory-pattern.java'></script>
+    <noscript>
+        <pre><code>// ingredients: dough, sauce
+public interface Dough {};
+public interface Cheese {};
+public interface Pepperoni {};
+
+public class ThinCrustDough implements Dough {
+    public String toString() { return "This Crust Dough"; }
+}
+
+public class ParmesanCheese implements Cheese {
+    public String toString() { return "Shredded Parmesan"; }
+}
+
+public class SlicedPepperoni implements Pepperoni {
+    public String toString() { return "Sliced Pepperoni"; }
+}
+
+// abstract ingredient factory
+public interface PizzaIngredientFactory {
+    public Dough createDough();
+    public Cheese createCheese();
+    public Pepperoni createPepperoni();
+}
+
+public class NYPizzaIngredientFactory implements PizzaIngredientFactory {
+    public Dough createDough() { return new ThinCrustDough(); }
+    public Sauce createCheese() { return new ParmesanCheese(); }
+    public Pepperoni createPepperoni() { return new SlicedPepperoni(); }
+}
+
+//The Product classes
+public abstract class Pizza {
+    String name;
+    String dough;
+    String cheese;
+    String pepperoni;
+    
+    public void setName(String name) { this.name = name; }
+    public String getName() { return name; }
+    abstract void prepare();
+    public void bake() { System.out.println("Baking " + name); }
+    
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(name + ": ");
+        if (dough != null) sb.append(dough + " ");
+        if (cheese != null) sb.append(cheese + " ");
+        if (pepperoni != null) sb.append(pepperoni + " ");
+        return sb.toString();
+    }
+}
+
+public class CheesePizza extends Pizza {
+    PizzaIngredientFactory ingredientFactory;
+    public CheesePizza(PizzaIngredientFactory ingredientFactory) {
+        this.ingredientFactory = ingredientFactory;
+    }
+    
+    void prepare() {
+        System.out.println("Preparing " + name);
+        dough = ingredientFactory.createDough();
+        cheese = ingredientFactory.createCheese();
+    }
+}
+
+public class PepperoniPizza extends Pizza {
+    PizzaIngredientFactory ingredientFactory;
+    
+    public PepperoniPizza(PizzaIngredientFactory ingredientFactory) {
+        this.ingredientFactory = ingredientFactory;
+    }
+    
+    void prepare() {
+        System.out.println("Preparing " + name);
+        dough = ingredientFactory.createDough();
+        cheese = ingredientFactory.createCheese();
+        pepperoni = ingredientFactory.createPepperoni();
+    }
+}
+
+// Client code
+public class NYPizzaStore extends PizzaStore {
+    Pizza pizza = null;
+    PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
+    
+    if (item.equalsIgnoreCase("cheese")) {
+        pizza = new CheesePizza(ingredientFactory);
+        pizza.setName("New York Style Cheese Pizza");
+    } else if (item.equalsIgnoreCase("pepperoni")) {
+        pizza = new PepperoniPizza(ingredientFactory);
+        pizza.setName("New York Style Pepperoni Pizza");
+    }
+    return pizza;
+}</code></pre>
+    </noscript>
+</div>
+<h3>Factory Method and Abstract Factory compared:</h3>
+<p>Factory Method</p>
 <ul>
-<li><strong>Parallel request and batching</strong>: Structure web application code to<ul>
-<li>Construct a directed acyclic graph (DAG) representing the dependencies between data</li>
-<li>Maximize the number of items that can be fetched concurrently</li>
-<li>Minimize the number of network round trips necessary to respond to page requests.  </li>
+<li>Provides an abstract interface for creating <strong><em>one</em></strong> product.</li>
+<li>PizzaStore is implemented as a Factory Method because we want to be able to create a product that varies by region. With the Factory Method, each region gets its own concrete factory that knows how to make pizzas which are appropriate for the area. </li>
 </ul>
-</li>
-<li><strong>Client-server communication</strong>: Clients use UDP and TCP to communicate with memcached servers.<ul>
-<li>Use UDP for <strong>get</strong> requests to reduce latency and overhead.</li>
-<li>Use TCP for <strong>set</strong> and <strong>delete</strong> requests for reliability, through <strong>mcrouter</strong> running on the same machine as the web server.</li>
-</ul>
-</li>
-</ul>
-<h3>Reducing Load</h3>
-<h4>Leases</h4>
-<p>Two problems:</p>
+<p>Abstract Factory</p>
 <ul>
-<li>A <strong>stale set</strong> occurs when concurrent updates to memcache get reordered.</li>
-<li>A <strong>thundering herd</strong> occurs when a specific key undergoes heavy read and write operations. Many reads default to the expensive paths such as database queries, as write operations repeatedly invalidates the recent values.</li>
-</ul>
-<p>A memcached instance gives a <strong>lease</strong> to a client to set data back into the cache when that client experiences a cache miss. With the lease token, memcached can verify and determine whether data should be stored. Each memcached server also regulates the rate at which it returns token. </p>
-<h4>Memcache Pools</h4>
-<p>Using memcache as a general-purpose caching layer requires workloads to share infrastructure. Due to heterogenous workloads, Facebook partition a cluster's memcached server into separate pools. For example, Facebook provision a small pool for keys that are accessed frequently but for which a cache miss is inexpensive, and provision a large pool for infrequently accessed keys for which cache misses are prohibitively expensive.</p>
-<h4>Replication Within Pools</h4>
-<p>Within some pools, Facebook use replication to improve the latency and efficiency of memcached servers. A client's request can be sent to any replica. This approach requires delivering invalidations to all replicas to maintain consistency.</p>
-<h3>Handling Failures</h3>
-<p>In a large distributed system, something is always broken. When a memcached client receives no response to its get request, the client assumes the server has failed and issues the request to a special <strong>Gutter</strong> pool. If this second request misses, the client will insert the key-value pair into the Gutter machine after querying the database.Entries in Gutter expire quickly. Gutter limits the load on databases at the cost of slightly stale data.</p>
-<h2>In a Region: Replication</h2>
-<p>Facebook split web and memcached servers into multiple <strong>frontend clusters</strong>. These clusters, along with a storage cluster that contain the databases, define a <strong>region</strong>.</p>
-<p>The figure below illustrates the final architecture of organizing co-located clusters into regions.</p>
-<p><img alt="Alt text" src="http://www.raydevblog.us/images/memcache.jpg" /></p>
-<h2>Across Regions: Consistency</h2>
-<p>Facebook designate one region to hold the master databases and the other regions to contain read-only replicas. They rely on MySQL's replication mechanism to keep replica databases up-to-date with their masters. Replica databases may lag behind the master database. </p>
-<h2>Reference</h2>
-<ul>
-<li><a href="https://www.usenix.org/conference/nsdi13/technical-sessions/presentation/nishtala">Scaling Memcache at Facebook</a></li>
-<li><a href="https://www.youtube.com/watch?v=e9lTgFO-ZXw">Turning Caches into Distributed Systems with mcrouter</a></li>
+<li>Provides an abstract interface for creating a <strong><em>family</em></strong> of products.</li>
+<li>PizzaIngredientFactory is implemented as an Abstract Factory because we need to create families of products (the ingredients). Each subclass implements the ingredients using its own regional suppliers. Methods to create products are often implemented with a Factory Method.</li>
 </ul>
             </div>
             <!-- /.entry-content -->
@@ -168,8 +327,8 @@ Ray's Thoughts and Writings            </a>
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
 
-                    var disqus_identifier = 'scaling-memcache-at-facebook';
-                var disqus_url = 'http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html';
+                    var disqus_identifier = 'creational-patterns-in-java';
+                var disqus_url = 'http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html';
 
             var disqus_config = function () {
                 this.language = "en";

@@ -81,22 +81,21 @@ Ray's Thoughts and Writings            </a>
         <div class="col-sm-9">
 
             <article>
-                <h2><a href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html">Creational Patterns in Java - Factory</a></h2>
-                <div class="summary"><h3>Factory Pattern</h3>
-<p><strong>Factory pattern</strong> is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating <strong>Currency</strong> in a factory.</p>
-<div class="gist">
-    <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'></script>
-    <noscript>
-        <pre><code>interface Currency {
-    String getSymbol();
-}
-
-class Rupee implements Currency {
-    @Override public String getSymbol() { return "Rs"; }
-}
-
-class SGDDollar ...</code></pre></noscript></div>
-                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html">more ...</a>
+                <h2><a href="http://www.raydevblog.us/posts/2014/behavioral-patterns-in-java-factory.html">Behavioral Patterns in Java - Factory</a></h2>
+                <div class="summary">
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/behavioral-patterns-in-java-factory.html">more ...</a>
+                </div>
+            </article>
+            <hr/>
+            <article>
+                <h2><a href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html">Creational Patterns in Java</a></h2>
+                <div class="summary"><h2>Factory Design Pattern</h2>
+<h3>Factory Pattern</h3>
+<p><strong>Factory pattern</strong> is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating <strong>Pizza</strong> in a factory:</p>
+<ul>
+<li>Pizza: product of the factory</li>
+<li>CheesePizza/VeggiePizza: concrete products that implement the Pizza ...</li></ul>
+                    <a class="btn btn-default btn-xs" href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html">more ...</a>
                 </div>
             </article>
             <hr/>
@@ -160,18 +159,13 @@ running worker threads execute <em>Runnable</em> objects from the task queue ...
                 <li class="list-group-item"><a href="http://www.raydevblog.us/"><h4><i class="fa fa-tags fa-lg"></i><span class="icon-label">Tags</span></h4></a>
                     <ul class="list-group " id="tags">
                         <li class="list-group-item tag-1">
-                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
-                                key-value store
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-1">
                             <a href="http://www.raydevblog.us/tag/concurrency.html">
                                 concurrency
                             </a>
                         </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://www.raydevblog.us/tag/python.html">
-                                python
+                        <li class="list-group-item tag-1">
+                            <a href="http://www.raydevblog.us/tag/key-value-store.html">
+                                key-value store
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
@@ -179,14 +173,9 @@ running worker threads execute <em>Runnable</em> objects from the task queue ...
                                 java
                             </a>
                         </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
+                        <li class="list-group-item tag-2">
+                            <a href="http://www.raydevblog.us/tag/python.html">
+                                python
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -195,23 +184,8 @@ running worker threads execute <em>Runnable</em> objects from the task queue ...
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/json.html">
-                                json
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
                                 two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -220,8 +194,33 @@ running worker threads execute <em>Runnable</em> objects from the task queue ...
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/data-structure.html">
                                 data structure
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/json.html">
+                                json
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                     </ul>

@@ -1,5 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/ray-chen.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-11-04T16:20:00-08:00</updated><entry><title>Distributed Unique Id Generation</title><link href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html" rel="alternate"></link><updated>2014-11-04T16:20:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-04:posts/2014/distributed-unique-id-generation.html</id><summary type="html">&lt;p&gt;Real-World Case Studies:&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/ray-chen.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-11-11T10:30:00-08:00</updated><entry><title>Behavioral Patterns in Java - Factory</title><link href="http://www.raydevblog.us/posts/2014/behavioral-patterns-in-java-factory.html" rel="alternate"></link><updated>2014-11-11T10:30:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-11:posts/2014/behavioral-patterns-in-java-factory.html</id><summary type="html"></summary></entry><entry><title>Creational Patterns in Java</title><link href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html" rel="alternate"></link><updated>2014-11-09T10:30:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-09:posts/2014/creational-patterns-in-java.html</id><summary type="html">&lt;h2&gt;Factory Design Pattern&lt;/h2&gt;
+&lt;h3&gt;Factory Pattern&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;Factory pattern&lt;/strong&gt; is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating &lt;strong&gt;Pizza&lt;/strong&gt; in a factory:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Pizza: product of the factory&lt;/li&gt;
+&lt;li&gt;CheesePizza/VeggiePizza: concrete products that implement the Pizza interface&lt;/li&gt;
+&lt;li&gt;PizzaFactory: factory where create concrete products&lt;/li&gt;
+&lt;li&gt;PizzaStore: client of the factory&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;In design patterns, the phrase "implement an interface" does NOT always mean "write a class that implements a Java interface, by using the &lt;strong&gt;implements&lt;/strong&gt; keyword in the class declaration." In the general use of the phrase, a concrete class implementing a method from a &lt;strong&gt;supertype&lt;/strong&gt; (which could be a class OR interface) is still considered to be "implementing the interface" of that supertype.&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;interface Pizza {
+    String getName();
+}
+ 
+class CheesePizza implements Pizza {
+    @Override public String getName() { return "CheesePizza"; }
+}
+ 
+class VeggiePizza implements Pizza {
+    @Override public String getSymbol() { return "VeggiePizza"; }
+}
+ 
+class PizzaFactory {
+    public static Pizza createPizza(String type) {
+        if (type.equalsIgnoreCase("cheese")) {
+            return new CheesePizza();
+        } else if (type.equalsIgnoreCase("veggie")) {
+            return new VeggiePizza();
+        }
+        throw new IllegalArgumentException("No such pizza type");
+    }
+}
+
+// Factory client code
+public class Factory {
+    public static void main(String[] args) {
+        String type = args[0];
+        Pizza pizza = PizzaFactory.createPizza(type);
+        System.out.println(pizza.getName());
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h3&gt;Factory Method Pattern&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;The Factory Method Pattern&lt;/strong&gt; defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses. This decouples the client code in the superclass from the object creation code in the subclass.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;abstract&lt;/span&gt; &lt;span class="n"&gt;Product&lt;/span&gt; &lt;span class="nf"&gt;factoryMethod&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The example below is about creating Pizza using a factory method:&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-method-pattern.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;//The Product classes
+public abstract class Pizza {
+    String name;
+    String sauce;
+
+    abstract void prepare();
+    void bake() { System.out.println("Baking ..."); }
+}
+
+public class NYStyleCheesePizza extends Pizza {
+    public NYStyleCheesePizza() {
+        name = "NY Style Cheese Pizza";
+        sauce = "Marinara Sauce";
+    }
+}
+
+//The Creator classes
+public abstract class PizzaStore {
+    public Pizza orderPizza(String type) {
+        Pizza = createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        return pizza;
+    }
+
+    // A factory method handles object creation and encapsulates it in a subclass
+    protected abstract Pizza createPizza(String type);
+}
+
+public class NYPizzaStore extends PizzaStore {
+    Pizza createPizza(String type) {
+        if (type.equalsIgnoreCase("cheese")) {
+            return new NYStyleCheesePizza();
+        } else if (type.equalsIgnoreCase("veggie")) {
+            return new NYStyleVeggiePizza();
+        }
+        throw new IllegalArgumentException("No such pizza type");
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h3&gt;Abstract Factory Pattern&lt;/h3&gt;
+&lt;p&gt;The abstract factory pattern provides an interface for creating families of related or dependent objects without specifying their concrete classes.&lt;/p&gt;
+&lt;p&gt;The example below is about creating Pizza using abstrace factory pattern:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PizzaIngredientFactory: defines the interface that all concrete factories must implement.&lt;/li&gt;
+&lt;li&gt;NYPizzaIngredientFactory: concrete pizza factory making pizza ingredients.&lt;/li&gt;
+&lt;li&gt;NYPizzaStore: client which composed at runtime with an actual factory.&lt;/li&gt;
+&lt;li&gt;Dough/Cheese/Pepperoni: product family. Each concrete factory can produce a different set of products.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=abstract-factory-pattern.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;// ingredients: dough, sauce
+public interface Dough {};
+public interface Cheese {};
+public interface Pepperoni {};
+
+public class ThinCrustDough implements Dough {
+    public String toString() { return "This Crust Dough"; }
+}
+
+public class ParmesanCheese implements Cheese {
+    public String toString() { return "Shredded Parmesan"; }
+}
+
+public class SlicedPepperoni implements Pepperoni {
+    public String toString() { return "Sliced Pepperoni"; }
+}
+
+// abstract ingredient factory
+public interface PizzaIngredientFactory {
+    public Dough createDough();
+    public Cheese createCheese();
+    public Pepperoni createPepperoni();
+}
+
+public class NYPizzaIngredientFactory implements PizzaIngredientFactory {
+    public Dough createDough() { return new ThinCrustDough(); }
+    public Sauce createCheese() { return new ParmesanCheese(); }
+    public Pepperoni createPepperoni() { return new SlicedPepperoni(); }
+}
+
+//The Product classes
+public abstract class Pizza {
+    String name;
+    String dough;
+    String cheese;
+    String pepperoni;
+    
+    public void setName(String name) { this.name = name; }
+    public String getName() { return name; }
+    abstract void prepare();
+    public void bake() { System.out.println("Baking " + name); }
+    
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(name + ": ");
+        if (dough != null) sb.append(dough + " ");
+        if (cheese != null) sb.append(cheese + " ");
+        if (pepperoni != null) sb.append(pepperoni + " ");
+        return sb.toString();
+    }
+}
+
+public class CheesePizza extends Pizza {
+    PizzaIngredientFactory ingredientFactory;
+    public CheesePizza(PizzaIngredientFactory ingredientFactory) {
+        this.ingredientFactory = ingredientFactory;
+    }
+    
+    void prepare() {
+        System.out.println("Preparing " + name);
+        dough = ingredientFactory.createDough();
+        cheese = ingredientFactory.createCheese();
+    }
+}
+
+public class PepperoniPizza extends Pizza {
+    PizzaIngredientFactory ingredientFactory;
+    
+    public PepperoniPizza(PizzaIngredientFactory ingredientFactory) {
+        this.ingredientFactory = ingredientFactory;
+    }
+    
+    void prepare() {
+        System.out.println("Preparing " + name);
+        dough = ingredientFactory.createDough();
+        cheese = ingredientFactory.createCheese();
+        pepperoni = ingredientFactory.createPepperoni();
+    }
+}
+
+// Client code
+public class NYPizzaStore extends PizzaStore {
+    Pizza pizza = null;
+    PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
+    
+    if (item.equalsIgnoreCase("cheese")) {
+        pizza = new CheesePizza(ingredientFactory);
+        pizza.setName("New York Style Cheese Pizza");
+    } else if (item.equalsIgnoreCase("pepperoni")) {
+        pizza = new PepperoniPizza(ingredientFactory);
+        pizza.setName("New York Style Pepperoni Pizza");
+    }
+    return pizza;
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h3&gt;Factory Method and Abstract Factory compared:&lt;/h3&gt;
+&lt;p&gt;Factory Method&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Provides an abstract interface for creating &lt;strong&gt;&lt;em&gt;one&lt;/em&gt;&lt;/strong&gt; product.&lt;/li&gt;
+&lt;li&gt;PizzaStore is implemented as a Factory Method because we want to be able to create a product that varies by region. With the Factory Method, each region gets its own concrete factory that knows how to make pizzas which are appropriate for the area. &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Abstract Factory&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Provides an abstract interface for creating a &lt;strong&gt;&lt;em&gt;family&lt;/em&gt;&lt;/strong&gt; of products.&lt;/li&gt;
+&lt;li&gt;PizzaIngredientFactory is implemented as an Abstract Factory because we need to create families of products (the ingredients). Each subclass implements the ingredients using its own regional suppliers. Methods to create products are often implemented with a Factory Method.&lt;/li&gt;
+&lt;/ul&gt;</summary></entry><entry><title>Distributed Unique Id Generation</title><link href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html" rel="alternate"></link><updated>2014-11-04T16:20:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-04:posts/2014/distributed-unique-id-generation.html</id><summary type="html">&lt;p&gt;Real-World Case Studies:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Flickr needs globally unique primary keys for their MySQL shards, because they need to migrate data between databases, and also their MySQL shards are built as master-master replicant pairs. &lt;a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap"&gt;1&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;Twitter needs unique, roughly sortable, 64-bit unsigned integers for Tweet IDs. &lt;a href="https://blog.twitter.com/2010/announcing-snowflake"&gt;2&lt;/a&gt;&lt;/li&gt;
@@ -50,99 +265,7 @@
 &lt;li&gt;&lt;a href="https://blog.twitter.com/2010/announcing-snowflake"&gt;Announcing Snowflake&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://instagram-engineering.tumblr.com/post/10853187575/sharding-ids-at-instagram"&gt;Sharding &amp;amp; IDs at Instagram&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="http://horicky.blogspot.com/2007/11/distributed-uuid-generation.html"&gt;Distributed UUID Generation&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</summary></entry><entry><title>Creational Patterns in Java - Factory</title><link href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java-factory.html" rel="alternate"></link><updated>2014-11-01T10:30:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-01:posts/2014/creational-patterns-in-java-factory.html</id><summary type="html">&lt;h3&gt;Factory Pattern&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;Factory pattern&lt;/strong&gt; is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating &lt;strong&gt;Currency&lt;/strong&gt; in a factory.&lt;/p&gt;
-&lt;div class="gist"&gt;
-    &lt;script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'&gt;&lt;/script&gt;
-    &lt;noscript&gt;
-        &lt;pre&gt;&lt;code&gt;interface Currency {
-    String getSymbol();
-}
-
-class Rupee implements Currency {
-    @Override public String getSymbol() { return "Rs"; }
-}
-
-class SGDDollar implements Currency {
-    @Override public String getSymbol() { return "SGD"; }
-}
-
-class USDollar implements Currency {
-    @Override public String getSymbol() { return "USD"; }
-}
-
-class CurrencyFactory {
-    public static Currency createCurrency(String country) {
-        if (country.equalsIgnoreCase("India")) {
-            return new Rupee();
-        } else if (country.equalsIgnoreCase("Singapore")) {
-            return new SGDDollar();
-        } else if (country.equalsIgnoreCase("US")) {
-            return new USDollar();
-        }
-        throw new IllegalArgumentException("No such currency");
-    }
-}
-
-// Factory client code
-public class Factory {
-    public static void main(String[] args) {
-        String country = args[0];
-        Currency currency = CurrencyFactory.createCurrency(country);
-        System.out.println(currency.getSymbol());
-    }
-}&lt;/code&gt;&lt;/pre&gt;
-    &lt;/noscript&gt;
-&lt;/div&gt;
-&lt;h3&gt;Factory Method Pattern&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;The Factory Method Pattern&lt;/strong&gt; defines an interface for creating an object, but lets subclasses decide
-which class to instantiate. Factory Method lets a class defer instantiation to subclasses.&lt;/p&gt;
-&lt;div class="gist"&gt;
-    &lt;script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-method-pattern.java'&gt;&lt;/script&gt;
-    &lt;noscript&gt;
-        &lt;pre&gt;&lt;code&gt;//The Product classes
-public abstract class Pizza {
-    String name;
-    String sauce;
-
-    abstract void prepare();
-    void bake() { System.out.println("Baking ..."); }
-}
-
-public class NYStyleCheesePizza extends Pizza {
-    public NYStyleCheesePizza() {
-        name = "NY Style Cheese Pizza";
-        sauce = "Marinara Sauce";
-    }
-}
-
-//The Creator classes
-public abstract class PizzaStore {
-    public Pizza orderPizza(String type) {
-        Pizza = createPizza(type);
-        pizza.prepare();
-        pizza.bake();
-        return pizza;
-    }
-
-    // A factory method handles object creation and encapsulates it in a subclass
-    protected abstract Pizza createPizza(String type);
-}
-
-public class NYPizzaStore extends PizzaStore {
-    Pizza createPizza(String type) {
-        if (type.equalsIgnoreCase("cheese")) {
-            return new NYStyleCheesePizza();
-        } else if (type.equalsIgnoreCase("veggie")) {
-            return new NYStyleVeggiePizza();
-        }
-        throw new IllegalArgumentException("No such pizza type");
-    }
-}&lt;/code&gt;&lt;/pre&gt;
-    &lt;/noscript&gt;
-&lt;/div&gt;
-&lt;h3&gt;Abstract Factory Pattern&lt;/h3&gt;
-&lt;p&gt;The abstract factory pattern provides an interface for creating families of related or dependent objects without specifying their concrete classes.&lt;/p&gt;</summary></entry><entry><title>Scaling Memcache at Facebook</title><link href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html" rel="alternate"></link><updated>2014-10-30T20:50:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-10-30:posts/2014/scaling-memcache-at-facebook.html</id><summary type="html">&lt;p&gt;A summary of how Facebook took &lt;strong&gt;memcached&lt;/strong&gt; as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described in the paper "&lt;a href="http://pdos.csail.mit.edu/6.824-2013/papers/memcache-fb.pdf"&gt;Scaling Memcache at Facebook&lt;/a&gt;".&lt;/p&gt;
+&lt;/ul&gt;</summary></entry><entry><title>Scaling Memcache at Facebook</title><link href="http://www.raydevblog.us/posts/2014/scaling-memcache-at-facebook.html" rel="alternate"></link><updated>2014-10-30T20:50:00-07:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-10-30:posts/2014/scaling-memcache-at-facebook.html</id><summary type="html">&lt;p&gt;A summary of how Facebook took &lt;strong&gt;memcached&lt;/strong&gt; as a basic building block, which provides a network attached in-memory hash table and supports LRU based eviction, and built a large distributed key-value storage system. The scaling is from a single cluster of servers to multiple geographically distributed clusters. Details are described in the paper "&lt;a href="http://pdos.csail.mit.edu/6.824-2013/papers/memcache-fb.pdf"&gt;Scaling Memcache at Facebook&lt;/a&gt;".&lt;/p&gt;
 &lt;h2&gt;Overview&lt;/h2&gt;
 &lt;p&gt;Memcache vs. memchached&lt;/p&gt;
 &lt;ul&gt;
@@ -290,19 +413,19 @@ public interface IRender {
     public String render(Object data);
 }
 
-public class HtmlReader implements IReader {
+public class HtmlRender implements IRender {
     @Override public String render(Object data) {
         // Code
     }
 }
 
-public class TextReader implements IReader {
+public class TextRender implements IRender {
     @Override public String render(Object data) {
         // Code
     }
 }
 
-public class JsonReader implements IReader {
+public class JsonRender implements IRender {
     @Override public String render(Object data) {
         // Code
     }
@@ -355,7 +478,7 @@ class NonFlyBird extends Bird {}&lt;/code&gt;&lt;/pre&gt;
 &lt;div class="gist"&gt;
     &lt;script src='https://gist.github.com/df9f7250c484983a584c.js?file=interface-segregation-principle.java'&gt;&lt;/script&gt;
     &lt;noscript&gt;
-        &lt;pre&gt;&lt;code&gt;public inteface IWorker {
+        &lt;pre&gt;&lt;code&gt;public interface IWorker {
     public void work();
     public void eat();
 }
@@ -422,9 +545,10 @@ class Robot implements IWorkable {
     }
 }
 
-//The Switch class is dependent on the Engine class which violates 
-//dependency inversion principle. It is tightly coupled with the Engine
-//class, not reusable with any other objects. It can be designed as follows:
+// The Switch class is dependent on the Engine class which violates 
+// dependency inversion principle. It is tightly coupled with the Engine
+// class, not reusable with any other objects. It can be designed as follows:
+// High Level Classes (Switch) -&gt; Abstraction Layer (SwitchClient) -&gt; Low Level Classes (Engine)
 public interface AbstractSwitch {
     public boolean getState();
     public void flip();
