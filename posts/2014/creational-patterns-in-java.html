@@ -13,7 +13,7 @@
 <link rel="canonical" href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html">
 
         <meta name="author" content="Ray Chen" />
-        <meta name="description" content="Factory Design Pattern Factory Pattern Factory pattern is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating Pizza in a factory: Pizza: product of the factory CheesePizza/VeggiePizza: concrete products that implement the Pizza ..." />
+        <meta name="description" content="Singleton Design Pattern Singleton design pattern restricts the instantiation of a class and ensures that only one instance of the class exists in the JVM. It is used for logging, caching and thread pool. Eager Initialization Using eager initialization, we rely on the JVM to create the unique Singleton instance ..." />
 
 
 
@@ -100,8 +100,108 @@ Ray's Thoughts and Writings            </a>
     
 </footer><!-- /.post-info -->                    </div>
                 </div>
-                <h2>Factory Design Pattern</h2>
-<h3>Factory Pattern</h3>
+                <h3>Singleton Design Pattern</h3>
+<p>Singleton design pattern restricts the instantiation of a class and ensures that only one instance of the class exists in the JVM. It is used for logging, caching and thread pool.</p>
+<h4>Eager Initialization</h4>
+<p>Using eager initialization, we rely on the JVM to create the unique Singleton instance when the class is loaded. The JVM guarantees that the instance will be created before any thread accesses the static uniqueInstance variable.
+If a singleton is expected to carry state, then those state variables should have synchronized access to make them thread safe.</p>
+<div class="gist">
+    <script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-pattern.java'></script>
+    <noscript>
+        <pre><code>public class Singleton {
+    private static Singleton instance = new Singleton();
+    private Map<String, String> kvmap = new ConcurrentHashMap(new HashMap<String, String>());
+
+    private Singleton() {}
+
+    public static Singleton getInstance { return instance; }
+
+    public String getValue(String key) { return kvmap.get(key); }
+    public Set<String> getKeys() { return kvmap.keySet(); }
+}</code></pre>
+    </noscript>
+</div>
+<h4>Lazy Initialization</h4>
+<p>Use "double-checked locking" to reduce the use of synchronization in <strong>getInstance()</strong>. The volatile keyword ensures that multiple threads handle the uniqueInstance variable correctly when it is being initialized to the Singleton instance.</p>
+<div class="gist">
+    <script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-lazy-initialization.java'></script>
+    <noscript>
+        <pre><code>public class Singleton {
+    private volatile static Singleton uniqueInstance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (uniqueInstance == null) {
+            synchronized (Singleton.class) {
+                if (uniqueInstance == null) {
+                    uniqueInstance = new Singleton();
+                }
+            }
+        }
+        return uniqueInstance;
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h4>Bill Pugh Approach</h4>
+<p>The Bill pugh approach suggests to use static inner class. Until we need an instance, the SingletonHolder class will not be initialized until required. </p>
+<div class="gist">
+    <script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-bill-pugh.java'></script>
+    <noscript>
+        <pre><code>public class Singleton {
+    private Singleton() {}
+
+    private static class SingletonHolder {
+        private static final Singleton instance = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHolder.instance;
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h4>Unit Test</h4>
+<p>Singletons are hard to mock in unit tests due to their private constructors. We should always have singletons implement an interface which allows for mock instances in unit tests. As follows, we can use <strong>Dependency Injection</strong> to make the <strong>Client</strong> class to receive the <strong>Server</strong> singleton instance in its constructor, instead of using the static <strong>getInstance</strong> method.</p>
+<div class="gist">
+    <script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-server-interface.java'></script>
+    <noscript>
+        <pre><code>public interface ServerInterface {
+    public void config(String[] params);
+}
+
+public class ServerSingleton implements ServerInterface {
+    private ServerSingleton() {}
+
+    private static class SingletonHolder {
+        private static final ServerSingleton uniqueInstance = new ServerSingleton();
+    }
+
+    public static ServerSingleton getInstance() {
+        return SingletonHolder.uniqueInstance;
+    }
+
+    public void config(String[] params) {
+        // ...
+    }
+}
+
+public class Client {
+    private final ServerInterface server;
+    
+    public Client(ServerInterface server) {
+        this.server = server;
+    }
+    
+    public void configServer(String[] params) {
+        this.server.config(params);
+    }
+}</code></pre>
+    </noscript>
+</div>
+<h3>Factory Design Pattern</h3>
+<h4>Factory Pattern</h4>
 <p><strong>Factory pattern</strong> is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating <strong>Pizza</strong> in a factory:</p>
 <ul>
 <li>Pizza: product of the factory</li>
@@ -113,40 +213,52 @@ Ray's Thoughts and Writings            </a>
 <div class="gist">
     <script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'></script>
     <noscript>
-        <pre><code>interface Pizza {
-    String getName();
+        <pre><code>public abstract class Pizza {
+    String name;
+    
+    public String getName() { return name; }
+    public void prepare() { System.out.println("Preparing " + name); }
+    public void bake() { System.out.println("Baking " + name); }
 }
  
-class CheesePizza implements Pizza {
-    @Override public String getName() { return "CheesePizza"; }
+public class CheesePizza extends Pizza {
+    public CheesePizza() { name = "CheesePizza"; }
 }
  
-class VeggiePizza implements Pizza {
-    @Override public String getSymbol() { return "VeggiePizza"; }
+public class VeggiePizza extends Pizza {
+    public VeggiePizza() { name = "VeggiePizza"; }
 }
  
-class PizzaFactory {
-    public static Pizza createPizza(String type) {
+public class PizzaFactory {
+    public Pizza createPizza(String type) {
+        Pizza pizza = null;
         if (type.equalsIgnoreCase("cheese")) {
-            return new CheesePizza();
+            pizza = new CheesePizza();
         } else if (type.equalsIgnoreCase("veggie")) {
-            return new VeggiePizza();
+            pizza = new VeggiePizza();
         }
-        throw new IllegalArgumentException("No such pizza type");
+        return pizza;
     }
 }
 
 // Factory client code
-public class Factory {
-    public static void main(String[] args) {
-        String type = args[0];
-        Pizza pizza = PizzaFactory.createPizza(type);
-        System.out.println(pizza.getName());
+public class PizzaStore {
+    PizzaFactory factory;
+    
+    public PizzaStore(PizzaFactory factory) {
+        this.factory = factory;
+    }
+    
+    public Pizza orderPizza(String type) {
+        Pizza pizza = factory.createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        return pizza;
     }
 }</code></pre>
     </noscript>
 </div>
-<h3>Factory Method Pattern</h3>
+<h4>Factory Method Pattern</h4>
 <p><strong>The Factory Method Pattern</strong> defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses. This decouples the client code in the superclass from the object creation code in the subclass.</p>
 <div class="highlight"><pre><span class="kd">abstract</span> <span class="n">Product</span> <span class="nf">factoryMethod</span><span class="o">(</span><span class="n">String</span> <span class="n">type</span><span class="o">)</span>
 </pre></div>
@@ -159,23 +271,28 @@ public class Factory {
         <pre><code>//The Product classes
 public abstract class Pizza {
     String name;
-    String sauce;
-
-    abstract void prepare();
-    void bake() { System.out.println("Baking ..."); }
+    
+    public String getName() { return name; }
+    public void prepare() { System.out.println("Preparing " + name); }
+    public void bake() { System.out.println("Baking " + name); }
 }
 
 public class NYStyleCheesePizza extends Pizza {
     public NYStyleCheesePizza() {
         name = "NY Style Cheese Pizza";
-        sauce = "Marinara Sauce";
+    }
+}
+
+public class NYStyleVeggiePizza extends Pizza {
+    public NYStyleVeggiePizza() {
+        name = "NY Style Veggie Pizza";
     }
 }
 
 //The Creator classes
 public abstract class PizzaStore {
     public Pizza orderPizza(String type) {
-        Pizza = createPizza(type);
+        Pizza pizza = createPizza(type);
         pizza.prepare();
         pizza.bake();
         return pizza;
@@ -187,12 +304,13 @@ public abstract class PizzaStore {
 
 public class NYPizzaStore extends PizzaStore {
     Pizza createPizza(String type) {
+        Pizza pizza = null;
         if (type.equalsIgnoreCase("cheese")) {
-            return new NYStyleCheesePizza();
+            pizza = new NYStyleCheesePizza();
         } else if (type.equalsIgnoreCase("veggie")) {
-            return new NYStyleVeggiePizza();
+            pizza = new NYStyleVeggiePizza();
         }
-        throw new IllegalArgumentException("No such pizza type");
+        return pizza;
     }
 }</code></pre>
     </noscript>
@@ -290,22 +408,36 @@ public class PepperoniPizza extends Pizza {
 }
 
 // Client code
-public class NYPizzaStore extends PizzaStore {
-    Pizza pizza = null;
-    PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
-    
-    if (item.equalsIgnoreCase("cheese")) {
-        pizza = new CheesePizza(ingredientFactory);
-        pizza.setName("New York Style Cheese Pizza");
-    } else if (item.equalsIgnoreCase("pepperoni")) {
-        pizza = new PepperoniPizza(ingredientFactory);
-        pizza.setName("New York Style Pepperoni Pizza");
+public abstract class PizzaStore {
+    public Pizza orderPizza(String type) {
+        Pizza pizza = createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        return pizza;
     }
-    return pizza;
+
+    // A factory method handles object creation and encapsulates it in a subclass
+    protected abstract Pizza createPizza(String type);
+}
+
+public class NYPizzaStore extends PizzaStore {
+    protected Pizza createPizza(String type) {
+        Pizza pizza = null;
+        PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
+        
+        if (item.equalsIgnoreCase("cheese")) {
+            pizza = new CheesePizza(ingredientFactory);
+            pizza.setName("New York Style Cheese Pizza");
+        } else if (item.equalsIgnoreCase("pepperoni")) {
+            pizza = new PepperoniPizza(ingredientFactory);
+            pizza.setName("New York Style Pepperoni Pizza");
+        }
+        return pizza;
+    }
 }</code></pre>
     </noscript>
 </div>
-<h3>Factory Method and Abstract Factory compared:</h3>
+<h4>Factory Method and Abstract Factory compared:</h4>
 <p>Factory Method</p>
 <ul>
 <li>Provides an abstract interface for creating <strong><em>one</em></strong> product.</li>
@@ -315,6 +447,11 @@ public class NYPizzaStore extends PizzaStore {
 <ul>
 <li>Provides an abstract interface for creating a <strong><em>family</em></strong> of products.</li>
 <li>PizzaIngredientFactory is implemented as an Abstract Factory because we need to create families of products (the ingredients). Each subclass implements the ingredients using its own regional suppliers. Methods to create products are often implemented with a Factory Method.</li>
+</ul>
+<h3>Reference</h3>
+<ul>
+<li><a href="http://howtodoinjava.com/2012/10/22/singleton-design-pattern-in-java/">Singleton design pattern in java</a></li>
+<li><a href="http://googletesting.blogspot.com/2008/05/tott-using-dependancy-injection-to.html">Using Dependancy Injection to Avoid Singletons</a></li>
 </ul>
             </div>
             <!-- /.entry-content -->
@@ -391,8 +528,13 @@ public class NYPizzaStore extends PizzaStore {
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -401,8 +543,18 @@ public class NYPizzaStore extends PizzaStore {
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/machine-learning.html">
                                 machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -416,23 +568,8 @@ public class NYPizzaStore extends PizzaStore {
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                     </ul>

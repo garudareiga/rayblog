@@ -1,6 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/all.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-11-09T10:30:00-08:00</updated><entry><title>Creational Patterns in Java</title><link href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html" rel="alternate"></link><updated>2014-11-09T10:30:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-09:posts/2014/creational-patterns-in-java.html</id><summary type="html">&lt;h2&gt;Factory Design Pattern&lt;/h2&gt;
-&lt;h3&gt;Factory Pattern&lt;/h3&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Ray's Thoughts and Writings</title><link href="http://www.raydevblog.us/" rel="alternate"></link><link href="http://www.raydevblog.us/feeds/all.atom.xml" rel="self"></link><id>http://www.raydevblog.us/</id><updated>2014-11-09T10:30:00-08:00</updated><entry><title>Creational Patterns in Java</title><link href="http://www.raydevblog.us/posts/2014/creational-patterns-in-java.html" rel="alternate"></link><updated>2014-11-09T10:30:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-09:posts/2014/creational-patterns-in-java.html</id><summary type="html">&lt;h3&gt;Singleton Design Pattern&lt;/h3&gt;
+&lt;p&gt;Singleton design pattern restricts the instantiation of a class and ensures that only one instance of the class exists in the JVM. It is used for logging, caching and thread pool.&lt;/p&gt;
+&lt;h4&gt;Eager Initialization&lt;/h4&gt;
+&lt;p&gt;Using eager initialization, we rely on the JVM to create the unique Singleton instance when the class is loaded. The JVM guarantees that the instance will be created before any thread accesses the static uniqueInstance variable.
+If a singleton is expected to carry state, then those state variables should have synchronized access to make them thread safe.&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-pattern.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;public class Singleton {
+    private static Singleton instance = new Singleton();
+    private Map&lt;String, String&gt; kvmap = new ConcurrentHashMap(new HashMap&lt;String, String&gt;());
+
+    private Singleton() {}
+
+    public static Singleton getInstance { return instance; }
+
+    public String getValue(String key) { return kvmap.get(key); }
+    public Set&lt;String&gt; getKeys() { return kvmap.keySet(); }
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h4&gt;Lazy Initialization&lt;/h4&gt;
+&lt;p&gt;Use "double-checked locking" to reduce the use of synchronization in &lt;strong&gt;getInstance()&lt;/strong&gt;. The volatile keyword ensures that multiple threads handle the uniqueInstance variable correctly when it is being initialized to the Singleton instance.&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-lazy-initialization.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;public class Singleton {
+    private volatile static Singleton uniqueInstance;
+
+    private Singleton() {}
+
+    public static Singleton getInstance() {
+        if (uniqueInstance == null) {
+            synchronized (Singleton.class) {
+                if (uniqueInstance == null) {
+                    uniqueInstance = new Singleton();
+                }
+            }
+        }
+        return uniqueInstance;
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h4&gt;Bill Pugh Approach&lt;/h4&gt;
+&lt;p&gt;The Bill pugh approach suggests to use static inner class. Until we need an instance, the SingletonHolder class will not be initialized until required. &lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-bill-pugh.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;public class Singleton {
+    private Singleton() {}
+
+    private static class SingletonHolder {
+        private static final Singleton instance = new Singleton();
+    }
+
+    public static Singleton getInstance() {
+        return SingletonHolder.instance;
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h4&gt;Unit Test&lt;/h4&gt;
+&lt;p&gt;Singletons are hard to mock in unit tests due to their private constructors. We should always have singletons implement an interface which allows for mock instances in unit tests. As follows, we can use &lt;strong&gt;Dependency Injection&lt;/strong&gt; to make the &lt;strong&gt;Client&lt;/strong&gt; class to receive the &lt;strong&gt;Server&lt;/strong&gt; singleton instance in its constructor, instead of using the static &lt;strong&gt;getInstance&lt;/strong&gt; method.&lt;/p&gt;
+&lt;div class="gist"&gt;
+    &lt;script src='https://gist.github.com/198c94bae70cb36cf5fe.js?file=singleton-server-interface.java'&gt;&lt;/script&gt;
+    &lt;noscript&gt;
+        &lt;pre&gt;&lt;code&gt;public interface ServerInterface {
+    public void config(String[] params);
+}
+
+public class ServerSingleton implements ServerInterface {
+    private ServerSingleton() {}
+
+    private static class SingletonHolder {
+        private static final ServerSingleton uniqueInstance = new ServerSingleton();
+    }
+
+    public static ServerSingleton getInstance() {
+        return SingletonHolder.uniqueInstance;
+    }
+
+    public void config(String[] params) {
+        // ...
+    }
+}
+
+public class Client {
+    private final ServerInterface server;
+    
+    public Client(ServerInterface server) {
+        this.server = server;
+    }
+    
+    public void configServer(String[] params) {
+        this.server.config(params);
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+    &lt;/noscript&gt;
+&lt;/div&gt;
+&lt;h3&gt;Factory Design Pattern&lt;/h3&gt;
+&lt;h4&gt;Factory Pattern&lt;/h4&gt;
 &lt;p&gt;&lt;strong&gt;Factory pattern&lt;/strong&gt; is used to create instances of different classes of same type, based on different parameters. It helps encapsulate object creation. The example below is about creating &lt;strong&gt;Pizza&lt;/strong&gt; in a factory:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Pizza: product of the factory&lt;/li&gt;
@@ -12,40 +112,52 @@
 &lt;div class="gist"&gt;
     &lt;script src='https://gist.github.com/4bc01df870e1c1b87843.js?file=factory-pattern.java'&gt;&lt;/script&gt;
     &lt;noscript&gt;
-        &lt;pre&gt;&lt;code&gt;interface Pizza {
-    String getName();
+        &lt;pre&gt;&lt;code&gt;public abstract class Pizza {
+    String name;
+    
+    public String getName() { return name; }
+    public void prepare() { System.out.println("Preparing " + name); }
+    public void bake() { System.out.println("Baking " + name); }
 }
  
-class CheesePizza implements Pizza {
-    @Override public String getName() { return "CheesePizza"; }
+public class CheesePizza extends Pizza {
+    public CheesePizza() { name = "CheesePizza"; }
 }
  
-class VeggiePizza implements Pizza {
-    @Override public String getSymbol() { return "VeggiePizza"; }
+public class VeggiePizza extends Pizza {
+    public VeggiePizza() { name = "VeggiePizza"; }
 }
  
-class PizzaFactory {
-    public static Pizza createPizza(String type) {
+public class PizzaFactory {
+    public Pizza createPizza(String type) {
+        Pizza pizza = null;
         if (type.equalsIgnoreCase("cheese")) {
-            return new CheesePizza();
+            pizza = new CheesePizza();
         } else if (type.equalsIgnoreCase("veggie")) {
-            return new VeggiePizza();
+            pizza = new VeggiePizza();
         }
-        throw new IllegalArgumentException("No such pizza type");
+        return pizza;
     }
 }
 
 // Factory client code
-public class Factory {
-    public static void main(String[] args) {
-        String type = args[0];
-        Pizza pizza = PizzaFactory.createPizza(type);
-        System.out.println(pizza.getName());
+public class PizzaStore {
+    PizzaFactory factory;
+    
+    public PizzaStore(PizzaFactory factory) {
+        this.factory = factory;
+    }
+    
+    public Pizza orderPizza(String type) {
+        Pizza pizza = factory.createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        return pizza;
     }
 }&lt;/code&gt;&lt;/pre&gt;
     &lt;/noscript&gt;
 &lt;/div&gt;
-&lt;h3&gt;Factory Method Pattern&lt;/h3&gt;
+&lt;h4&gt;Factory Method Pattern&lt;/h4&gt;
 &lt;p&gt;&lt;strong&gt;The Factory Method Pattern&lt;/strong&gt; defines an interface for creating an object, but lets subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses. This decouples the client code in the superclass from the object creation code in the subclass.&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span class="kd"&gt;abstract&lt;/span&gt; &lt;span class="n"&gt;Product&lt;/span&gt; &lt;span class="nf"&gt;factoryMethod&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;String&lt;/span&gt; &lt;span class="n"&gt;type&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
@@ -58,23 +170,28 @@ public class Factory {
         &lt;pre&gt;&lt;code&gt;//The Product classes
 public abstract class Pizza {
     String name;
-    String sauce;
-
-    abstract void prepare();
-    void bake() { System.out.println("Baking ..."); }
+    
+    public String getName() { return name; }
+    public void prepare() { System.out.println("Preparing " + name); }
+    public void bake() { System.out.println("Baking " + name); }
 }
 
 public class NYStyleCheesePizza extends Pizza {
     public NYStyleCheesePizza() {
         name = "NY Style Cheese Pizza";
-        sauce = "Marinara Sauce";
+    }
+}
+
+public class NYStyleVeggiePizza extends Pizza {
+    public NYStyleVeggiePizza() {
+        name = "NY Style Veggie Pizza";
     }
 }
 
 //The Creator classes
 public abstract class PizzaStore {
     public Pizza orderPizza(String type) {
-        Pizza = createPizza(type);
+        Pizza pizza = createPizza(type);
         pizza.prepare();
         pizza.bake();
         return pizza;
@@ -86,12 +203,13 @@ public abstract class PizzaStore {
 
 public class NYPizzaStore extends PizzaStore {
     Pizza createPizza(String type) {
+        Pizza pizza = null;
         if (type.equalsIgnoreCase("cheese")) {
-            return new NYStyleCheesePizza();
+            pizza = new NYStyleCheesePizza();
         } else if (type.equalsIgnoreCase("veggie")) {
-            return new NYStyleVeggiePizza();
+            pizza = new NYStyleVeggiePizza();
         }
-        throw new IllegalArgumentException("No such pizza type");
+        return pizza;
     }
 }&lt;/code&gt;&lt;/pre&gt;
     &lt;/noscript&gt;
@@ -189,22 +307,36 @@ public class PepperoniPizza extends Pizza {
 }
 
 // Client code
-public class NYPizzaStore extends PizzaStore {
-    Pizza pizza = null;
-    PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
-    
-    if (item.equalsIgnoreCase("cheese")) {
-        pizza = new CheesePizza(ingredientFactory);
-        pizza.setName("New York Style Cheese Pizza");
-    } else if (item.equalsIgnoreCase("pepperoni")) {
-        pizza = new PepperoniPizza(ingredientFactory);
-        pizza.setName("New York Style Pepperoni Pizza");
+public abstract class PizzaStore {
+    public Pizza orderPizza(String type) {
+        Pizza pizza = createPizza(type);
+        pizza.prepare();
+        pizza.bake();
+        return pizza;
     }
-    return pizza;
+
+    // A factory method handles object creation and encapsulates it in a subclass
+    protected abstract Pizza createPizza(String type);
+}
+
+public class NYPizzaStore extends PizzaStore {
+    protected Pizza createPizza(String type) {
+        Pizza pizza = null;
+        PizzaIngredientFactory ingredientFactory = new NYPizzaIngredientFactory();
+        
+        if (item.equalsIgnoreCase("cheese")) {
+            pizza = new CheesePizza(ingredientFactory);
+            pizza.setName("New York Style Cheese Pizza");
+        } else if (item.equalsIgnoreCase("pepperoni")) {
+            pizza = new PepperoniPizza(ingredientFactory);
+            pizza.setName("New York Style Pepperoni Pizza");
+        }
+        return pizza;
+    }
 }&lt;/code&gt;&lt;/pre&gt;
     &lt;/noscript&gt;
 &lt;/div&gt;
-&lt;h3&gt;Factory Method and Abstract Factory compared:&lt;/h3&gt;
+&lt;h4&gt;Factory Method and Abstract Factory compared:&lt;/h4&gt;
 &lt;p&gt;Factory Method&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Provides an abstract interface for creating &lt;strong&gt;&lt;em&gt;one&lt;/em&gt;&lt;/strong&gt; product.&lt;/li&gt;
@@ -214,6 +346,11 @@ public class NYPizzaStore extends PizzaStore {
 &lt;ul&gt;
 &lt;li&gt;Provides an abstract interface for creating a &lt;strong&gt;&lt;em&gt;family&lt;/em&gt;&lt;/strong&gt; of products.&lt;/li&gt;
 &lt;li&gt;PizzaIngredientFactory is implemented as an Abstract Factory because we need to create families of products (the ingredients). Each subclass implements the ingredients using its own regional suppliers. Methods to create products are often implemented with a Factory Method.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Reference&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://howtodoinjava.com/2012/10/22/singleton-design-pattern-in-java/"&gt;Singleton design pattern in java&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://googletesting.blogspot.com/2008/05/tott-using-dependancy-injection-to.html"&gt;Using Dependancy Injection to Avoid Singletons&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</summary></entry><entry><title>Distributed Unique Id Generation</title><link href="http://www.raydevblog.us/posts/2014/distributed-unique-id-generation.html" rel="alternate"></link><updated>2014-11-04T16:20:00-08:00</updated><author><name>Ray Chen</name></author><id>tag:www.raydevblog.us,2014-11-04:posts/2014/distributed-unique-id-generation.html</id><summary type="html">&lt;p&gt;Real-World Case Studies:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Flickr needs globally unique primary keys for their MySQL shards, because they need to migrate data between databases, and also their MySQL shards are built as master-master replicant pairs. &lt;a href="http://code.flickr.net/2010/02/08/ticket-servers-distributed-unique-primary-keys-on-the-cheap"&gt;1&lt;/a&gt;&lt;/li&gt;
