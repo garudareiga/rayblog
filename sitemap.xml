@@ -5,28 +5,28 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
 <loc>http://www.raydevblog.us/index.html</loc>
-<lastmod>2014-11-16T11:11:24-00:00</lastmod>
+<lastmod>2014-11-16T22:58:39-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/archives.html</loc>
-<lastmod>2014-11-16T11:11:24-00:00</lastmod>
+<lastmod>2014-11-16T22:58:39-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/tags.html</loc>
-<lastmod>2014-11-16T11:11:24-00:00</lastmod>
+<lastmod>2014-11-16T22:58:39-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
 
 <url>
 <loc>http://www.raydevblog.us/categories.html</loc>
-<lastmod>2014-11-16T11:11:24-00:00</lastmod>
+<lastmod>2014-11-16T22:58:39-00:00</lastmod>
 <changefreq>daily</changefreq>
 <priority>0.5</priority>
 </url>
@@ -60,7 +60,7 @@ xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 </url>
 
 <url>
-<loc>http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html</loc>
+<loc>http://www.raydevblog.us/posts/2014/cap-theorem-and-key-based-nosql-database-systems.html</loc>
 <lastmod>2014-10-15T21:00:00-00:00</lastmod>
 <changefreq>monthly</changefreq>
 <priority>0.5</priority>

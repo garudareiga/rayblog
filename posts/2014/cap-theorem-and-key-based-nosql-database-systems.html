@@ -2,7 +2,7 @@
 <html lang="en"
 >
 <head>
-    <title>CAP Theorem and NoSQL Database Systems - Ray's Thoughts and Writings</title>
+    <title>CAP Theorem and Key-based NoSQL Database Systems - Ray's Thoughts and Writings</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
@@ -10,10 +10,10 @@
 
 
 
-<link rel="canonical" href="http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html">
+<link rel="canonical" href="http://www.raydevblog.us/posts/2014/cap-theorem-and-key-based-nosql-database-systems.html">
 
         <meta name="author" content="Ray Chen" />
-        <meta name="description" content="CAP Theorem CAP is an abbreviation for consistency, availability, and partition tolerance. The CAP Theorem states that in a distributed system, you can have only two of these properties, but not all three at once. One of them must be sacrificed. Consistency A read request in a distributed system sees ..." />
+        <meta name="description" content="CAP Theorem CAP is an abbreviation for Consistency, Availability, and Partition tolerance. The CAP Theorem states that in a distributed system, you can have only two of these properties, but not all three at once. One of them must be sacrificed. Consistency A read request in a ..." />
 
 
 
@@ -79,10 +79,10 @@ Ray's Thoughts and Writings            </a>
         <article>
             <header class="page-header">
                 <h1>
-                    <a href="http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html"
+                    <a href="http://www.raydevblog.us/posts/2014/cap-theorem-and-key-based-nosql-database-systems.html"
                        rel="bookmark"
-                       title="Permalink to CAP Theorem and NoSQL Database Systems">
-                        CAP Theorem and NoSQL Database Systems
+                       title="Permalink to CAP Theorem and Key-based NoSQL Database Systems">
+                        CAP Theorem and Key-based NoSQL Database Systems
                     </a>
                 </h1>
             </header>
@@ -101,7 +101,7 @@ Ray's Thoughts and Writings            </a>
 </footer><!-- /.post-info -->                    </div>
                 </div>
                 <h2>CAP Theorem</h2>
-<p>CAP is an abbreviation for consistency, availability, and partition tolerance. The <a href="http://en.wikipedia.org/wiki/CAP_theorem">CAP Theorem</a> states that in a distributed system, you can have only two of these properties, but not all three at once. One of them must be sacrificed. </p>
+<p>CAP is an abbreviation for <strong>C</strong>onsistency, <strong>A</strong>vailability, and <strong>P</strong>artition tolerance. The <a href="http://en.wikipedia.org/wiki/CAP_theorem">CAP Theorem</a> states that in a distributed system, you can have only two of these properties, but not all three at once. One of them must be sacrificed. </p>
 <h4>Consistency</h4>
 <p>A read request in a distributed system sees all previously completed writes. Traditional ways to achieve this in relational database systems are distributed transactions. </p>
 <h4>Availability</h4>
@@ -112,29 +112,33 @@ Ray's Thoughts and Writings            </a>
 <p>Given completely unreliable networks, we must tolerate partitions in a distributed system. It's considered impossible to offer both full consistency and 100% availability at the same time, there will always be trade-offs involved. </p>
 <ul>
 <li>CP - Consistency/Partition Tolerance: choose consistency over availability when your business requirements dictate atomic reads and writes.</li>
-<li>AP - Availability/Partition Tolerance: choose availability over consistency when your business requirements allow for some flexibility and the system needs to continue to function in spite of external errors.
-I
-The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guide to NoSQL Systems"</a> offers a quick overview of the major trade-offs involved with relational and NoSQL database systems.
-<img alt="Alt text" src="http://www.raydevblog.us/images/nosql.png" /></li>
+<li>AP - Availability/Partition Tolerance: choose availability over consistency when your business requirements allow for some flexibility and the system needs to continue to function in spite of external errors.</li>
 </ul>
+<p>The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guide to NoSQL Systems"</a> offers a quick overview of the major trade-offs involved with relational and NoSQL database systems as follows:
+<img alt="Alt text" src="http://www.raydevblog.us/images/nosql.png" /></p>
 <h2>Key-based NoSQL Database Systems</h2>
-<p>The data model of a database specifies how data is logically organized. Its query model dictates how the data can be retrieved and updated. Common data models are the relational model, key-based model, or various graph models. Query languages include SQL, key lookups, and MapReduce <a href="http://aosabook.org/en/nosql.html">1</a>.</p>
+<p>The <strong>data model</strong> of a database specifies how data is logically organized. Its <strong>query model</strong> dictates how the data can be retrieved and updated. Common data models are the relational model, key-based model, or various graph models. Query languages include SQL, key lookups, and MapReduce <a href="http://aosabook.org/en/nosql.html">1</a>. NoSQL systems combine different data and query models, resulting in different architectures.</p>
 <p>Key-based NoSQL systems restrict lookups on a dataset to a single key field. The key-based lookup model is beneficial because the database has a consistent query pattern - the entire workload consists of key lookups whose performance is relatively uniform and predictable.</p>
+<p>Let's quickly look at the data associated with each key. Various NoSQL systems offer different solutions.</p>
 <h4>Key-Value Stores</h4>
-<p>In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value containing arbitrary data. The key-value store has no knowledge of the contents of its payload, and it might map the key to a <a href="http://en.wikipedia.org/wiki/Binary_large_object">blob</a> containing JSON or binary format. In order to use structured formats to store complex data for a key, developers must operate against the data in the application space. Key-value stores shine in the simplicity of their query model.</p>
+<p>The simplest form of NoSQL store is a key-value store.
+In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value containing arbitrary data, which is a <a href="http://en.wikipedia.org/wiki/Binary_large_object">blob</a> containing JSON or binary format. The key-value store has no knowledge of the contents of its payload. In order to use structured formats to store complex data for a key, developers must operate against the data in application space. </p>
+<p>Key-value stores shine in the simplicity of their query model, usually consisting of set, get, and delete primitives, but discard the ability to add simple in-database filtering capabilities due to the opacity of their values.</p>
 <h4>Key-Data Structure Stores</h4>
 <p>Key-data structure stores assign each value a type. In Redis, the available types are integer, string, list, set, and sorted set. By providing simple type-specific functionality while avoiding multi-key operations such as aggregation or joins, Redis balances functionality and performance.</p>
 <h4>Key-Document Stores</h4>
-<p>Key-document stores, such as CouchDB9, MongoDB10, and Riak11, map a key to some document that contains structured information. These systems store documents in a JSON or JSON-like format. They store lists and dictionaries, which can be embedded recursively inside one-another.</p>
+<p>Key-document stores, such as CouchDB, MongoDB, and Riak, map a key to some document that contains structured information. These systems store documents in a JSON or JSON-like format. They store lists and dictionaries, which can be embedded recursively inside one-another.</p>
+<p>The freedom and complexity of document stores is a double-edged sword: application developers have a lot of freedom in modeling their documents, but application-based query logic can become exceedingly complex.</p>
 <h4>BigTable Column Family Stores</h4>
-<p>HBase and Cassandra are based on Google's BigTable. In this model, a key identifies a row, which contains data stored in one or more Column Families (CFs). Within a CF, each row can contain multiple columns. The values within each column are timestamped, so that several versions of a row-column mapping can live within a CF. Conceptually, one can think of Column Families as storing complex keys of the form (row ID, CF, column, timestamp), mapping to values which are sorted by their keys.</p>
+<p>HBase and Cassandra are based on Google's BigTable. In this model, a key identifies a row, which contains data stored in one or more Column Families (CFs). Within a CF, each row can contain multiple columns. The values within each column are timestamped, so that several versions of a row-column mapping can live within a CF. </p>
+<p>Conceptually, one can think of Column Families as storing complex keys of the form (row ID, CF, column, timestamp), mapping to values which are sorted by their keys. The model is particularly good at modeling historical data with timestamps.</p>
 <h2>Data Durability</h2>
-<p>Different NoSQL systems make different data durability guarantees in order to improve performance. No all NoSQL systems protect us against failures.</p>
+<p>Data durability is in tension with performance. Different NoSQL systems make different data durability guarantees in order to improve performance. No all NoSQL systems protect us against failures.</p>
 <h4>Single-server Durability</h4>
 <p>The simplest form of durability is a single-server durability. The single-server durability usually means writing the changed data to disk, which often bottlenecks your workload. To ensure efficient single-server durability, we need minimize the number of random writes between <em>fsync</em> system calls, and maximize the number of sequential writes per hard drive.</p>
 <ul>
 <li>Control <em>fsync</em> frequency: Memcached offers no on-disk durability in exchange for extremely fast in-memory operations. Redis offers developers several options for when to call <em>fsync</em>. </li>
-<li>Increase sequential writes by logging: To reduce random writes, systems such as Cassandra, HBase, Redis, and Riak append update operations to a sequentially-written log file, which is frequently fsynced.</li>
+<li>Increase sequential writes by logging: To reduce random writes, systems such as Cassandra, HBase, Redis, and Riak append update operations to a sequentially-written log file, which is frequently fsynced. The log is treated as the ground-truth state of the database after a crash.</li>
 </ul>
 <h4>Multi-server Durability</h4>
 <p>Many NoSQL systems offer multi-server durability by copying data across nodes.</p>
@@ -143,12 +147,14 @@ The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guid
 <li>MongoDB provides the notion of replica sets, where some number of servers are responsible for storing each document. It gives developers the option of ensuring that all replicas have received updates, or to proceed without ensuring that replicas have the most recent data.</li>
 <li>HBase receives multi-server durability through HDFS. All writes are replicated to two or more HDFS nodes before returning control to the user, ensuring multi-server durability.</li>
 <li>Riak, Cassandra, and Voldemort support quorum-based configurable forms of replication. They allow the user to specify $N$, the number of nodes which should have a copy of the data, and $W &lt; N$, the number of machines that should confirm the data has been written before returning control to the user.</li>
+<li>Cassandra, HBase, and Voldemort support multi-server replication across data centers. Updates are streamed across data centers without confirmation to back up data centers.</li>
 </ul>
 <h2>Horizontal Scalability</h2>
-<h4>Do Not Shard</h4>
-<p>There are two ways to scale without sharding: <strong>read replicas</strong> and <strong>caching</strong>. Read replicas and caching allow us to scale up our read-heave workloads.</p>
+<p>Sharding is the act of splitting your read and write wordload across multiple nodes to scale out your system. </p>
+<h4>Do Not Shard Until You Have To</h4>
+<p>There are two ways to scale without sharding: <strong>read replicas</strong> and <strong>caching</strong>. Read replicas and caching allow us to scale up our read-heavy workloads.</p>
 <ul>
-<li>Read replicas: Make copies of the data on multiple nodes. All write requests still go to a master node. Read requests go to nodes which replicate the data, and are often slightly stale with respect to the data on the write master.</li>
+<li>Read replicas: Make copies of the data on multiple nodes. All write requests still go to a master node. Read requests go to nodes which replicate the data, and are often slightly stale with respect to the data on the master node.</li>
 <li>Caching: Memcached dedicates blocks of memory on multiple nodes to cache data from data storage. Memcached clients distribute load across Memcached installations on different nodes.</li>
 </ul>
 <h4>Consistent Hashing</h4>
@@ -206,8 +212,8 @@ The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guid
             /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
             var disqus_shortname = 'garudareiga'; // required: replace example with your forum shortname
 
-                    var disqus_identifier = 'cap-theorem-and-nosql-database-systems';
-                var disqus_url = 'http://www.raydevblog.us/posts/2014/cap-theorem-and-nosql-database-systems.html';
+                    var disqus_identifier = 'cap-theorem-and-key-based-nosql-database-systems';
+                var disqus_url = 'http://www.raydevblog.us/posts/2014/cap-theorem-and-key-based-nosql-database-systems.html';
 
             var disqus_config = function () {
                 this.language = "en";
@@ -270,18 +276,13 @@ The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guid
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/json.html">
                                 json
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
+                                consistent hashing
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -290,8 +291,23 @@ The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guid
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
+                                two-phase commit
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/machine-learning.html">
                                 machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -302,16 +318,6 @@ The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guid
                         <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/logging.html">
                                 logging
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
-                                two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/consistent-hashing.html">
-                                consistent hashing
                             </a>
                         </li>
                     </ul>
