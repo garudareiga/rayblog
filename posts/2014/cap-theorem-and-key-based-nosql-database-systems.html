@@ -143,10 +143,10 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
 <h4>Multi-server Durability</h4>
 <p>Many NoSQL systems offer multi-server durability by copying data across nodes.</p>
 <ul>
-<li>Redis takes a traditional <strong>master-slave</strong> approach to replicating data. All operations executed against a master are communicated in a log-like fashion to slave machines, which replicate the operations on their own hardware. If a master fails, a slave can step in and serve the data from the state of the operation log that it received from the master. CouchDB facilitates a similar form of directional replication.</li>
+<li>Redis takes a traditional <strong>master-slave</strong> approach to replicating data. All operations executed against a master are communicated in a log-like fashion to slaves, which replicate the operations on their own hardware. If a master fails, a slave can step in and serve the data from the state of the operation log that it received from the master. CouchDB facilitates a similar form of directional replication.</li>
 <li>MongoDB provides the notion of replica sets, where some number of servers are responsible for storing each document. It gives developers the option of ensuring that all replicas have received updates, or to proceed without ensuring that replicas have the most recent data.</li>
 <li>HBase receives multi-server durability through HDFS. All writes are replicated to two or more HDFS nodes before returning control to the user, ensuring multi-server durability.</li>
-<li>Riak, Cassandra, and Voldemort support quorum-based configurable forms of replication. They allow the user to specify $N$, the number of nodes which should have a copy of the data, and $W &lt; N$, the number of machines that should confirm the data has been written before returning control to the user.</li>
+<li>Riak, Cassandra, and Voldemort support quorum-based configurable forms of replication. They allow the user to specify $N$, the number of nodes which should have a copy of the data, and $W &lt; N$, the number of nodes that should confirm the data has been written before returning control to the user.</li>
 <li>Cassandra, HBase, and Voldemort support multi-server replication across data centers. Updates are streamed across data centers without confirmation to back up data centers.</li>
 </ul>
 <h2>Horizontal Scalability</h2>
@@ -157,11 +157,25 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
 <li>Read replicas: Make copies of the data on multiple nodes. All write requests still go to a master node. Read requests go to nodes which replicate the data, and are often slightly stale with respect to the data on the master node.</li>
 <li>Caching: Memcached dedicates blocks of memory on multiple nodes to cache data from data storage. Memcached clients distribute load across Memcached installations on different nodes.</li>
 </ul>
+<h4>Sharding Through Coordinators</h4>
+<p>Twitter built the notions of sharding and replication into a coordinating framework called <a href="https://github.com/twitter/gizzard">Gizzard</a>. Gizzard is designed to replicat data acroos any network-available data storage service SQL or NoSQL. It handles partitioning by mapping ranges of data to particular shards, and these mappings are stored in a forwarding table. </p>
 <h4>Consistent Hashing</h4>
-<h4>Range Partitioning</h4>
-<p>In the range partitioning approach, some nodes in our system keep metadata about which nodes contain which key ranges. This range partitioning splits the keyspace into ranges, which each key range being managed by one machine and potentially replicated to others. </p>
+<p>Good hash functions distribute a set of keys in a uniform manner, which make them a powerful tool for distributing key-value pairs among multiple nodes. The <strong>consistent hashing</strong> technique was first adopted by Amazon's Dynamo, and then it appears in Cassandra, Voldemort, and Riak.  </p>
+<p>Consistent hashing work as follows. Say we have a hash function H that maps keys to the range of [0, 2^128] (e.g. MD5 hash). Given a list of nodes, hash them to integers in the range by taking each node's unique identifier (e.g. IP address). To map a key to a server, we hash it to a single integer, move clockwise on the consistent hash ring until finding the first node it encounters. </p>
+<p><img alt="Alt text" src="http://www.raydevblog.us/images/consistent_hash_ring.gif" /></p>
+<p>Replication for multi-server durability is achieved by passing the keys and values in one server's assigned range to the servers following it in the ring. For example, with a replication factor of 3, keys mapped to server A will be stored on servers A, B, C.</p>
+<p>Hashing requires many servers before it distributed evenly. To achieve better load balancing when we often start with a small number of servers, we create <strong>virtual nodes</strong> per physical server. Each virtual node hashes to a different value, giving the physical node more opportunities to manage keys distributed to different parts of the keyspace. If we add or remove a node from the list, only a small proportion of keys end up mapping to different other nodes.</p>
+<p><img alt="Alt text" src="http://www.raydevblog.us/images/virtual_nodes.gif" /></p>
+<p>There are a few options on where to keep consistent hash ring.</p>
 <ul>
-<li>HBase employs Google BigTable's hierarchical approach to range-partitioning. THe master server maintains the tablet assignment in a metadata table. The metadata table is also sharded into tablets, when this metadata gets large. Underlying tablet data is stored in HDFS, and HDFS handles data replication and consistency among replicas. ZooKeeper manage secondary master servers and tablet server reassignment.</li>
+<li>Central point of coordination. </li>
+<li>No central point of coordination - full duplication.</li>
+<li>No central point of coordination - partial duplication.</li>
+</ul>
+<h4>Range Partitioning</h4>
+<p>In the range partitioning approach, some nodes in our system keep metadata about which nodes contain which key ranges. This range partitioning splits the keyspace into ranges, which each key range being managed by one node and potentially replicated to others. </p>
+<ul>
+<li>HBase employs Google BigTable's hierarchical approach to range-partitioning. THe master maintains the tablet assignment in a metadata table. The metadata table is also sharded into tablets, when this metadata gets large. Underlying tablet data is stored in HDFS, and HDFS handles data replication and consistency among replicas. ZooKeeper manage secondary master servers and tablet server reassignment.</li>
 <li>MongoDB use configuration nodes to specify which storage nodes is responsible for which key ranges. These configuration nodes stay in sync through a protocol called <strong>two-phase commit</strong>. Storage nodes are arranged in replica sets to handle replication.</li>
 </ul>
 <h2>Consistency</h2>
@@ -170,6 +184,7 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
 <ul>
 <li><a href="http://robertgreiner.com/2014/08/cap-theorem-revisited">CAP Theorem: Revisited</a></li>
 <li><a href="http://aosabook.org/en/nosql.html">The NoSQL Ecosystem</a></li>
+<li><a href="http://ivoroshilin.com/2013/07/15/distributed-caching-under-consistent-hashing/">How automatic sharding works or consistent hashing under the hood</a></li>
 </ul><script type= "text/javascript">
     if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
         var mathjaxscript = document.createElement('script');
@@ -266,13 +281,33 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
                             </a>
                         </li>
                         <li class="list-group-item tag-2">
+                            <a href="http://www.raydevblog.us/tag/java.html">
+                                java
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-2">
                             <a href="http://www.raydevblog.us/tag/python.html">
                                 python
                             </a>
                         </li>
-                        <li class="list-group-item tag-2">
-                            <a href="http://www.raydevblog.us/tag/java.html">
-                                java
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
+                                bloom filter
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -286,11 +321,6 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
                                 two-phase commit
                             </a>
@@ -301,23 +331,8 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/bloom-filter.html">
-                                bloom filter
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
                             </a>
                         </li>
                     </ul>
