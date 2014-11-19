@@ -115,7 +115,7 @@ Ray's Thoughts and Writings            </a>
 <li>AP - Availability/Partition Tolerance: choose availability over consistency when your business requirements allow for some flexibility and the system needs to continue to function in spite of external errors.</li>
 </ul>
 <p>The <a href="http://blog.nahurst.com/visual-guide-to-nosql-systems">"Visual Guide to NoSQL Systems"</a> offers a quick overview of the major trade-offs involved with relational and NoSQL database systems as follows:
-<img alt="Alt text" src="http://www.raydevblog.us/images/nosql.png" /></p>
+<img alt="Alt text" src="http://www.raydevblog.us/images/nosql.jpg" /></p>
 <h2>Key-based NoSQL Database Systems</h2>
 <p>The <strong>data model</strong> of a database specifies how data is logically organized. Its <strong>query model</strong> dictates how the data can be retrieved and updated. Common data models are the relational model, key-based model, or various graph models. Query languages include SQL, key lookups, and MapReduce <a href="http://aosabook.org/en/nosql.html">1</a>. NoSQL systems combine different data and query models, resulting in different architectures.</p>
 <p>Key-based NoSQL systems restrict lookups on a dataset to a single key field. The key-based lookup model is beneficial because the database has a consistent query pattern - the entire workload consists of key lookups whose performance is relatively uniform and predictable.</p>
@@ -161,30 +161,53 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
 <p>Twitter built the notions of sharding and replication into a coordinating framework called <a href="https://github.com/twitter/gizzard">Gizzard</a>. Gizzard is designed to replicat data acroos any network-available data storage service SQL or NoSQL. It handles partitioning by mapping ranges of data to particular shards, and these mappings are stored in a forwarding table. </p>
 <h4>Consistent Hashing</h4>
 <p>Good hash functions distribute a set of keys in a uniform manner, which make them a powerful tool for distributing key-value pairs among multiple nodes. The <strong>consistent hashing</strong> technique was first adopted by Amazon's Dynamo, and then it appears in Cassandra, Voldemort, and Riak.  </p>
-<p>Consistent hashing work as follows. Say we have a hash function H that maps keys to the range of [0, 2^128] (e.g. MD5 hash). Given a list of nodes, hash them to integers in the range by taking each node's unique identifier (e.g. IP address). To map a key to a server, we hash it to a single integer, move clockwise on the consistent hash ring until finding the first node it encounters. </p>
+<p>Consistent hashing works as follows. Say we have a hash function $H$ that maps keys to the range of [0, 2^128] (e.g. MD5 hash). Given a list of $N$ nodes, hash them to integers in the range by taking each node's unique identifier (e.g. IP address). To map a key to a server, we hash it to a single integer, move clockwise on the consistent hash ring until finding the first node it encounters.</p>
 <p><img alt="Alt text" src="http://www.raydevblog.us/images/consistent_hash_ring.gif" /></p>
 <p>Replication for multi-server durability is achieved by passing the keys and values in one server's assigned range to the servers following it in the ring. For example, with a replication factor of 3, keys mapped to server A will be stored on servers A, B, C.</p>
-<p>Hashing requires many servers before it distributed evenly. To achieve better load balancing when we often start with a small number of servers, we create <strong>virtual nodes</strong> per physical server. Each virtual node hashes to a different value, giving the physical node more opportunities to manage keys distributed to different parts of the keyspace. If we add or remove a node from the list, only a small proportion of keys end up mapping to different other nodes.</p>
+<p>Hashing requires many nodes before it distributed evenly. We often start with a small number of physical nodes, so we create a number of virtual nodes to achieve better load balancing. The hash-space is divided into $P$ evenly sized partitions, and assign $P/N$ partitions per physical node. When a physical node joins, all data from partitions of other physical nodes are uniformly get assigned to the new physical node. When a physical node leaves, it gives back to remaining nodes. The number of virtual nodes is picked once during building of the ring and never changes over the lifetime of the cluster. </p>
 <p><img alt="Alt text" src="http://www.raydevblog.us/images/virtual_nodes.gif" /></p>
-<p>There are a few options on where to keep consistent hash ring.</p>
+<p>How should the clients find and talk to the nodes in the consistent hashing ring? There are a few options on how we keep track of consistent hash ring.</p>
 <ul>
-<li>Central point of coordination. </li>
-<li>No central point of coordination - full duplication.</li>
-<li>No central point of coordination - partial duplication.</li>
+<li>Centralized coordination: A dedicated machine keeps track of a ring configuration and works as a central load-balancer which routes client's request to appropriate nodes.</li>
+<li>Full decentralized configuration: Each node keeps a full copy of the ring configuration. Join/Leave of a node from the ring requires notification of all other nodes in the ring. This option is used in Amazon Dynamo.</li>
+<li>Distributed configuration with an external nanny: The overall system would depend on an independent monitor of the ring. Clients keep a local copy of the ring configuration, and periodically sync with the external monitor. Zookeeper is good at this kind of thing.</li>
 </ul>
 <h4>Range Partitioning</h4>
-<p>In the range partitioning approach, some nodes in our system keep metadata about which nodes contain which key ranges. This range partitioning splits the keyspace into ranges, which each key range being managed by one node and potentially replicated to others. </p>
+<p>In the range partitioning approach, some nodes in our system keep metadata about which nodes contain which key ranges. This metadata is consulted to route key and range lookups to the appropriate servers. This range partitioning splits the keyspace into ranges, which each key range being managed by one node and potentially replicated to others. Two keys that are next to each other in the key's sort order are likely to appear in the same partition.</p>
 <ul>
-<li>HBase employs Google BigTable's hierarchical approach to range-partitioning. THe master maintains the tablet assignment in a metadata table. The metadata table is also sharded into tablets, when this metadata gets large. Underlying tablet data is stored in HDFS, and HDFS handles data replication and consistency among replicas. ZooKeeper manage secondary master servers and tablet server reassignment.</li>
-<li>MongoDB use configuration nodes to specify which storage nodes is responsible for which key ranges. These configuration nodes stay in sync through a protocol called <strong>two-phase commit</strong>. Storage nodes are arranged in replica sets to handle replication.</li>
+<li>HBase employs Google BigTable's hierarchical approach to range-partitioning. The master maintains the tablet assignment in a metadata table. When this metadata gets large, the metadata table is also sharded into tablets that map key ranges to tablets and tablet servers responsible for those ranges. Underlying tablet data is stored in HDFS, and HDFS handles data replication and consistency among replicas. ZooKeeper manage secondary master servers and tablet server reassignment.</li>
+<li>In MongoDB, several configuration nodes store and manage the routing tables that specify which storage nodes is responsible for which key ranges. These configuration nodes stay in sync through a protocol called two-phase commit. Storage nodes are arranged in replica sets to handle replication.</li>
+<li>Cassandra provides an order-preserving partitioner. Rather than hashing a key-value pair onto the consistent hashing ring, the key is simply mapped onto the server which controls the range in which the key naturally fits.</li>
 </ul>
-<h2>Consistency</h2>
-<p>There are two major approaches to data consistency in the NoSQL systems. The first is <strong>strong consistency</strong>, where all replicas remain in sync. The second is <strong>eventual consistency</strong>, where replicas are allowed to get out of sync, but eventually catch up with one-another.</p>
+<h3>Consistency</h3>
+<p>Keeping replicas of data on multiple machines consistent with on-another is hard. There are two major approaches to data consistency in the NoSQL ecosystem: <strong>strong consistency</strong> (all replicas remain in sync) and eventual consistency (replicas are allowed to get out of sync, but eventually catch up with one-another). Other approaches exist, such as the relaxed consistency and relaxed availability appoach presented in Yahoo!'s PNUTS system.</p>
+<h4>Strong Consistency</h4>
+<p>Say we replicate a key on $N$ machines. Some machines, perhaps one of the $N$, serves as a coordinator for each user request. The coordinator ensures that a certain number of the $N$ machines has received and acknowledged each request. When a write or update occurs to a key, the coordinator does not confirm with the user that the write occurred util $W$ replicas confirm that they have received the update. When a user wants to read the value for some key, the coordinator responds when at least R have responded with the same value. We say that the system exemplifies strong consistency if $R + W &gt; N$. </p>
+<p>When $W$ replicas do not respond to a write request, or $R$ replicas do not respond to a read request with a consistent response, the coordinator can timeout eventually and send the user an error, or wait until the situation correct itself. Either way, the system is considered unavailable for that request for at least some time.</p>
+<p>You choice of $R$ and $W$ affect how many machines can act strangely before your system becomes unavailable for different actions on a key. A common choice is $R + W = N + 1$, the minimum required for strong consistency while still allowing for temporary disagreement between replicas. Many strong consistency systems opt for $W=N$ and $R=1$, since they do not have to design for nodes going out of sync.</p>
+<h4>Eventual Consistency</h4>
+<p>Dynamo-inspired system, including Cassandra, Riak and Voldemort, allow the user to specify $N$, $R$, and $W$ to their needs, even if $R + W &lt;= N$. User can achieve either strong or eventual consistency. Let's find out how various systems determine that data has gotten out of sync, how they synchronize replicas, and how to speed up the synchronization process.</p>
+<h5>Versioning and Conflicts</h5>
+<p>Because two replicas might see two different versions of a value for some key, data versioning and conflict detection is important. Dynamo uses a type of versioning called <strong>vector clocks</strong>. </p>
+<p>A vector clock is a vector assigned to each key which contains a counter for each replica. Each time a replica modifies a key, it increments its counter in the vector. Say we have two replicas A and B. If vector clock counters in A are all less than the ones in B, then A has a stale version and can overwrite its own copy with B's. If A and B have vector clocks in which some counters are greater than others in both clocks, we identify a conflict.</p>
+<h5>Conflict Resolution</h5>
+<p>Conflict resolution varies across the different systems.
+- Dynamo and Voldemort leave conflict resolution to the application using the storage system.
+- Cassandra, which stores a timestamp on each key, uses the most recently timestamped version of a key when two versions are in conflict.</p>
+<h5>Read Repair</h5>
+<p>When the coordinator identifies a conflict on read, even if a consistent value has been returned to the user, the coordinator starts conflict-resolution protocols between conflicted replicas. </p>
+<h5>Hinted Handoff</h5>
+<p>If one of the replicas for a key does not respond to a write request, another node is selected to temporarily take over its write workload. Writes for the unavailable node are kept separately, and when the backup node notices the previously unavailable node become available, it forward all of the writes to the newly available replica. </p>
+<h5>Anti-Entropy</h5>
+<p>In anti-entropy, replicas exchange <strong>Merkel Trees</strong> to identify parts of their replicated key ranges which are out of sync. A Merkel tree is a hierarchical hash verification: if the hash over the entire keyspace is not the same between two replicas, they will exchange hashes of smaller and smaller portions of the replicated keyspace until the out-of-sync keys are identified. This approach reduces unncessary data transfer between replicas which contain mostly similar data.</p>
+<h4>Gossip</h4>
+<p>System employs gossip protocol to keep track of nodes. Periodically, a node will pick a random node it once communicated with to exchange of the health of the other nodes in the system. If provoiding this exchange, nodes learn which other nodes are down, and know where to route clients in search of a key.</p>
 <h3>References</h3>
 <ul>
 <li><a href="http://robertgreiner.com/2014/08/cap-theorem-revisited">CAP Theorem: Revisited</a></li>
 <li><a href="http://aosabook.org/en/nosql.html">The NoSQL Ecosystem</a></li>
 <li><a href="http://ivoroshilin.com/2013/07/15/distributed-caching-under-consistent-hashing/">How automatic sharding works or consistent hashing under the hood</a></li>
+<li><a href="http://highlyscalable.wordpress.com/2012/09/18/distributed-algorithms-in-nosql-databases/">Distributed Algorithms in NoSQL Databases</a></li>
 </ul><script type= "text/javascript">
     if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
         var mathjaxscript = document.createElement('script');
@@ -291,18 +314,8 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/mongodb.html">
-                                mongodb
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/data-structure.html">
-                                data structure
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/logging.html">
-                                logging
+                            <a href="http://www.raydevblog.us/tag/json.html">
+                                json
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -311,8 +324,28 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/json.html">
-                                json
+                            <a href="http://www.raydevblog.us/tag/data-structure.html">
+                                data structure
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
+                                machine learning
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/mongodb.html">
+                                mongodb
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/logging.html">
+                                logging
+                            </a>
+                        </li>
+                        <li class="list-group-item tag-4">
+                            <a href="http://www.raydevblog.us/tag/distributed.html">
+                                distributed
                             </a>
                         </li>
                         <li class="list-group-item tag-4">
@@ -323,16 +356,6 @@ In key-value stores, such as Dynamo and Voldemort, each key is mapped to a value
                         <li class="list-group-item tag-4">
                             <a href="http://www.raydevblog.us/tag/two-phase-commit.html">
                                 two-phase commit
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/machine-learning.html">
-                                machine learning
-                            </a>
-                        </li>
-                        <li class="list-group-item tag-4">
-                            <a href="http://www.raydevblog.us/tag/distributed.html">
-                                distributed
                             </a>
                         </li>
                     </ul>
