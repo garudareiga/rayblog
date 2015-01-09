@@ -24,3 +24,17 @@ Consider the **Duck** class design using strategy pattern.
 ### Observer Design Pattern
 
 The **Observer Pattern** defines a one-to-many dependency between objects so that when one object changes state, al of its dependents are notified and updated automatically.
+
+Design Principle: 
+
+- Strive for loosely coupled designs between objects that interact.
+
+The Observer Pattern provides an object design where subjects and observers are loosely coupled. Loosely coupled designs allow us to build flexible OO systems that can handle change because they minimize the interdependency between objects.
+
+[gist:id=31cac1535487dcdbb3de,file=observer-pattern.java]
+
+Java has built-in support for Observer Pattern in several of its APIs. The most general is the Observer interface and the Observable class in the java.util package. We can implement either a push or pull style of update to our observers.
+
+- For an Object to become an Observer, implement the Observer interface.
+- For the Observable to send notifications, must call the *setChanged()* method to signify that the state has changed in your object. Then, call one of two *notifyObservers()* methods.
+- For an Observer to receive notifications, implement the update method.
