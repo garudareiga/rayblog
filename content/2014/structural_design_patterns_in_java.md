@@ -13,5 +13,3 @@ Design Principle:
 
 Consider the **Duck** class design using strategy pattern.
 
-[gist:id=227649a29eb478234c12,file=decorate-pattern.java]
-

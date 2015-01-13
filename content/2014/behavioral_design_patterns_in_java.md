@@ -38,3 +38,11 @@ Java has built-in support for Observer Pattern in several of its APIs. The most 
 - For an Object to become an Observer, implement the Observer interface.
 - For the Observable to send notifications, must call the *setChanged()* method to signify that the state has changed in your object. Then, call one of two *notifyObservers()* methods.
 - For an Observer to receive notifications, implement the update method.
+
+### Template Method Design Pattern
+
+The **Template Method Pattern** defines the skeleton of an algorithm in a method, deferring some steps
+to subclasses. Template Method lets subclasses redefine certain steps of an algorithm without changing
+the algorithm's structure.
+
+[gist:id=37301e7c5175db5d8805,file=template-method-pattern.java]
